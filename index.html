@@ -40,7 +40,7 @@ button{border:0;border-radius:13px;padding:12px 14px;font-size:14px;font-weight:
   <div class="app-icon">✚</div>
   <div><h1>কহিনুর কেমিক্যাল পিএলসি</h1><p>অর্ডার অটোমেশন</p></div>
   <div class="spacer"></div>
-  <button class="icon-btn" onclick="openHistory()" title="অর্ডার হিস্ট্রি">◷</button>
+  <button class="icon-btn" onclick="openOnlineSetup()" title="অনলাইন সেটআপ">☁</button><button class="icon-btn" onclick="openHistory()" title="অর্ডার হিস্ট্রি">◷</button>
  </div>
 </header>
 
@@ -89,6 +89,12 @@ button{border:0;border-radius:13px;padding:12px 14px;font-size:14px;font-weight:
  </div>
  <div id="emptyOrder" class="empty">এখনও কোনো পণ্য যোগ করা হয়নি।</div>
  <div class="total-box"><div class="total"><span>মোট টাকা</span><span>৳ <span id="grandTotal">0.00</span></span></div><div class="words">কথায়: <b id="amountWords">শূন্য টাকা মাত্র</b></div></div>
+</section>
+
+<section class="card no-print">
+ <div class="section-title"><h2>অনলাইন অর্ডার</h2><span id="onlineStatus">লোকাল</span></div>
+ <div class="notice">☁ Web App URL সেট করলে অর্ডার আপনার কোম্পানির অনলাইন Google Sheet-এও জমা হবে।</div>
+ <button class="secondary" style="width:100%;margin-top:9px" onclick="openOnlineSetup()">⚙ অনলাইন সেটআপ</button>
 </section>
 
 <section class="card">
@@ -180,11 +186,14 @@ function setQty(i,v){let n=Math.max(0,Math.min(Number(v)||0,order[i].stock));ord
 function setBonus(i,v){order[i].bonus=Math.max(0,Number(v)||0);renderOrder()}
 function removeLine(i){order.splice(i,1);renderOrder()}
 function calc(){let t=order.reduce((s,p)=>s+p.qty*p.price,0);$('grandTotal').textContent=t.toFixed(2);$('amountWords').textContent=moneyBn(t)}
-function saveOrder(){
+async function saveOrder(){
  if(!$('shop').value.trim()){alert('দোকানের নাম লিখুন।');return}
  if(!order.length){alert('কমপক্ষে একটি পণ্য যোগ করুন।');return}
  const data={id:Date.now(),shop:$('shop').value.trim(),orderDate:$('orderDate').value,deliveryDate:$('deliveryDate').value,customer:$('customer').value.trim(),rep:$('rep').value.trim(),mobile:$('mobile').value.trim(),note:$('note').value.trim(),items:order,total:order.reduce((s,p)=>s+p.qty*p.price,0)};
- let arr=JSON.parse(localStorage.getItem(ORD)||'[]');arr.unshift(data);localStorage.setItem(ORD,JSON.stringify(arr.slice(0,100)));alert('অর্ডার সেভ হয়েছে।');openHistory();
+ let arr=JSON.parse(localStorage.getItem(ORD)||'[]');arr.unshift(data);localStorage.setItem(ORD,JSON.stringify(arr.slice(0,100)));
+ const api=localStorage.getItem('kohinoor_api_url')||'';
+ if(api){try{let iframe=document.getElementById('orderSubmitFrame');if(!iframe){iframe=document.createElement('iframe');iframe.id='orderSubmitFrame';iframe.name='orderSubmitFrame';iframe.style.display='none';document.body.appendChild(iframe)}const form=document.createElement('form');form.method='POST';form.action=api;form.target='orderSubmitFrame';form.style.display='none';const fields={id:data.id,shop:data.shop,orderDate:data.orderDate,deliveryDate:data.deliveryDate,customer:data.customer,rep:data.rep,mobile:data.mobile,total:data.total,note:data.note,items:JSON.stringify(data.items)};Object.entries(fields).forEach(([k,v])=>{const i=document.createElement('input');i.name=k;i.value=v??'';form.appendChild(i)});document.body.appendChild(form);form.submit();setTimeout(()=>form.remove(),1200);alert('অর্ডার সেভ হয়েছে এবং অনলাইনে পাঠানো হয়েছে।');openHistory();return}catch(e){alert('অর্ডার ফোনে সেভ হয়েছে, অনলাইনে পাঠানো যায়নি।');openHistory();return}}
+ alert('অর্ডার ফোনে সেভ হয়েছে। অনলাইন URL সেট করলে কোম্পানির কাছে যাবে।');openHistory();
 }
 function newOrder(){if(confirm('নতুন অর্ডার শুরু করবেন?')){order=[];$('shop').value='';$('customer').value='';$('rep').value='';$('mobile').value='';$('note').value='';$('deliveryDate').value='';$('orderDate').value=today();renderOrder()}}
 async function shareOrder(){
@@ -216,6 +225,14 @@ renderProducts();renderOrder();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 <script>
+function updateOnlineStatus(){const u=localStorage.getItem('kohinoor_api_url')||'';const e=document.getElementById('onlineStatus');if(e){e.textContent=u?'অনলাইন ✓':'লোকাল';e.style.color=u?'#087f50':'#71807a'}const i=document.getElementById('apiUrl');if(i)i.value=u}
+function openOnlineSetup(){updateOnlineStatus();document.getElementById('onlineModal').classList.add('show')}
+function closeOnlineSetup(){document.getElementById('onlineModal').classList.remove('show')}
+function clearApiUrl(){localStorage.removeItem('kohinoor_api_url');updateOnlineStatus();document.getElementById('apiTest').textContent='URL মুছে দেওয়া হয়েছে।'}
+function saveApiUrl(){const u=document.getElementById('apiUrl').value.trim();if(!u){clearApiUrl();return}localStorage.setItem('kohinoor_api_url',u);updateOnlineStatus();document.getElementById('apiTest').textContent='✓ URL সেভ হয়েছে। এখন অর্ডার অনলাইনে যাবে।'}
+updateOnlineStatus();
+</script>
+<script>
 function updateDashboard(){
  const arr=JSON.parse(localStorage.getItem(ORD)||'[]');
  const total=order.reduce((s,p)=>s+p.qty*p.price,0);
@@ -233,5 +250,15 @@ const _newOrder=newOrder;
 newOrder=function(){_newOrder();updateDashboard()};
 updateDashboard();
 </script>
+<div id="onlineModal" class="modal">
+ <div class="modal-box">
+  <div class="section-title"><h2>অনলাইন সেটআপ</h2><button class="gray" onclick="closeOnlineSetup()">✕</button></div>
+  <p style="font-size:13px;color:#52615b">Google Apps Script Web App URL এখানে একবার বসান।</p>
+  <label>Web App URL<input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"></label>
+  <div class="toolbar" style="margin-top:12px"><button class="primary" onclick="saveApiUrl()">সেভ</button><button class="gray" onclick="clearApiUrl()">মুছুন</button></div>
+  <div id="apiTest" class="notice" style="margin-top:10px">URL সেট করা নেই।</div>
+ </div>
+</div>
+
 </body>
 </html>

@@ -3,114 +3,144 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b6b45">
+<meta name="theme-color" content="#087f50">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
-<title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
+<title>কহিনুর কেমিক্যাল — অর্ডার অটোমেশন</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Noto Sans Bengali",sans-serif;background:#f3f6f5;color:#17201c}
-header{background:#0b6b45;color:#fff;padding:22px 18px}header h1{margin:0 0 5px;font-size:25px}header p{margin:0;opacity:.9}
-main{max-width:1100px;margin:auto;padding:14px}.card{background:#fff;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 2px 14px #0000000d}
-h2{font-size:19px;margin:4px 0 14px;color:#0b6b45}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-label{display:block;font-weight:700;font-size:14px;color:#46534d}input,select,textarea{width:100%;padding:13px;border:1px solid #ccd7d2;border-radius:12px;font-size:16px;margin-top:6px;background:#fff}
-button{border:0;border-radius:12px;padding:12px 15px;font-size:15px;font-weight:800;cursor:pointer}.primary{background:#0b6b45;color:#fff}.secondary{background:#e6f1ed;color:#0b6b45}.danger{background:#b42318;color:#fff}.gray{background:#eef1f0;color:#26322d}
-.search{margin-bottom:10px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}
-.table-wrap{overflow:auto}.order-table{width:100%;border-collapse:collapse;min-width:850px}.order-table th,.order-table td{border:1px solid #d5ddd9;padding:7px;font-size:13px;vertical-align:middle}.order-table th{background:#edf4f1}.order-table input{margin:0;padding:8px;border-radius:7px;font-size:14px}.total{text-align:right;font-size:18px;font-weight:900;margin-top:12px}
-.product-list{max-height:420px;overflow:auto}.prod{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;border-bottom:1px solid #e2e8e5}.prod small{display:block;color:#63716b}.prod .actions{display:flex;gap:5px;align-items:center}
-.badge{display:inline-block;background:#e8f5ef;color:#0b6b45;border-radius:20px;padding:4px 8px;font-size:12px;font-weight:800}
-.empty{text-align:center;color:#6b7772;padding:25px}.history-item{border:1px solid #dce5e1;border-radius:12px;padding:11px;margin:8px 0}.history-item b{color:#0b6b45}
-.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.show{display:flex}.modal-box{background:#fff;width:100%;max-width:650px;border-radius:20px 20px 0 0;padding:18px;max-height:90vh;overflow:auto}
-@media(min-width:700px){.modal{align-items:center}.modal-box{border-radius:20px}.grid3{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:600px){.grid{grid-template-columns:1fr}header h1{font-size:22px}main{padding:8px}.card{padding:13px}}
-@media print{header,.no-print,.toolbar,.search,.modal{display:none!important}body{background:#fff}.card{box-shadow:none;margin:0;padding:4px}.order-table{min-width:0}.order-table th,.order-table td{font-size:10px;padding:4px}}
+:root{--green:#087f50;--green2:#0aa568;--dark:#075c3a;--bg:#f4f7f6;--card:#fff;--text:#26332e;--muted:#71807a;--line:#e1e9e5;--blue:#1976d2;--orange:#f59e0b;--red:#e53935}
+*{box-sizing:border-box}html{background:#111}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,"Noto Sans Bengali","Noto Sans",sans-serif;max-width:720px;margin:auto;min-height:100vh}
+.appbar{position:sticky;top:0;z-index:10;background:var(--green);color:#fff;padding:12px 16px 13px;box-shadow:0 2px 8px #0002}
+.appbar-row{display:flex;align-items:center;gap:12px}.app-icon{width:42px;height:42px;border-radius:13px;background:#fff;color:var(--green);display:grid;place-items:center;font-size:22px;font-weight:900;box-shadow:0 2px 6px #0002}
+.appbar h1{font-size:19px;margin:0;font-weight:850}.appbar p{font-size:12px;margin:1px 0 0;opacity:.88}.spacer{flex:1}.icon-btn{border:0;background:#ffffff1c;color:#fff;width:40px;height:40px;border-radius:50%;font-size:19px}
+main{padding:12px 12px 88px}.card{background:var(--card);border-radius:20px;padding:15px;margin:10px 0;box-shadow:0 2px 12px #14382b0b;border:1px solid #edf2ef}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 13px}.section-title h2{font-size:18px;color:var(--dark);margin:0}.section-title span{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}label{display:block;font-size:13px;font-weight:800;color:#52615b}input,select,textarea{width:100%;margin-top:6px;padding:13px 12px;border:1px solid #d4dfda;border-radius:13px;font-size:16px;background:#fff;color:var(--text);outline:none}input:focus,select:focus,textarea:focus{border-color:#0aa568;box-shadow:0 0 0 3px #0aa56818}
+.notice{background:#f0faf6;color:#176548;border-radius:12px;padding:10px 11px;font-size:12px;margin-top:12px}
+.searchbox{position:relative}.searchbox input{padding-left:40px}.searchbox:before{content:"⌕";position:absolute;left:13px;top:13px;color:var(--muted);font-size:21px;z-index:1}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar button{flex:1;min-width:130px}
+button{border:0;border-radius:13px;padding:12px 14px;font-size:14px;font-weight:850;cursor:pointer}.primary{background:var(--green);color:#fff}.secondary{background:#eaf6f1;color:var(--dark)}.blue{background:#eaf2ff;color:#1465ad}.danger{background:#ffecec;color:#c62828}.gray{background:#eef2f0;color:#405049}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick{border:0;border-radius:17px;padding:16px 12px;text-align:left;color:#fff;min-height:88px}.quick b{display:block;font-size:16px}.quick small{opacity:.9}.q1{background:var(--green)}.q2{background:#1976d2}.q3{background:#7b4bd6}.q4{background:#ef8b14}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:11px}.stat{background:#f7faf9;border:1px solid var(--line);border-radius:14px;padding:11px}.stat small{color:var(--muted);display:block}.stat b{font-size:19px;color:var(--dark)}
+.product-results{margin-top:9px}.prod{display:flex;align-items:center;gap:9px;padding:11px 2px;border-bottom:1px solid var(--line)}.prod:last-child{border-bottom:0}.prod-main{flex:1;min-width:0}.prod b{display:block;font-size:14px}.prod small{display:block;color:var(--muted);font-size:12px;margin-top:3px}.prod button{flex:0 0 auto;padding:9px 12px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}.order-table{width:100%;border-collapse:collapse;min-width:790px}.order-table th,.order-table td{border-bottom:1px solid var(--line);padding:8px;font-size:12px;vertical-align:middle}.order-table th{background:#f0f7f4;color:#466057}.order-table input{margin:0;padding:7px;border-radius:8px;font-size:13px}.total-box{background:#f0faf6;border-radius:15px;padding:13px;margin-top:10px}.total{display:flex;justify-content:space-between;font-size:18px;font-weight:900;color:var(--dark)}.words{font-size:12px;color:#52615b;margin-top:4px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;height:70px;background:#fff;border-top:1px solid #dfe8e4;display:grid;grid-template-columns:repeat(4,1fr);z-index:15;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -3px 12px #0000000b}.nav-btn{border:0;background:none;color:#71807a;font-size:11px;font-weight:750;padding:7px 3px}.nav-btn span{display:block;font-size:21px;line-height:26px}.nav-btn.active{color:var(--green)}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:30}.modal.show{display:flex}.modal-box{background:#fff;width:100%;max-width:720px;border-radius:22px 22px 0 0;padding:18px;max-height:90vh;overflow:auto}
+.history-item{border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0}.history-item b{color:var(--dark)}.badge{display:inline-block;background:#e8f6f0;color:var(--green);border-radius:20px;padding:4px 8px;font-size:11px;font-weight:850}.empty{text-align:center;color:var(--muted);padding:22px}
+.fab{position:fixed;right:max(18px,calc((100vw - 720px)/2 + 18px));bottom:84px;width:56px;height:56px;border-radius:50%;background:var(--green);color:#fff;font-size:28px;box-shadow:0 5px 16px #0003;z-index:14}
+@media(max-width:430px){main{padding-left:9px;padding-right:9px}.grid{grid-template-columns:1fr}.quick-grid{grid-template-columns:1fr 1fr}.appbar h1{font-size:17px}.card{padding:13px}.stats{grid-template-columns:1fr 1fr}}
+@media print{html,body{max-width:none;background:#fff}.appbar,.bottom-nav,.fab,.no-print{display:none!important}main{padding:0}.card{box-shadow:none;border:0;padding:5px}.order-table{min-width:0}.order-table th,.order-table td{font-size:10px;padding:4px}}
 </style>
 </head>
 <body>
-<header>
-  <h1>কহিনুর কেমিক্যাল পিএলসি</h1>
-  <p>কাস্টমার বেইজড প্রোডাক্ট • অর্ডার অটোমেশন</p>
+
+<header class="appbar">
+ <div class="appbar-row">
+  <div class="app-icon">✚</div>
+  <div><h1>কহিনুর কেমিক্যাল পিএলসি</h1><p>অর্ডার অটোমেশন</p></div>
+  <div class="spacer"></div>
+  <button class="icon-btn" onclick="openHistory()" title="অর্ডার হিস্ট্রি">◷</button>
+ </div>
 </header>
 
 <main>
-<section class="card">
-<h2>অর্ডারের তথ্য</h2>
-<div class="grid">
-<label>দোকানের নাম<input id="shop" placeholder="দোকানের নাম"></label>
-<label>অর্ডার তারিখ<input id="orderDate" type="date"></label>
-<label>সরবরাহের তারিখ<input id="deliveryDate" type="date"></label>
-<label>কাস্টমার/কোড<input id="customer" placeholder="কাস্টমার কোড বা নাম"></label>
-</div>
-<p style="color:#68756f;margin-bottom:0">অর্ডার নেওয়ার আগে সকল পণ্যের স্টক দেখে নিতে হবে।</p>
+<section class="card no-print">
+ <div class="section-title"><h2>ড্যাশবোর্ড</h2><span>আজকের কাজ</span></div>
+ <div class="stats">
+  <div class="stat"><small>অর্ডারে পণ্য</small><b id="dashItems">0</b></div>
+  <div class="stat"><small>মোট অর্ডার</small><b id="dashOrders">0</b></div>
+  <div class="stat"><small>পণ্যের সংখ্যা</small><b id="dashProducts">0</b></div>
+  <div class="stat"><small>বর্তমান মোট</small><b id="dashTotal">৳0</b></div>
+ </div>
+ <div class="quick-grid">
+  <button class="quick q1" onclick="document.getElementById('shop').focus()"><b>＋ নতুন অর্ডার</b><small>অর্ডার তৈরি করুন</small></button>
+  <button class="quick q2" onclick="document.getElementById('productSearch').focus()"><b>▣ পণ্য তালিকা</b><small>পণ্য খুঁজুন</small></button>
+  <button class="quick q3" onclick="openHistory()"><b>◷ অর্ডার হিস্ট্রি</b><small>আগের অর্ডার দেখুন</small></button>
+  <button class="quick q4" onclick="openProductManager()"><b>▤ স্টক/পণ্য</b><small>পণ্য ব্যবস্থাপনা</small></button>
+ </div>
 </section>
 
 <section class="card">
-<h2>পণ্য যোগ করুন</h2>
-<div class="grid">
-<label>পণ্যের নাম/কোড দিয়ে খুঁজুন<input id="productSearch" class="search" placeholder="যেমন: 03227"></label>
-<div class="toolbar" style="align-items:end">
-<button class="primary" onclick="addSelected()">+ পণ্য যোগ করুন</button>
-<button class="secondary" onclick="openProductManager()">পণ্য ব্যবস্থাপনা</button>
-</div>
-</div>
-<div id="productResults"></div>
+ <div class="section-title"><h2>নতুন অর্ডার</h2><span>ধাপ ১</span></div>
+ <div class="grid">
+  <label>দোকানের নাম<input id="shop" placeholder="দোকানের নাম"></label>
+  <label>অর্ডার তারিখ<input id="orderDate" type="date"></label>
+  <label>সরবরাহের তারিখ<input id="deliveryDate" type="date"></label>
+  <label>কাস্টমার/কোড<input id="customer" placeholder="কোড বা নাম"></label>
+ </div>
+ <div class="notice">✓ অর্ডার নেওয়ার আগে সকল পণ্যের স্টক দেখে নিন।</div>
 </section>
 
 <section class="card">
-<h2>অর্ডার তালিকা</h2>
-<div class="table-wrap">
-<table class="order-table">
-<thead><tr><th>কোড</th><th>সামগ্রীর নাম</th><th>প্যাক</th><th>মূল্য/ইউনিট</th><th>স্টক</th><th>পরিমাণ</th><th>বোনাস</th><th>মূল্য (টাকা)</th><th>বাদ</th></tr></thead>
-<tbody id="orderBody"></tbody>
-</table>
-</div>
-<div id="emptyOrder" class="empty">এখনও কোনো পণ্য যোগ করা হয়নি।</div>
-<div class="total">মোট: ৳ <span id="grandTotal">0.00</span></div>
-<div>কথায়: <b id="amountWords">শূন্য টাকা মাত্র</b></div>
+ <div class="section-title"><h2>পণ্য যোগ করুন</h2><span>ধাপ ২</span></div>
+ <div class="searchbox"><input id="productSearch" placeholder="পণ্যের নাম/কোড লিখে খুঁজুন"></div>
+ <div id="productResults" class="product-results"></div>
+ <button class="secondary" style="width:100%;margin-top:9px" onclick="openProductManager()">＋ পণ্য ব্যবস্থাপনা</button>
 </section>
 
 <section class="card">
-<h2>অতিরিক্ত তথ্য</h2>
-<div class="grid">
-<label>প্রতিনিধির নাম<input id="rep" placeholder="নাম"></label>
-<label>মোবাইল<input id="mobile" placeholder="01XXXXXXXXX" inputmode="tel"></label>
-<label style="grid-column:1/-1">নোট<textarea id="note" rows="3" placeholder="বিশেষ নির্দেশনা"></textarea></label>
-</div>
+ <div class="section-title"><h2>অর্ডার তালিকা</h2><span>ধাপ ৩</span></div>
+ <div class="table-wrap">
+  <table class="order-table">
+   <thead><tr><th>কোড</th><th>পণ্যের নাম</th><th>প্যাক</th><th>দাম</th><th>স্টক</th><th>পরিমাণ</th><th>বোনাস</th><th>মূল্য</th><th>×</th></tr></thead>
+   <tbody id="orderBody"></tbody>
+  </table>
+ </div>
+ <div id="emptyOrder" class="empty">এখনও কোনো পণ্য যোগ করা হয়নি।</div>
+ <div class="total-box"><div class="total"><span>মোট টাকা</span><span>৳ <span id="grandTotal">0.00</span></span></div><div class="words">কথায়: <b id="amountWords">শূন্য টাকা মাত্র</b></div></div>
+</section>
+
+<section class="card">
+ <div class="section-title"><h2>অতিরিক্ত তথ্য</h2><span>ঐচ্ছিক</span></div>
+ <div class="grid">
+  <label>প্রতিনিধির নাম<input id="rep" placeholder="নাম"></label>
+  <label>মোবাইল<input id="mobile" placeholder="01XXXXXXXXX" inputmode="tel"></label>
+  <label style="grid-column:1/-1">নোট<textarea id="note" rows="2" placeholder="বিশেষ নির্দেশনা"></textarea></label>
+ </div>
 </section>
 
 <section class="card no-print">
-<div class="toolbar">
-<button class="primary" onclick="saveOrder()">💾 অর্ডার সেভ করুন</button>
-<button class="secondary" onclick="shareOrder()">📤 শেয়ার</button>
-<button class="secondary" onclick="window.print()">🖨️ প্রিন্ট/PDF</button>
-<button class="gray" onclick="newOrder()">↻ নতুন অর্ডার</button>
-<button class="secondary" onclick="openHistory()">অর্ডার হিস্ট্রি</button>
-</div>
+ <div class="toolbar">
+  <button class="primary" onclick="saveOrder()">💾 অর্ডার সেভ</button>
+  <button class="secondary" onclick="shareOrder()">↗ শেয়ার</button>
+  <button class="blue" onclick="window.print()">▣ প্রিন্ট/PDF</button>
+  <button class="gray" onclick="newOrder()">↻ নতুন</button>
+ </div>
 </section>
 </main>
 
+<button class="fab no-print" onclick="saveOrder()" title="অর্ডার সেভ">✓</button>
+
+<nav class="bottom-nav no-print">
+ <button class="nav-btn active" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span>⌂</span>হোম</button>
+ <button class="nav-btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})"><span>▣</span>অর্ডার</button>
+ <button class="nav-btn" onclick="document.getElementById('productSearch').scrollIntoView({behavior:'smooth'})"><span>□</span>পণ্য</button>
+ <button class="nav-btn" onclick="openHistory()"><span>⋯</span>আরও</button>
+</nav>
+
 <div id="productModal" class="modal">
-<div class="modal-box">
-<h2>পণ্য ব্যবস্থাপনা</h2>
-<div class="grid">
-<label>কোড<input id="pCode" placeholder="03227"></label>
-<label>পণ্যের নাম<input id="pName" placeholder="পণ্যের নাম"></label>
-<label>প্যাক<input id="pPack" placeholder="60"></label>
-<label>মূল্য (টাকা)<input id="pPrice" type="number" step="0.01" placeholder="88"></label>
-<label>স্টক<input id="pStock" type="number" step="1" placeholder="100"></label>
+ <div class="modal-box">
+  <div class="section-title"><h2>পণ্য ব্যবস্থাপনা</h2><button class="gray" onclick="closeProductManager()">✕</button></div>
+  <div class="grid">
+   <label>কোড<input id="pCode" placeholder="03227"></label>
+   <label>পণ্যের নাম<input id="pName" placeholder="পণ্যের নাম"></label>
+   <label>প্যাক<input id="pPack" placeholder="60"></label>
+   <label>মূল্য (টাকা)<input id="pPrice" type="number" step="0.01" placeholder="88"></label>
+   <label>স্টক<input id="pStock" type="number" step="1" placeholder="100"></label>
+  </div>
+  <div class="toolbar" style="margin-top:12px"><button class="primary" onclick="saveProduct()">পণ্য সেভ</button></div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:15px 0">
+  <div id="productList"></div>
+ </div>
 </div>
-<div class="toolbar" style="margin-top:12px">
-<button class="primary" onclick="saveProduct()">পণ্য সেভ</button>
-<button class="gray" onclick="closeProductManager()">বন্ধ করুন</button>
-</div>
-<hr>
-<div id="productList" class="product-list"></div>
-</div></div>
 
 <div id="historyModal" class="modal">
-<div class="modal-box">
-<h2>অর্ডার হিস্ট্রি</h2>
-<div id="historyList"></div>
-<button class="gray" onclick="closeHistory()">বন্ধ করুন</button>
-</div></div>
+ <div class="modal-box">
+  <div class="section-title"><h2>অর্ডার হিস্ট্রি</h2><button class="gray" onclick="closeHistory()">✕</button></div>
+  <div id="historyList"></div>
+ </div>
+</div>
 
 <script>
 const KEY='kohinoor_products_v2', ORD='kohinoor_orders_v2';
@@ -184,6 +214,24 @@ function js(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
 $('productSearch').addEventListener('input',renderProducts);
 renderProducts();renderOrder();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script>
+function updateDashboard(){
+ const arr=JSON.parse(localStorage.getItem(ORD)||'[]');
+ const total=order.reduce((s,p)=>s+p.qty*p.price,0);
+ const a=document.getElementById('dashItems'),b=document.getElementById('dashOrders'),c=document.getElementById('dashProducts'),d=document.getElementById('dashTotal');
+ if(a)a.textContent=order.length;
+ if(b)b.textContent=arr.length;
+ if(c)c.textContent=products.length;
+ if(d)d.textContent='৳'+total.toFixed(0);
+}
+const _renderOrder=renderOrder;
+renderOrder=function(){_renderOrder();updateDashboard()};
+const _saveOrder=saveOrder;
+saveOrder=function(){_saveOrder();setTimeout(updateDashboard,50)};
+const _newOrder=newOrder;
+newOrder=function(){_newOrder();updateDashboard()};
+updateDashboard();
 </script>
 </body>
 </html>

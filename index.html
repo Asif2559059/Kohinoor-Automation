@@ -2,163 +2,188 @@
 <html lang="bn">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b6b45">
 <link rel="manifest" href="manifest.json">
 <title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,"Noto Sans Bengali",sans-serif;background:#f3f6f5;color:#17201c}
-header{background:#0b6b45;color:#fff;padding:16px;position:sticky;top:0;z-index:5}
-h1{font-size:20px;margin:0 0 4px} .sub{font-size:12px;opacity:.9}
-main{max-width:1100px;margin:auto;padding:14px}
-.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 2px 10px #0000000d}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-label{font-size:12px;font-weight:700;color:#46534d}input,select,button,textarea{width:100%;padding:10px;border:1px solid #ccd7d2;border-radius:9px;font:inherit}
-button{background:#0b6b45;color:white;border:0;font-weight:700;cursor:pointer}.secondary{background:#e8f0ed;color:#0b6b45}.danger{background:#b42318}
-.toolbar{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
-.tablewrap{overflow:auto}.order-table{width:100%;border-collapse:collapse;min-width:850px}
-.order-table th,.order-table td{border:1px solid #d5ddd9;padding:7px;font-size:12px}.order-table th{background:#edf4f1}
-.order-table input{padding:7px;border-radius:5px}
-.total{text-align:right;font-size:18px;font-weight:800;margin-top:10px}
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.small{font-size:11px;color:#68756f}.stock-ok{color:#087443;font-weight:700}.stock-bad{color:#b42318;font-weight:700}
-@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.actions{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.grid{grid-template-columns:1fr}.actions{grid-template-columns:1fr}}
-@media print{header,.no-print,.actions{display:none!important}body{background:#fff}.card{box-shadow:none}}
+header{background:#0b6b45;color:#fff;padding:22px 18px}header h1{margin:0 0 5px;font-size:25px}header p{margin:0;opacity:.9}
+main{max-width:1100px;margin:auto;padding:14px}.card{background:#fff;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 2px 14px #0000000d}
+h2{font-size:19px;margin:4px 0 14px;color:#0b6b45}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+label{display:block;font-weight:700;font-size:14px;color:#46534d}input,select,textarea{width:100%;padding:13px;border:1px solid #ccd7d2;border-radius:12px;font-size:16px;margin-top:6px;background:#fff}
+button{border:0;border-radius:12px;padding:12px 15px;font-size:15px;font-weight:800;cursor:pointer}.primary{background:#0b6b45;color:#fff}.secondary{background:#e6f1ed;color:#0b6b45}.danger{background:#b42318;color:#fff}.gray{background:#eef1f0;color:#26322d}
+.search{margin-bottom:10px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.table-wrap{overflow:auto}.order-table{width:100%;border-collapse:collapse;min-width:850px}.order-table th,.order-table td{border:1px solid #d5ddd9;padding:7px;font-size:13px;vertical-align:middle}.order-table th{background:#edf4f1}.order-table input{margin:0;padding:8px;border-radius:7px;font-size:14px}.total{text-align:right;font-size:18px;font-weight:900;margin-top:12px}
+.product-list{max-height:420px;overflow:auto}.prod{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;border-bottom:1px solid #e2e8e5}.prod small{display:block;color:#63716b}.prod .actions{display:flex;gap:5px;align-items:center}
+.badge{display:inline-block;background:#e8f5ef;color:#0b6b45;border-radius:20px;padding:4px 8px;font-size:12px;font-weight:800}
+.empty{text-align:center;color:#6b7772;padding:25px}.history-item{border:1px solid #dce5e1;border-radius:12px;padding:11px;margin:8px 0}.history-item b{color:#0b6b45}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.show{display:flex}.modal-box{background:#fff;width:100%;max-width:650px;border-radius:20px 20px 0 0;padding:18px;max-height:90vh;overflow:auto}
+@media(min-width:700px){.modal{align-items:center}.modal-box{border-radius:20px}.grid3{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}header h1{font-size:22px}main{padding:8px}.card{padding:13px}}
+@media print{header,.no-print,.toolbar,.search,.modal{display:none!important}body{background:#fff}.card{box-shadow:none;margin:0;padding:4px}.order-table{min-width:0}.order-table th,.order-table td{font-size:10px;padding:4px}}
 </style>
 </head>
 <body>
 <header>
   <h1>কহিনুর কেমিক্যাল পিএলসি</h1>
-  <div class="sub">কাস্টমার বেইজড প্রোডাক্ট • অর্ডার অটোমেশন</div>
+  <p>কাস্টমার বেইজড প্রোডাক্ট • অর্ডার অটোমেশন</p>
 </header>
+
 <main>
 <section class="card">
-  <div class="grid">
-    <div><label>দোকানের নাম</label><input id="shop" placeholder="দোকানের নাম"></div>
-    <div><label>অর্ডার তারিখ</label><input id="orderDate" type="date"></div>
-    <div><label>সরবরাহের তারিখ</label><input id="deliveryDate" type="date"></div>
-    <div><label>কাস্টমার/কোড</label><input id="customer" placeholder="কাস্টমার কোড বা নাম"></div>
-  </div>
-  <p class="small">অর্ডার নেওয়ার আগে স্টক যাচাই করা হবে।</p>
+<h2>অর্ডারের তথ্য</h2>
+<div class="grid">
+<label>দোকানের নাম<input id="shop" placeholder="দোকানের নাম"></label>
+<label>অর্ডার তারিখ<input id="orderDate" type="date"></label>
+<label>সরবরাহের তারিখ<input id="deliveryDate" type="date"></label>
+<label>কাস্টমার/কোড<input id="customer" placeholder="কাস্টমার কোড বা নাম"></label>
+</div>
+<p style="color:#68756f;margin-bottom:0">অর্ডার নেওয়ার আগে সকল পণ্যের স্টক দেখে নিতে হবে।</p>
 </section>
 
 <section class="card">
-  <div class="toolbar no-print">
-    <input id="search" placeholder="পণ্যের নাম/কোড লিখে খুঁজুন">
-    <button onclick="addRow()">+ পণ্য যোগ করুন</button>
-    <button class="secondary" onclick="manageProducts()">পণ্য তালিকা</button>
-  </div>
-  <div class="tablewrap">
-  <table class="order-table">
-    <thead><tr>
-      <th>কোড</th><th>সামগ্রীর নাম</th><th>প্যাক</th><th>মূল্য/ইউনিট</th>
-      <th>পরিমাণ</th><th>বোনাস</th><th>মূল্য (টাকা)</th><th class="no-print">স্টক</th><th class="no-print"></th>
-    </tr></thead>
-    <tbody id="rows"></tbody>
-  </table>
-  </div>
-  <div class="total">মোট: ৳ <span id="grand">0.00</span></div>
+<h2>পণ্য যোগ করুন</h2>
+<div class="grid">
+<label>পণ্যের নাম/কোড দিয়ে খুঁজুন<input id="productSearch" class="search" placeholder="যেমন: 03227"></label>
+<div class="toolbar" style="align-items:end">
+<button class="primary" onclick="addSelected()">+ পণ্য যোগ করুন</button>
+<button class="secondary" onclick="openProductManager()">পণ্য ব্যবস্থাপনা</button>
+</div>
+</div>
+<div id="productResults"></div>
 </section>
 
 <section class="card">
-  <div class="grid">
-    <div><label>টাকা (কথায়)</label><input id="words" readonly></div>
-    <div><label>প্রতিনিধির নাম</label><input id="rep" placeholder="প্রতিনিধি"></div>
-    <div><label>মোবাইল</label><input id="mobile" placeholder="মোবাইল নম্বর"></div>
-    <div><label>নোট</label><input id="note" placeholder="অতিরিক্ত তথ্য"></div>
-  </div>
+<h2>অর্ডার তালিকা</h2>
+<div class="table-wrap">
+<table class="order-table">
+<thead><tr><th>কোড</th><th>সামগ্রীর নাম</th><th>প্যাক</th><th>মূল্য/ইউনিট</th><th>স্টক</th><th>পরিমাণ</th><th>বোনাস</th><th>মূল্য (টাকা)</th><th>বাদ</th></tr></thead>
+<tbody id="orderBody"></tbody>
+</table>
+</div>
+<div id="emptyOrder" class="empty">এখনও কোনো পণ্য যোগ করা হয়নি।</div>
+<div class="total">মোট: ৳ <span id="grandTotal">0.00</span></div>
+<div>কথায়: <b id="amountWords">শূন্য টাকা মাত্র</b></div>
+</section>
+
+<section class="card">
+<h2>অতিরিক্ত তথ্য</h2>
+<div class="grid">
+<label>প্রতিনিধির নাম<input id="rep" placeholder="নাম"></label>
+<label>মোবাইল<input id="mobile" placeholder="01XXXXXXXXX" inputmode="tel"></label>
+<label style="grid-column:1/-1">নোট<textarea id="note" rows="3" placeholder="বিশেষ নির্দেশনা"></textarea></label>
+</div>
 </section>
 
 <section class="card no-print">
-  <div class="actions">
-    <button onclick="saveOrder()">অর্ডার সংরক্ষণ</button>
-    <button class="secondary" onclick="newOrder()">নতুন অর্ডার</button>
-    <button class="secondary" onclick="showOrders()">সংরক্ষিত অর্ডার</button>
-    <button onclick="window.print()">প্রিন্ট / PDF</button>
-  </div>
-  <p class="small">এই সংস্করণটি ফোনের ব্রাউজারেই কাজ করে এবং ডেটা এই ডিভাইসে সংরক্ষণ করে।</p>
+<div class="toolbar">
+<button class="primary" onclick="saveOrder()">💾 অর্ডার সেভ করুন</button>
+<button class="secondary" onclick="shareOrder()">📤 শেয়ার</button>
+<button class="secondary" onclick="window.print()">🖨️ প্রিন্ট/PDF</button>
+<button class="gray" onclick="newOrder()">↻ নতুন অর্ডার</button>
+<button class="secondary" onclick="openHistory()">অর্ডার হিস্ট্রি</button>
+</div>
 </section>
 </main>
 
-<script>
-const key='kohinoor_products_v1', ordersKey='kohinoor_orders_v1';
-let products=JSON.parse(localStorage.getItem(key)||'null') || [
- {code:'0227',name:'সান্টাদিন সাজাল এন্ড মায়ন্ডারাইজার',pack:'75 গ্রাম',price:44,stock:100},
- {code:'0181',name:'বিউটিন হেয়ার ওয়েল',pack:'100 মি.লি.',price:100,stock:100},
- {code:'0182',name:'বিউটিন হেয়ার ওয়েল',pack:'200 মি.লি.',price:155,stock:100}
-];
-let rows=[];
-document.getElementById('orderDate').valueAsDate=new Date();
+<div id="productModal" class="modal">
+<div class="modal-box">
+<h2>পণ্য ব্যবস্থাপনা</h2>
+<div class="grid">
+<label>কোড<input id="pCode" placeholder="03227"></label>
+<label>পণ্যের নাম<input id="pName" placeholder="পণ্যের নাম"></label>
+<label>প্যাক<input id="pPack" placeholder="60"></label>
+<label>মূল্য (টাকা)<input id="pPrice" type="number" step="0.01" placeholder="88"></label>
+<label>স্টক<input id="pStock" type="number" step="1" placeholder="100"></label>
+</div>
+<div class="toolbar" style="margin-top:12px">
+<button class="primary" onclick="saveProduct()">পণ্য সেভ</button>
+<button class="gray" onclick="closeProductManager()">বন্ধ করুন</button>
+</div>
+<hr>
+<div id="productList" class="product-list"></div>
+</div></div>
 
-function addRow(p=null){
- rows.push(p?{...p,qty:1,bonus:0}:{code:'',name:'',pack:'',price:0,qty:1,bonus:0,stock:null});
- render();
+<div id="historyModal" class="modal">
+<div class="modal-box">
+<h2>অর্ডার হিস্ট্রি</h2>
+<div id="historyList"></div>
+<button class="gray" onclick="closeHistory()">বন্ধ করুন</button>
+</div></div>
+
+<script>
+const KEY='kohinoor_products_v2', ORD='kohinoor_orders_v2';
+let products=JSON.parse(localStorage.getItem(KEY)||'null') || [
+ {code:'03227',name:'স্যাভলন সাবান 100 গ্রাম',pack:'60',price:88,stock:100},
+ {code:'03228',name:'স্যাভলন সাবান 75 গ্রাম',pack:'48',price:65,stock:100},
+ {code:'03229',name:'স্যাভলন লিকুইড',pack:'24',price:188,stock:80}
+];
+let order=[];
+let editCode=null;
+const $=id=>document.getElementById(id);
+function today(){let d=new Date();return new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+$('orderDate').value=today();
+
+function renderProducts(){
+ const q=$('productSearch').value.trim().toLowerCase();
+ const arr=products.filter(p=>(p.code+' '+p.name).toLowerCase().includes(q)).slice(0,30);
+ $('productResults').innerHTML=arr.length?arr.map(p=>`<div class="prod">
+ <div><b>${esc(p.code)} — ${esc(p.name)}</b><small>প্যাক: ${esc(p.pack)} • মূল্য: ৳${Number(p.price).toFixed(2)} • স্টক: ${p.stock}</small></div>
+ <button class="secondary" onclick="addProduct('${js(p.code)}')">যোগ</button></div>`).join(''):'<div class="empty">কোনো পণ্য পাওয়া যায়নি।</div>';
 }
-function render(){
- const tb=document.getElementById('rows'); tb.innerHTML='';
- rows.forEach((r,i)=>{
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td><input value="${esc(r.code)}" onchange="edit(${i},'code',this.value)"></td>
-  <td><input list="plist" value="${esc(r.name)}" onchange="nameChange(${i},this.value)"></td>
-  <td>${esc(r.pack||'')}</td>
-  <td><input type="number" step="0.01" value="${r.price}" onchange="edit(${i},'price',+this.value)"></td>
-  <td><input type="number" min="0" value="${r.qty}" onchange="edit(${i},'qty',+this.value)"></td>
-  <td><input type="number" min="0" value="${r.bonus}" onchange="edit(${i},'bonus',+this.value)"></td>
-  <td>৳ ${(r.price*r.qty).toFixed(2)}</td>
-  <td class="no-print">${r.stock==null?'—':(r.qty<=r.stock?'<span class="stock-ok">OK</span>':'<span class="stock-bad">স্টক কম</span>')}</td>
-  <td class="no-print"><button class="danger" onclick="removeRow(${i})">×</button></td>`;
-  tb.appendChild(tr);
- });
- let total=rows.reduce((s,r)=>s+(r.price*r.qty),0); document.getElementById('grand').textContent=total.toFixed(2);
- document.getElementById('words').value=numberWords(Math.round(total))+' টাকা মাত্র';
+function addSelected(){let first=document.querySelector('#productResults .prod button'); if(first) first.click(); else alert('আগে পণ্যের নাম/কোড লিখে খুঁজুন।')}
+function addProduct(code){
+ const p=products.find(x=>x.code===code); if(!p)return;
+ if(order.some(x=>x.code===code)){alert('এই পণ্যটি ইতিমধ্যে অর্ডারে আছে।');return}
+ order.push({...p,qty:1,bonus:0}); renderOrder();
 }
-function edit(i,k,v){rows[i][k]=v; if(k==='qty'){} render()}
-function nameChange(i,v){
- let p=products.find(x=>x.name===v||x.code===v);
- rows[i].name=v;
- if(p){rows[i]={...rows[i],...p,qty:rows[i].qty,bonus:rows[i].bonus};}
- render();
+function renderOrder(){
+ $('orderBody').innerHTML=order.map((p,i)=>`<tr>
+<td>${esc(p.code)}</td><td>${esc(p.name)}</td><td>${esc(p.pack)}</td><td>৳${Number(p.price).toFixed(2)}</td>
+<td>${p.stock}</td><td><input type="number" min="0" max="${p.stock}" value="${p.qty}" onchange="setQty(${i},this.value)"></td>
+<td><input type="number" min="0" value="${p.bonus}" onchange="setBonus(${i},this.value)"></td>
+<td>৳${(p.qty*p.price).toFixed(2)}</td><td><button class="danger" onclick="removeLine(${i})">×</button></td></tr>`).join('');
+ $('emptyOrder').style.display=order.length?'none':'block'; calc();
 }
-function removeRow(i){rows.splice(i,1);render()}
-function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')}
+function setQty(i,v){let n=Math.max(0,Math.min(Number(v)||0,order[i].stock));order[i].qty=n;renderOrder()}
+function setBonus(i,v){order[i].bonus=Math.max(0,Number(v)||0);renderOrder()}
+function removeLine(i){order.splice(i,1);renderOrder()}
+function calc(){let t=order.reduce((s,p)=>s+p.qty*p.price,0);$('grandTotal').textContent=t.toFixed(2);$('amountWords').textContent=moneyBn(t)}
 function saveOrder(){
- if(!document.getElementById('shop').value.trim()) return alert('দোকানের নাম দিন।');
- if(!rows.length) return alert('কমপক্ষে একটি পণ্য যোগ করুন।');
- if(rows.some(r=>r.stock!=null && r.qty>r.stock)) return alert('কোনো পণ্যের স্টক পর্যাপ্ত নয়।');
- const order={id:Date.now(),shop:shop.value,customer:customer.value,orderDate:orderDate.value,deliveryDate:deliveryDate.value,rep:rep.value,mobile:mobile.value,note:note.value,rows,total:+grand.textContent};
- const all=JSON.parse(localStorage.getItem(ordersKey)||'[]'); all.unshift(order); localStorage.setItem(ordersKey,JSON.stringify(all));
- alert('অর্ডার সংরক্ষণ হয়েছে।'); 
+ if(!$('shop').value.trim()){alert('দোকানের নাম লিখুন।');return}
+ if(!order.length){alert('কমপক্ষে একটি পণ্য যোগ করুন।');return}
+ const data={id:Date.now(),shop:$('shop').value.trim(),orderDate:$('orderDate').value,deliveryDate:$('deliveryDate').value,customer:$('customer').value.trim(),rep:$('rep').value.trim(),mobile:$('mobile').value.trim(),note:$('note').value.trim(),items:order,total:order.reduce((s,p)=>s+p.qty*p.price,0)};
+ let arr=JSON.parse(localStorage.getItem(ORD)||'[]');arr.unshift(data);localStorage.setItem(ORD,JSON.stringify(arr.slice(0,100)));alert('অর্ডার সেভ হয়েছে।');openHistory();
 }
-function newOrder(){if(confirm('নতুন অর্ডার শুরু করবেন?')){rows=[];document.querySelectorAll('input').forEach(x=>{if(x.id!=='orderDate')x.value=''});document.getElementById('orderDate').valueAsDate=new Date();render()}}
-function showOrders(){
- const all=JSON.parse(localStorage.getItem(ordersKey)||'[]');
- if(!all.length)return alert('কোনো সংরক্ষিত অর্ডার নেই।');
- alert(all.slice(0,10).map((o,i)=>`${i+1}. ${o.shop} | ${o.orderDate} | ৳${o.total.toFixed(2)}`).join('\\n'));
+function newOrder(){if(confirm('নতুন অর্ডার শুরু করবেন?')){order=[];$('shop').value='';$('customer').value='';$('rep').value='';$('mobile').value='';$('note').value='';$('deliveryDate').value='';$('orderDate').value=today();renderOrder()}}
+async function shareOrder(){
+ if(!order.length){alert('শেয়ার করার মতো অর্ডার নেই।');return}
+ let text=`কহিনুর কেমিক্যাল পিএলসি\nদোকান: ${$('shop').value}\nঅর্ডার: ${$('orderDate').value}\n${order.map(p=>`${p.code} ${p.name} — ${p.qty} × ৳${p.price} = ৳${(p.qty*p.price).toFixed(2)}`).join('\n')}\nমোট: ৳${$('grandTotal').textContent}`;
+ if(navigator.share){try{await navigator.share({title:'Kohinoor Order',text})}catch(e){}}else{await navigator.clipboard.writeText(text);alert('অর্ডারের লেখা কপি হয়েছে।')}
 }
-function manageProducts(){
- const raw=prompt('নতুন পণ্য যোগ করুন:\\nকোড|নাম|প্যাক|দাম|স্টক', '0001|নতুন পণ্য|100 গ্রাম|50|100');
- if(!raw)return; const a=raw.split('|'); if(a.length<5)return alert('ফরম্যাট ঠিক নয়।');
- products.push({code:a[0],name:a[1],pack:a[2],price:+a[3],stock:+a[4]});
- localStorage.setItem(key,JSON.stringify(products)); alert('পণ্য যোগ হয়েছে।');
+function openProductManager(){editCode=null;clearProductForm();renderProductList();$('productModal').classList.add('show')}
+function closeProductManager(){$('productModal').classList.remove('show')}
+function clearProductForm(){$('pCode').value='';$('pName').value='';$('pPack').value='';$('pPrice').value='';$('pStock').value=''}
+function saveProduct(){
+ const p={code:$('pCode').value.trim(),name:$('pName').value.trim(),pack:$('pPack').value.trim(),price:Number($('pPrice').value)||0,stock:Number($('pStock').value)||0};
+ if(!p.code||!p.name){alert('কোড ও পণ্যের নাম দিন।');return}
+ if(editCode){let i=products.findIndex(x=>x.code===editCode);if(i>=0)products[i]=p}else{if(products.some(x=>x.code===p.code)){alert('এই কোড ইতিমধ্যে আছে।');return}products.push(p)}
+ localStorage.setItem(KEY,JSON.stringify(products));editCode=null;clearProductForm();renderProductList();renderProducts();alert('পণ্য সেভ হয়েছে।')
 }
-function numberWords(n){
- if(n===0)return 'শূন্য'; const u=['','এক','দুই','তিন','চার','পাঁচ','ছয়','সাত','আট','নয়','দশ','এগারো','বারো','তেরো','চৌদ্দ','পনেরো','ষোল','সতেরো','আঠারো','উনিশ','বিশ','একুশ','বাইশ','তেইশ','চব্বিশ','পঁচিশ','ছাব্বিশ','সাতাশ','আঠাশ','ঊনত্রিশ','ত্রিশ','একত্রিশ','বত্রিশ','তেত্রিশ','চৌত্রিশ','পঁয়ত্রিশ','ছত্রিশ','সাঁইত্রিশ','আটত্রিশ','ঊনচল্লিশ','চল্লিশ','একচল্লিশ','বিয়াল্লিশ','তেতাল্লিশ','চুয়াল্লিশ','পঁয়তাল্লিশ','ছেচল্লিশ','সাতচল্লিশ','আটচল্লিশ','ঊনপঞ্চাশ','পঞ্চাশ','একান্ন','বাহান্ন','তিপ্পান্ন','চুয়ান্ন','পঞ্চান্ন','ছাপ্পান্ন','সাতান্ন','আটান্ন','ঊনষাট','ষাট','একষট্টি','বাষট্টি','তেষট্টি','চৌষট্টি','পঁয়ষট্টি','ছেষট্টি','সাতষট্টি','আটষট্টি','ঊনসত্তর','সত্তর','একাত্তর','বাহাত্তর','তিয়াত্তর','চুয়াত্তর','পঁচাত্তর','ছিয়াত্তর','সাতাত্তর','আটাত্তর','ঊনআশি','আশি','একাশি','বিরাশি','তিরাশি','চুরাশি','পঁচাশি','ছিয়াশি','সাতাশি','আটাশি','ঊননব্বই','নব্বই','একানব্বই','বিরানব্বই','তিরানব্বই','চুরানব্বই','পঁচানব্বই','ছিয়ানব্বই','সাতানব্বই','আটানব্বই','নিরানব্বই'];
- function two(x){return x<100?u[x]:''}
- let s='';
- if(n>=10000000){s+=two(Math.floor(n/10000000))+' কোটি ';n%=10000000}
- if(n>=100000){s+=two(Math.floor(n/100000))+' লাখ ';n%=100000}
- if(n>=1000){s+=two(Math.floor(n/1000))+' হাজার ';n%=1000}
- if(n>=100){s+=u[Math.floor(n/100)]+' শত ';n%=100}
- if(n>0)s+=two(n);
- return s.trim();
-}
-document.getElementById('search').addEventListener('input',e=>{
- const q=e.target.value.toLowerCase(); if(!q)return;
- const p=products.find(x=>x.name.toLowerCase().includes(q)||x.code.toLowerCase()===q);
- if(p){addRow(p);e.target.value='';}
-});
-document.body.insertAdjacentHTML('beforeend','<datalist id="plist">'+products.map(p=>`<option value="${esc(p.name)}">${esc(p.code)}</option>`).join('')+'</datalist>');
-addRow(); render();
+function editProduct(code){let p=products.find(x=>x.code===code);if(!p)return;editCode=code;$('pCode').value=p.code;$('pName').value=p.name;$('pPack').value=p.pack;$('pPrice').value=p.price;$('pStock').value=p.stock;window.scrollTo(0,0)}
+function deleteProduct(code){if(!confirm('এই পণ্য মুছে ফেলবেন?'))return;products=products.filter(x=>x.code!==code);localStorage.setItem(KEY,JSON.stringify(products));renderProductList();renderProducts()}
+function renderProductList(){$('productList').innerHTML=products.map(p=>`<div class="prod"><div><b>${esc(p.code)} — ${esc(p.name)}</b><small>প্যাক ${esc(p.pack)} • ৳${Number(p.price).toFixed(2)} • স্টক ${p.stock}</small></div><div class="actions"><button class="secondary" onclick="editProduct('${js(p.code)}')">Edit</button><button class="danger" onclick="deleteProduct('${js(p.code)}')">×</button></div></div>`).join('')}
+function openHistory(){let arr=JSON.parse(localStorage.getItem(ORD)||'[]');$('historyList').innerHTML=arr.length?arr.map(o=>`<div class="history-item"><b>${esc(o.shop)}</b> <span class="badge">৳${Number(o.total).toFixed(2)}</span><br><small>${o.orderDate} • ${o.items.length} পণ্য</small><div class="toolbar" style="margin-top:7px"><button class="secondary" onclick="loadOrder(${o.id})">আবার খুলুন</button><button class="danger" onclick="deleteOrder(${o.id})">মুছুন</button></div></div>`).join(''):'<div class="empty">কোনো অর্ডার সেভ করা নেই।</div>';$('historyModal').classList.add('show')}
+function closeHistory(){$('historyModal').classList.remove('show')}
+function loadOrder(id){let o=(JSON.parse(localStorage.getItem(ORD)||'[]')).find(x=>x.id===id);if(!o)return;$('shop').value=o.shop;$('orderDate').value=o.orderDate;$('deliveryDate').value=o.deliveryDate;$('customer').value=o.customer||'';$('rep').value=o.rep||'';$('mobile').value=o.mobile||'';$('note').value=o.note||'';order=o.items||[];renderOrder();closeHistory();window.scrollTo({top:0,behavior:'smooth'})}
+function deleteOrder(id){let a=JSON.parse(localStorage.getItem(ORD)||'[]').filter(x=>x.id!==id);localStorage.setItem(ORD,JSON.stringify(a));openHistory()}
+function moneyBn(n){if(!n)return'শূন্য টাকা মাত্র';let s=Math.floor(n),p=Math.round((n-s)*100);const ones=['শূন্য','এক','দুই','তিন','চার','পাঁচ','ছয়','সাত','আট','নয়','দশ','এগারো','বারো','তেরো','চৌদ্দ','পনেরো','ষোল','সতেরো','আঠারো','উনিশ'];const tens=['','','বিশ','ত্রিশ','চল্লিশ','পঞ্চাশ','ষাট','সত্তর','আশি','নব্বই'];function w(x){if(x<20)return ones[x];if(x<100)return tens[Math.floor(x/10)]+(x%10?' '+ones[x%10]:'');if(x<1000)return ones[Math.floor(x/100)]+' শত'+(x%100?' '+w(x%100):'');if(x<100000)return w(Math.floor(x/1000))+' হাজার'+(x%1000?' '+w(x%1000):'');if(x<10000000)return w(Math.floor(x/100000))+' লাখ'+(x%100000?' '+w(x%100000):'');return w(Math.floor(x/10000000))+' কোটি'+(x%10000000?' '+w(x%10000000):'')}return w(s)+' টাকা'+(p?' '+w(p)+' পয়সা':'')+' মাত্র'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function js(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+$('productSearch').addEventListener('input',renderProducts);
+renderProducts();renderOrder();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
-</body></html>
+</body>
+</html>

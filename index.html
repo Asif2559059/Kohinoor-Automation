@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b6b45">
+<link rel="manifest" href="manifest.json">
+<title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Noto Sans Bengali",sans-serif;background:#f3f6f5;color:#17201c}
+header{background:#0b6b45;color:#fff;padding:16px;position:sticky;top:0;z-index:5}
+h1{font-size:20px;margin:0 0 4px} .sub{font-size:12px;opacity:.9}
+main{max-width:1100px;margin:auto;padding:14px}
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 2px 10px #0000000d}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+label{font-size:12px;font-weight:700;color:#46534d}input,select,button,textarea{width:100%;padding:10px;border:1px solid #ccd7d2;border-radius:9px;font:inherit}
+button{background:#0b6b45;color:white;border:0;font-weight:700;cursor:pointer}.secondary{background:#e8f0ed;color:#0b6b45}.danger{background:#b42318}
+.toolbar{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+.tablewrap{overflow:auto}.order-table{width:100%;border-collapse:collapse;min-width:850px}
+.order-table th,.order-table td{border:1px solid #d5ddd9;padding:7px;font-size:12px}.order-table th{background:#edf4f1}
+.order-table input{padding:7px;border-radius:5px}
+.total{text-align:right;font-size:18px;font-weight:800;margin-top:10px}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.small{font-size:11px;color:#68756f}.stock-ok{color:#087443;font-weight:700}.stock-bad{color:#b42318;font-weight:700}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.actions{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.actions{grid-template-columns:1fr}}
+@media print{header,.no-print,.actions{display:none!important}body{background:#fff}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>কহিনুর কেমিক্যাল পিএলসি</h1>
+  <div class="sub">কাস্টমার বেইজড প্রোডাক্ট • অর্ডার অটোমেশন</div>
+</header>
+<main>
+<section class="card">
+  <div class="grid">
+    <div><label>দোকানের নাম</label><input id="shop" placeholder="দোকানের নাম"></div>
+    <div><label>অর্ডার তারিখ</label><input id="orderDate" type="date"></div>
+    <div><label>সরবরাহের তারিখ</label><input id="deliveryDate" type="date"></div>
+    <div><label>কাস্টমার/কোড</label><input id="customer" placeholder="কাস্টমার কোড বা নাম"></div>
+  </div>
+  <p class="small">অর্ডার নেওয়ার আগে স্টক যাচাই করা হবে।</p>
+</section>
+
+<section class="card">
+  <div class="toolbar no-print">
+    <input id="search" placeholder="পণ্যের নাম/কোড লিখে খুঁজুন">
+    <button onclick="addRow()">+ পণ্য যোগ করুন</button>
+    <button class="secondary" onclick="manageProducts()">পণ্য তালিকা</button>
+  </div>
+  <div class="tablewrap">
+  <table class="order-table">
+    <thead><tr>
+      <th>কোড</th><th>সামগ্রীর নাম</th><th>প্যাক</th><th>মূল্য/ইউনিট</th>
+      <th>পরিমাণ</th><th>বোনাস</th><th>মূল্য (টাকা)</th><th class="no-print">স্টক</th><th class="no-print"></th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  </div>
+  <div class="total">মোট: ৳ <span id="grand">0.00</span></div>
+</section>
+
+<section class="card">
+  <div class="grid">
+    <div><label>টাকা (কথায়)</label><input id="words" readonly></div>
+    <div><label>প্রতিনিধির নাম</label><input id="rep" placeholder="প্রতিনিধি"></div>
+    <div><label>মোবাইল</label><input id="mobile" placeholder="মোবাইল নম্বর"></div>
+    <div><label>নোট</label><input id="note" placeholder="অতিরিক্ত তথ্য"></div>
+  </div>
+</section>
+
+<section class="card no-print">
+  <div class="actions">
+    <button onclick="saveOrder()">অর্ডার সংরক্ষণ</button>
+    <button class="secondary" onclick="newOrder()">নতুন অর্ডার</button>
+    <button class="secondary" onclick="showOrders()">সংরক্ষিত অর্ডার</button>
+    <button onclick="window.print()">প্রিন্ট / PDF</button>
+  </div>
+  <p class="small">এই সংস্করণটি ফোনের ব্রাউজারেই কাজ করে এবং ডেটা এই ডিভাইসে সংরক্ষণ করে।</p>
+</section>
+</main>
+
+<script>
+const key='kohinoor_products_v1', ordersKey='kohinoor_orders_v1';
+let products=JSON.parse(localStorage.getItem(key)||'null') || [
+ {code:'0227',name:'সান্টাদিন সাজাল এন্ড মায়ন্ডারাইজার',pack:'75 গ্রাম',price:44,stock:100},
+ {code:'0181',name:'বিউটিন হেয়ার ওয়েল',pack:'100 মি.লি.',price:100,stock:100},
+ {code:'0182',name:'বিউটিন হেয়ার ওয়েল',pack:'200 মি.লি.',price:155,stock:100}
+];
+let rows=[];
+document.getElementById('orderDate').valueAsDate=new Date();
+
+function addRow(p=null){
+ rows.push(p?{...p,qty:1,bonus:0}:{code:'',name:'',pack:'',price:0,qty:1,bonus:0,stock:null});
+ render();
+}
+function render(){
+ const tb=document.getElementById('rows'); tb.innerHTML='';
+ rows.forEach((r,i)=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input value="${esc(r.code)}" onchange="edit(${i},'code',this.value)"></td>
+  <td><input list="plist" value="${esc(r.name)}" onchange="nameChange(${i},this.value)"></td>
+  <td>${esc(r.pack||'')}</td>
+  <td><input type="number" step="0.01" value="${r.price}" onchange="edit(${i},'price',+this.value)"></td>
+  <td><input type="number" min="0" value="${r.qty}" onchange="edit(${i},'qty',+this.value)"></td>
+  <td><input type="number" min="0" value="${r.bonus}" onchange="edit(${i},'bonus',+this.value)"></td>
+  <td>৳ ${(r.price*r.qty).toFixed(2)}</td>
+  <td class="no-print">${r.stock==null?'—':(r.qty<=r.stock?'<span class="stock-ok">OK</span>':'<span class="stock-bad">স্টক কম</span>')}</td>
+  <td class="no-print"><button class="danger" onclick="removeRow(${i})">×</button></td>`;
+  tb.appendChild(tr);
+ });
+ let total=rows.reduce((s,r)=>s+(r.price*r.qty),0); document.getElementById('grand').textContent=total.toFixed(2);
+ document.getElementById('words').value=numberWords(Math.round(total))+' টাকা মাত্র';
+}
+function edit(i,k,v){rows[i][k]=v; if(k==='qty'){} render()}
+function nameChange(i,v){
+ let p=products.find(x=>x.name===v||x.code===v);
+ rows[i].name=v;
+ if(p){rows[i]={...rows[i],...p,qty:rows[i].qty,bonus:rows[i].bonus};}
+ render();
+}
+function removeRow(i){rows.splice(i,1);render()}
+function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')}
+function saveOrder(){
+ if(!document.getElementById('shop').value.trim()) return alert('দোকানের নাম দিন।');
+ if(!rows.length) return alert('কমপক্ষে একটি পণ্য যোগ করুন।');
+ if(rows.some(r=>r.stock!=null && r.qty>r.stock)) return alert('কোনো পণ্যের স্টক পর্যাপ্ত নয়।');
+ const order={id:Date.now(),shop:shop.value,customer:customer.value,orderDate:orderDate.value,deliveryDate:deliveryDate.value,rep:rep.value,mobile:mobile.value,note:note.value,rows,total:+grand.textContent};
+ const all=JSON.parse(localStorage.getItem(ordersKey)||'[]'); all.unshift(order); localStorage.setItem(ordersKey,JSON.stringify(all));
+ alert('অর্ডার সংরক্ষণ হয়েছে।'); 
+}
+function newOrder(){if(confirm('নতুন অর্ডার শুরু করবেন?')){rows=[];document.querySelectorAll('input').forEach(x=>{if(x.id!=='orderDate')x.value=''});document.getElementById('orderDate').valueAsDate=new Date();render()}}
+function showOrders(){
+ const all=JSON.parse(localStorage.getItem(ordersKey)||'[]');
+ if(!all.length)return alert('কোনো সংরক্ষিত অর্ডার নেই।');
+ alert(all.slice(0,10).map((o,i)=>`${i+1}. ${o.shop} | ${o.orderDate} | ৳${o.total.toFixed(2)}`).join('\\n'));
+}
+function manageProducts(){
+ const raw=prompt('নতুন পণ্য যোগ করুন:\\nকোড|নাম|প্যাক|দাম|স্টক', '0001|নতুন পণ্য|100 গ্রাম|50|100');
+ if(!raw)return; const a=raw.split('|'); if(a.length<5)return alert('ফরম্যাট ঠিক নয়।');
+ products.push({code:a[0],name:a[1],pack:a[2],price:+a[3],stock:+a[4]});
+ localStorage.setItem(key,JSON.stringify(products)); alert('পণ্য যোগ হয়েছে।');
+}
+function numberWords(n){
+ if(n===0)return 'শূন্য'; const u=['','এক','দুই','তিন','চার','পাঁচ','ছয়','সাত','আট','নয়','দশ','এগারো','বারো','তেরো','চৌদ্দ','পনেরো','ষোল','সতেরো','আঠারো','উনিশ','বিশ','একুশ','বাইশ','তেইশ','চব্বিশ','পঁচিশ','ছাব্বিশ','সাতাশ','আঠাশ','ঊনত্রিশ','ত্রিশ','একত্রিশ','বত্রিশ','তেত্রিশ','চৌত্রিশ','পঁয়ত্রিশ','ছত্রিশ','সাঁইত্রিশ','আটত্রিশ','ঊনচল্লিশ','চল্লিশ','একচল্লিশ','বিয়াল্লিশ','তেতাল্লিশ','চুয়াল্লিশ','পঁয়তাল্লিশ','ছেচল্লিশ','সাতচল্লিশ','আটচল্লিশ','ঊনপঞ্চাশ','পঞ্চাশ','একান্ন','বাহান্ন','তিপ্পান্ন','চুয়ান্ন','পঞ্চান্ন','ছাপ্পান্ন','সাতান্ন','আটান্ন','ঊনষাট','ষাট','একষট্টি','বাষট্টি','তেষট্টি','চৌষট্টি','পঁয়ষট্টি','ছেষট্টি','সাতষট্টি','আটষট্টি','ঊনসত্তর','সত্তর','একাত্তর','বাহাত্তর','তিয়াত্তর','চুয়াত্তর','পঁচাত্তর','ছিয়াত্তর','সাতাত্তর','আটাত্তর','ঊনআশি','আশি','একাশি','বিরাশি','তিরাশি','চুরাশি','পঁচাশি','ছিয়াশি','সাতাশি','আটাশি','ঊননব্বই','নব্বই','একানব্বই','বিরানব্বই','তিরানব্বই','চুরানব্বই','পঁচানব্বই','ছিয়ানব্বই','সাতানব্বই','আটানব্বই','নিরানব্বই'];
+ function two(x){return x<100?u[x]:''}
+ let s='';
+ if(n>=10000000){s+=two(Math.floor(n/10000000))+' কোটি ';n%=10000000}
+ if(n>=100000){s+=two(Math.floor(n/100000))+' লাখ ';n%=100000}
+ if(n>=1000){s+=two(Math.floor(n/1000))+' হাজার ';n%=1000}
+ if(n>=100){s+=u[Math.floor(n/100)]+' শত ';n%=100}
+ if(n>0)s+=two(n);
+ return s.trim();
+}
+document.getElementById('search').addEventListener('input',e=>{
+ const q=e.target.value.toLowerCase(); if(!q)return;
+ const p=products.find(x=>x.name.toLowerCase().includes(q)||x.code.toLowerCase()===q);
+ if(p){addRow(p);e.target.value='';}
+});
+document.body.insertAdjacentHTML('beforeend','<datalist id="plist">'+products.map(p=>`<option value="${esc(p.name)}">${esc(p.code)}</option>`).join('')+'</datalist>');
+addRow(); render();
+</script>
+</body></html>

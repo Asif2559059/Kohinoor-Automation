@@ -1,1 +1,216 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#087f50"><title>Kohinoor Admin</title><style>body{margin:0;background:#f4f7f6;font-family:system-ui,"Noto Sans Bengali",sans-serif;color:#26332e}header{background:#087f50;color:#fff;padding:18px}main{max-width:760px;margin:auto;padding:14px}.card{background:#fff;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 2px 10px #0001}input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #d4dfda;border-radius:12px;font-size:16px;margin:6px 0 10px}button{padding:12px 16px;border:0;border-radius:12px;background:#087f50;color:#fff;font-weight:800}.order{border:1px solid #e1e9e5;border-radius:14px;padding:12px;margin:9px 0}.badge{float:right;background:#eaf6f1;color:#087f50;padding:5px 8px;border-radius:20px;font-weight:800}.muted{color:#71807a;font-size:12px}.item{padding:5px 0;border-bottom:1px solid #eee;font-size:13px}</style></head><body><header><h2 style="margin:0">কহিনুর কেমিক্যাল পিএলসি</h2><div>Admin — Online Orders</div></header><main><div class="card"><b>অনলাইন অর্ডার দেখুন</b><input id="url" placeholder="Apps Script Web App URL"><input id="token" placeholder="Admin Token" type="password"><button onclick="loadOrders()">অর্ডার লোড করুন</button><div id="status" class="muted" style="margin-top:8px"></div></div><div id="orders"></div></main><script>function loadOrders(){const u=document.getElementById('url').value.trim(),t=document.getElementById('token').value.trim();if(!u||!t)return alert('URL ও Admin Token দিন');localStorage.adminUrl=u;localStorage.adminToken=t;document.getElementById('status').textContent='লোড হচ্ছে…';const cb='cb'+Date.now();window[cb]=j=>{delete window[cb];if(!j.ok){document.getElementById('status').textContent='সমস্যা: '+j.error;return}document.getElementById('status').textContent=j.orders.length+'টি অর্ডার';document.getElementById('orders').innerHTML=j.orders.map(o=>'<div class="card order"><span class="badge">৳'+Number(o.total).toFixed(2)+'</span><b>'+esc(o.shop)+'</b><div class="muted">'+esc(o.orderDate||'')+' • '+esc(o.mobile||'')+'</div><div style="margin-top:8px">'+o.items.map(i=>'<div class="item">'+esc(i.code)+' — '+esc(i.name)+' × '+i.qty+' | ৳'+Number(i.price*i.qty).toFixed(2)+'</div>').join('')+'</div></div>').join('')||'<div class="card">কোনো অর্ডার নেই।</div>'};const sc=document.createElement('script');sc.src=u+'?action=orders&token='+encodeURIComponent(t)+'&callback='+cb;sc.onerror=()=>document.getElementById('status').textContent='লোড করা যায়নি। URL/Token পরীক্ষা করুন।';document.body.appendChild(sc)}function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}window.addEventListener('load',()=>{url.value=localStorage.adminUrl||'';token.value=localStorage.adminToken||''})</script></body></html>
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#087f50">
+<title>Kohinoor Admin</title>
+
+<style>
+body{
+  margin:0;
+  background:#f4f7f6;
+  font-family:system-ui,"Noto Sans Bengali",sans-serif;
+  color:#26332e
+}
+header{
+  background:#087f50;
+  color:#fff;
+  padding:18px
+}
+main{
+  max-width:760px;
+  margin:auto;
+  padding:14px
+}
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:15px;
+  margin:10px 0;
+  box-shadow:0 2px 10px #0001
+}
+input{
+  width:100%;
+  box-sizing:border-box;
+  padding:13px;
+  border:1px solid #d4dfda;
+  border-radius:12px;
+  font-size:16px;
+  margin:6px 0 10px
+}
+button{
+  padding:12px 16px;
+  border:0;
+  border-radius:12px;
+  background:#087f50;
+  color:#fff;
+  font-weight:800
+}
+.order{
+  border:1px solid #e1e9e5;
+  border-radius:14px;
+  padding:12px;
+  margin:9px 0
+}
+.badge{
+  float:right;
+  background:#eaf6f1;
+  color:#087f50;
+  padding:5px 8px;
+  border-radius:20px;
+  font-weight:800
+}
+.muted{
+  color:#71807a;
+  font-size:12px
+}
+.item{
+  padding:5px 0;
+  border-bottom:1px solid #eee;
+  font-size:13px
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2 style="margin:0">কহিনুর কেমিক্যাল পিএলসি</h2>
+<div>Admin — Online Orders</div>
+</header>
+
+<main>
+
+<div class="card">
+
+<b>Supabase সংযোগ</b>
+
+<input id="supabaseUrl"
+placeholder="Supabase API URL">
+
+<input id="supabaseKey"
+placeholder="Supabase Publishable Key"
+type="password">
+
+<button onclick="loadOrders()">অর্ডার লোড করুন</button>
+
+<div id="status" class="muted" style="margin-top:8px"></div>
+
+</div>
+
+<div id="orders"></div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+async function loadOrders(){
+
+const url=document.getElementById('supabaseUrl').value.trim();
+const key=document.getElementById('supabaseKey').value.trim();
+
+if(!url || !key){
+alert('Supabase API URL ও Publishable Key দিন');
+return;
+}
+
+localStorage.supabaseUrl=url;
+localStorage.supabaseKey=key;
+
+document.getElementById('status').textContent='অর্ডার লোড হচ্ছে…';
+
+try{
+
+const client=window.supabase.createClient(url,key);
+
+const {data,error}=await client
+.from('Orders')
+.select(`
+id,
+created_at,
+"Shop_Name",
+"Mobile",
+customer_code,
+order_date,
+delivery_date,
+total,
+rep,
+"Note",
+status,
+order_items(
+id,
+quantity,
+unit_price,
+product_id,
+products(
+id,
+name,
+description,
+price,
+stock
+)
+)
+`)
+.order('created_at',{ascending:false});
+
+if(error){
+throw error;
+}
+
+document.getElementById('status').textContent=
+(data?.length || 0)+'টি অর্ডার পাওয়া গেছে';
+
+if(!data || data.length===0){
+
+document.getElementById('orders').innerHTML=
+'<div class="card">কোনো অর্ডার নেই।</div>';
+
+return;
+}
+
+document.getElementById('orders').innerHTML=data.map(o=>{
+
+const items=(o.order_items||[]).map(i=>{
+
+const p=i.products||{};
+
+const qty=Number(i.quantity||1);
+const price=Number(i.unit_price ?? p.price ?? 0);
+
+return `
+<div class="item">
+${esc(p.name||'পণ্য')} × ${qty}
+| ৳${(price*qty).toFixed(2)}
+</div>
+`;
+
+}).join('');
+
+return `
+<div class="card order">
+
+<span class="badge">
+৳${Number(o.total||0).toFixed(2)}
+</span>
+
+<b>${esc(o["Shop_Name"]||'নাম নেই')}</b>
+
+<div class="muted">
+${esc(o.order_date||'')}
+ •
+${esc(o["Mobile"]||'')}
+</div>
+
+<div style="margin-top:8px">
+${items||'<div class="muted">কোনো পণ্য নেই</div>'}
+</div>
+
+</div>
+`;
+
+}).join('');
+
+}catch(error){

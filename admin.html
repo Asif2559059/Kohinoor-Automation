@@ -54,13 +54,27 @@ button{
   cursor:pointer;
 }
 
-button:active{
-  opacity:.8;
+.call{
+  display:inline-block;
+  background:#1565c0;
+  color:white;
+  text-decoration:none;
+  border-radius:8px;
+  padding:9px 14px;
+  margin-top:10px;
 }
 
-#status{
+.status{
   margin-top:12px;
-  font-weight:bold;
+}
+
+.status select{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+  background:white;
 }
 
 .order{
@@ -79,15 +93,21 @@ button:active{
 
 .item{
   background:#f4f7f6;
-  padding:8px;
-  border-radius:6px;
-  margin-top:6px;
+  padding:10px;
+  border-radius:7px;
+  margin-top:8px;
 }
 
 .empty{
   text-align:center;
   padding:30px;
   color:#777;
+}
+
+.small{
+  color:#666;
+  font-size:13px;
+  margin-top:6px;
 }
 </style>
 </head>
@@ -117,6 +137,65 @@ const SHEET_ID =
 
 const SHEET_NAME = "Form Responses 1";
 
+const STATUS_KEY = "kohinoor_order_status";
+
+/* Date সুন্দর করার ফাংশন */
+function formatDate(value){
+
+  if(!value) return "";
+
+  let match = String(value).match(
+    /Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/
+  );
+
+  if(match){
+
+    const year = Number(match[1]);
+    const month = Number(match[2]) + 1;
+    const day = Number(match[3]);
+    const hour = Number(match[4]);
+    const minute = Number(match[5]);
+
+    const dd = String(day).padStart(2,"0");
+    const mm = String(month).padStart(2,"0");
+    const hh = String(hour).padStart(2,"0");
+    const min = String(minute).padStart(2,"0");
+
+    return `${dd}/${mm}/${year} ${hh}:${min}`;
+  }
+
+  return value;
+}
+
+
+/* Status সংরক্ষণ */
+function getStatuses(){
+
+  try{
+    return JSON.parse(
+      localStorage.getItem(STATUS_KEY) || "{}"
+    );
+  }catch(e){
+    return {};
+  }
+}
+
+
+/* Status পরিবর্তন */
+function changeStatus(orderNumber, value){
+
+  const statuses = getStatuses();
+
+  statuses[orderNumber] = value;
+
+  localStorage.setItem(
+    STATUS_KEY,
+    JSON.stringify(statuses)
+  );
+}
+
+
+/* অর্ডার লোড */
 async function loadOrders(){
 
   const status = document.getElementById("status");
@@ -148,19 +227,26 @@ async function loadOrders(){
       throw new Error("Sheet data পাওয়া যায়নি");
     }
 
-    const data = JSON.parse(text.substring(start,end+1));
+    const data =
+      JSON.parse(text.substring(start,end+1));
 
     const rows = data.table.rows || [];
 
     if(rows.length === 0){
-      status.textContent = "কোনো অর্ডার পাওয়া যায়নি।";
+
+      status.textContent =
+        "কোনো অর্ডার পাওয়া যায়নি।";
+
       ordersBox.innerHTML =
         '<div class="card empty">এখনও কোনো অর্ডার নেই।</div>';
+
       return;
     }
 
     status.textContent =
       rows.length + " টি অর্ডার পাওয়া গেছে";
+
+    const statuses = getStatuses();
 
     rows.reverse().forEach((row,index)=>{
 
@@ -181,25 +267,59 @@ async function loadOrders(){
       const quantity  = val(6);
       const note      = val(7);
 
-      const div = document.createElement("div");
+      const orderNumber = rows.length - index;
+
+      const currentStatus =
+        statuses[orderNumber] || "নতুন";
+
+      const div =
+        document.createElement("div");
+
       div.className = "order";
 
+      const safeMobile =
+        String(mobile).replace(/[^0-9+]/g,"");
+
       div.innerHTML = `
-        <h3>অর্ডার #${rows.length - index}</h3>
 
-        <b>তারিখ:</b> ${timestamp}<br>
+        <h3>অর্ডার #${orderNumber}</h3>
 
-        <b>দোকানের নাম:</b> ${shop}<br>
+        <b>তারিখ:</b>
+        ${formatDate(timestamp)}
+        <br>
 
-        <b>ক্রেতার নাম:</b> ${customer}<br>
+        <b>দোকানের নাম:</b>
+        ${shop}
+        <br>
 
-        <b>মোবাইল:</b> ${mobile}<br>
+        <b>ক্রেতার নাম:</b>
+        ${customer}
+        <br>
 
-        <b>ঠিকানা:</b> ${address}<br>
+        <b>মোবাইল:</b>
+        ${mobile}
+        <br>
+
+        ${
+          safeMobile
+          ? `<a class="call" href="tel:${safeMobile}">
+               📞 সরাসরি কল করুন
+             </a>`
+          : ""
+        }
+
+        <br>
+
+        <b>ঠিকানা:</b>
+        ${address}
 
         <div class="item">
-          <b>পণ্য:</b> ${product}<br>
-          <b>পরিমাণ:</b> ${quantity}
+          <b>পণ্য:</b>
+          ${product}
+          <br>
+
+          <b>পরিমাণ:</b>
+          ${quantity}
         </div>
 
         ${
@@ -207,6 +327,40 @@ async function loadOrders(){
           ? `<p><b>মন্তব্য:</b> ${note}</p>`
           : ""
         }
+
+        <div class="status">
+          <b>অর্ডারের Status:</b>
+
+          <select
+            onchange="changeStatus(${orderNumber},this.value)"
+          >
+
+            <option value="নতুন"
+              ${currentStatus==="নতুন"?"selected":""}>
+              🆕 নতুন
+            </option>
+
+            <option value="প্রসেসিং"
+              ${currentStatus==="প্রসেসিং"?"selected":""}>
+              🔄 প্রসেসিং
+            </option>
+
+            <option value="ডেলিভারি"
+              ${currentStatus==="ডেলিভারি"?"selected":""}>
+              🚚 ডেলিভারি
+            </option>
+
+            <option value="সম্পন্ন"
+              ${currentStatus==="সম্পন্ন"?"selected":""}>
+              ✅ সম্পন্ন
+            </option>
+
+          </select>
+
+          <div class="small">
+            Status এই Admin ফোনে সংরক্ষিত হবে।
+          </div>
+        </div>
       `;
 
       ordersBox.appendChild(div);

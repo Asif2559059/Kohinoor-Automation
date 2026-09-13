@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>কহিনুর কেমিক্যাল পিএলসি — Login</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: #f3f6f5;
+    }
+
+    .login-box {
+      width: 92%;
+      max-width: 400px;
+      background: white;
+      padding: 30px 25px;
+      border-radius: 18px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #0b6b45;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 7px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #0b6b45;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 22px;
+      border: none;
+      border-radius: 10px;
+      background: #0b6b45;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-box">
+
+    <h2>কহিনুর কেমিক্যাল পিএলসি</h2>
+
+    <div class="subtitle">
+      অর্ডার অটোমেশন
+    </div>
+
+    <label for="username">Username</label>
+    <input
+      id="username"
+      type="text"
+      placeholder="Username লিখুন"
+      autocomplete="username"
+    >
+
+    <label for="password">Password</label>
+    <input
+      id="password"
+      type="password"
+      placeholder="Password লিখুন"
+      autocomplete="current-password"
+    >
+
+    <button onclick="login()">Login</button>
+
+    <div id="message"></div>
+
+  </div>
+
+<script>
+
+  const SUPABASE_URL =
+    "https://utzkpsohkoiawvuupgeb.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0emtwc29oa29pYXd2dXVwZ2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMDY0OTEsImV4cCI6MjEwNDY4MjQ5MX0.xJIYFw2KEN-4bDXUJ8BkuWcFEtfnSpyvJMaBCMX_LgE";
+
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+  async function login() {
+
+    const username =
+      document.getElementById("username").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    const message =
+      document.getElementById("message");
+
+
+    if (!username || !password) {
+
+      message.textContent =
+        "Username এবং Password দিন";
+
+      message.style.color = "red";
+
+      return;
+    }
+
+
+    message.textContent = "Login হচ্ছে...";
+
+    message.style.color = "#0b6b45";
+
+
+    // Username থেকে Email বের করা
+    const { data: userData, error: userError } =
+      await supabaseClient.rpc(
+        "get_login_email",
+        {
+          p_username: username
+        }
+      );
+
+
+    if (
+      userError ||
+      !userData ||
+      userData.length === 0
+    ) {
+
+      message.textContent =
+        "Username পাওয়া যায়নি";
+
+      message.style.color = "red";
+
+      return;
+    }
+
+
+    const email =
+      userData[0].email;
+
+
+    // Supabase Login
+    const { error } =
+      await supabaseClient.auth.signInWithPassword({
+
+        email: email,
+
+        password: password
+
+      });
+
+
+    if (error) {
+
+      message.textContent =
+        "Username অথবা Password ভুল";
+
+      message.style.color = "red";
+
+      return;
+    }
+
+
+    message.textContent =
+      "Login সফল হয়েছে!";
+
+    message.style.color = "#0b6b45";
+
+
+    // মূল অ্যাপে পাঠানো
+    setTimeout(function() {
+
+      window.location.href = "index.html";
+
+    }, 500);
+
+  }
+
+</script>
+
+</body>
+</html>

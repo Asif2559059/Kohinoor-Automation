@@ -32,6 +32,30 @@ button{border:0;border-radius:13px;padding:12px 14px;font-size:14px;font-weight:
 @media(max-width:430px){main{padding-left:9px;padding-right:9px}.grid{grid-template-columns:1fr}.quick-grid{grid-template-columns:1fr 1fr}.appbar h1{font-size:17px}.card{padding:13px}.stats{grid-template-columns:1fr 1fr}}
 @media print{html,body{max-width:none;background:#fff}.appbar,.bottom-nav,.fab,.no-print{display:none!important}main{padding:0}.card{box-shadow:none;border:0;padding:5px}.order-table{min-width:0}.order-table th,.order-table td{font-size:10px;padding:4px}}
 </style>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL =
+    "https://utzkpsohkoiawvuupgeb.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0emtwc29oa2pzb2lhIh0cGViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMDY0OTEsImV4cCI6MjEwNDY4MjQ5MX0.xJIYFw2KEN-4bDXUJ8BkuWcFEtfnSpyvJMaBCMX_LgE";
+
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  async function checkLogin() {
+    const { data } = await supabaseClient.auth.getSession();
+
+    if (!data.session) {
+      window.location.href = "login.html";
+    }
+  }
+
+  checkLogin();
+</script>
 </head>
 <body>
 

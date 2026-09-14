@@ -46,15 +46,37 @@ button{border:0;border-radius:13px;padding:12px 14px;font-size:14px;font-weight:
     SUPABASE_ANON_KEY
   );
 
-  async function checkLogin() {
-    const { data } = await supabaseClient.auth.getSession();
+  async function checkAdmin() {
 
-    if (!data.session) {
-      window.location.href = "login.html";
-    }
+  const { data: sessionData } =
+    await supabaseClient.auth.getSession();
+
+  const session = sessionData.session;
+
+  if (!session) {
+    window.location.href = "login.html";
+    return;
   }
 
-  checkLogin();
+  const { data: profile, error } =
+    await supabaseClient
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .single();
+
+  if (error || !profile || profile.role !== "admin") {
+
+    await supabaseClient.auth.signOut();
+
+    alert("শুধুমাত্র Admin এই পেজে প্রবেশ করতে পারবেন।");
+
+    window.location.href = "login.html";
+    return;
+  }
+}
+
+checkAdmin();
 </script>
 </head>
 <body>

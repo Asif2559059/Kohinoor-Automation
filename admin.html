@@ -1,6 +1,28 @@
 <!doctype html>
 <html lang="bn">
-<head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL =
+"https://utzkpsohkoiawvuupgeb.supabase.co";
+
+const SUPABASE_ANON_KEY =
+"আপনার আগের Supabase anon key এখানে দিন";
+
+const supabaseClient =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+async function adminLogout() {
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href = "login.html";
+}
+</script>
+  <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#087f50">

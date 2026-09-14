@@ -75,7 +75,10 @@ button{border:0;border-radius:13px;padding:12px 14px;font-size:14px;font-weight:
     return;
   }
 }
-
+async function adminLogout() {
+  await supabaseClient.auth.signOut();
+  window.location.href = "login.html";
+}
 checkAdmin();
 </script>
 </head>
@@ -86,6 +89,9 @@ checkAdmin();
   <div class="app-icon">✚</div>
   <div><h1>কহিনুর কেমিক্যাল পিএলসি</h1><p>অর্ডার অটোমেশন</p></div>
   <div class="spacer"></div>
+  <button class="icon-btn" onclick="adminLogout()" title="Logout">
+  🚪 Logout
+</button>
   <button class="icon-btn" onclick="openOnlineSetup()" title="অনলাইন সেটআপ">☁</button><button class="icon-btn" onclick="openHistory()" title="অর্ডার হিস্ট্রি">◷</button>
  </div>
 </header>

@@ -22,6 +22,30 @@ async function adminLogout() {
   window.location.href = "login.html";
 }
 </script>
+  <script>
+async function checkAdmin(){
+  const { data:{session} } = await supabaseClient.auth.getSession();
+
+  if(!session){
+    window.location.href="login.html";
+    return;
+  }
+
+  const { data: profile, error } = await supabaseClient
+    .from("profiles")
+    .select("role")
+    .eq("id", session.user.id)
+    .single();
+
+  if(error || !profile || profile.role !== "admin"){
+    await supabaseClient.auth.signOut();
+    alert("শুধুমাত্র Admin এই পেজে প্রবেশ করতে পারবেন।");
+    window.location.href="login.html";
+  }
+}
+
+checkAdmin();
+</script>
   <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -198,9 +198,14 @@ async function signup() {
 
   const { data: authData, error: authError } =
     await supabaseClient.auth.signUp({
-      email: email,
-      password: password
-    });
+    email: email,
+    password: password,
+    options: {
+        data: {
+            username: username
+        }
+    }
+});
 
 
   if (authError) {
@@ -216,24 +221,6 @@ async function signup() {
     message.style.color = "red";
     return;
   }
-
-
-  const { error: profileError } =
-    await supabaseClient
-      .from("profiles")
-      .insert({
-        id: authData.user.id,
-        username: username,
-        email: email,
-        role: "user"
-      });
-
-if (profileError) {
-    message.textContent =
-        "User profile তৈরি করতে সমস্যা হয়েছে: " + profileError.message;
-    message.style.color = "red";
-    return;
-}
 
 
   message.textContent =

@@ -228,13 +228,12 @@ async function signup() {
         role: "user"
       });
 
-
-  if (profileError) {
+if (profileError) {
     message.textContent =
-      "User profile তৈরি করতে সমস্যা হয়েছে।";
+        "User profile তৈরি করতে সমস্যা হয়েছে: " + profileError.message;
     message.style.color = "red";
     return;
-  }
+}
 
 
   message.textContent =

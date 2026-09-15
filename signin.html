@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Kohinoor Automation - Login</title>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      padding: 20px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      padding: 35px 30px;
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 30px;
+      font-size: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #334155;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 5px;
+    }
+
+    .login-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .login-btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 9px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .error {
+      display: block;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .success {
+      display: block;
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .links a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    .forgot {
+      text-align: right;
+      margin-top: -8px;
+      margin-bottom: 18px;
+    }
+
+    .forgot a {
+      color: #2563eb;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .forgot a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-box">
+
+    <div class="logo">Kohinoor Automation</div>
+
+    <div class="subtitle">
+      Login to your account
+    </div>
+
+    <form id="loginForm">
+
+      <div class="form-group">
+        <label for="email">Email</label>
+
+        <input
+          type="email"
+          id="email"
+          placeholder="Enter your email"
+          autocomplete="email"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+
+        <input
+          type="password"
+          id="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <div class="forgot">
+        <a href="#" id="forgotPassword">
+          Forgot Password?
+        </a>
+      </div>
+
+      <button type="submit" class="login-btn" id="loginBtn">
+        Login
+      </button>
+
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <div class="links">
+      Don't have an account?
+      <a href="login.html">Sign Up</a>
+    </div>
+
+  </div>
+
+
+  <script>
+
+    // ============================================
+    // SUPABASE CONFIGURATION
+    // ============================================
+
+    const SUPABASE_URL =
+      "https://utzkpsohkoiawvuupgeb.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0emtwc29oa2lhd3Z1dXBnZWIiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc4OTEwNjQ5MSwiZXhwIjoyMTA0NjgyNDkxfQ.xJIYFw2KEN-4bDXUJ8BkuWcFEtfnSpyvJMaBCMX_LgE";
+
+
+    // Create Supabase client
+    const { createClient } = supabase;
+
+    const supabaseClient = createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+    // ============================================
+    // ELEMENTS
+    // ============================================
+
+    const loginForm = document.getElementById("loginForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const message = document.getElementById("message");
+    const forgotPassword = document.getElementById("forgotPassword");
+
+
+    // ============================================
+    // SHOW MESSAGE
+    // ============================================
+
+    function showMessage(text, type) {
+
+      message.textContent = text;
+
+      message.className = "message " + type;
+
+    }
+
+
+    // ============================================
+    // LOGIN
+    // ============================================
+
+    loginForm.addEventListener("submit", async function(event) {
+
+      event.preventDefault();
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+
+        showMessage(
+          "Please enter your email and password.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Logging in...";
+
+      message.className = "message";
+
+
+      try {
+
+        const { data, error } =
+          await supabaseClient.auth.signInWithPassword({
+
+            email: email,
+            password: password
+
+          });
+
+
+        if (error) {
+
+          console.error("Login error:", error);
+
+          showMessage(
+            "Login failed: " + error.message,
+            "error"
+          );
+
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Login";
+
+          return;
+        }
+
+
+        if (data && data.user) {
+
+          showMessage(
+            "Login successful! Redirecting...",
+            "success"
+          );
+
+
+          // Small delay so user can see success message
+          setTimeout(function() {
+
+            window.location.href = "index.html";
+
+          }, 700);
+
+        }
+
+      } catch (err) {
+
+        console.error(err);
+
+        showMessage(
+          "Something went wrong. Please try again.",
+          "error"
+        );
+
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Login";
+
+      }
+
+    });
+
+
+    // ============================================
+    // FORGOT PASSWORD
+    // ============================================
+
+    forgotPassword.addEventListener("click", async function(event) {
+
+      event.preventDefault();
+
+      const email = emailInput.value.trim();
+
+      if (!email) {
+
+        showMessage(
+          "Please enter your email first.",
+          "error"
+        );
+
+        emailInput.focus();
+
+        return;
+      }
+
+
+      try {
+
+        const { error } =
+          await supabaseClient.auth.resetPasswordForEmail(
+            email,
+            {
+              redirectTo:
+                "https://Asif2559059.github.io/Kohinoor-Automation/signin.html"
+            }
+          );
+
+
+        if (error) {
+
+          showMessage(
+            "Password reset failed: " + error.message,
+            "error"
+          );
+
+          return;
+        }
+
+
+        showMessage(
+          "Password reset link has been sent to your email.",
+          "success"
+        );
+
+      } catch (err) {
+
+        console.error(err);
+
+        showMessage(
+          "Unable to send password reset email.",
+          "error"
+        );
+
+      }
+
+    });
+
+
+    // ============================================
+    // CHECK EXISTING SESSION
+    // ============================================
+
+    async function checkSession() {
+
+      const { data } =
+        await supabaseClient.auth.getSession();
+
+      if (data.session) {
+
+        // Already logged in
+        // Uncomment this if you want automatic redirect
+
+        // window.location.href = "index.html";
+
+      }
+
+    }
+
+    checkSession();
+
+  </script>
+
+</body>
+</html>

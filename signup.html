@@ -28,16 +28,16 @@
     .signup-box {
       width: 100%;
       max-width: 400px;
-      background: #ffffff;
-      padding: 25px;
+      background: white;
+      padding: 28px 24px;
       border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.12);
     }
 
     h2 {
+      margin: 0 0 8px;
       text-align: center;
       color: #0b6b45;
-      margin: 0 0 8px;
     }
 
     .subtitle {
@@ -51,6 +51,7 @@
       margin-top: 14px;
       margin-bottom: 6px;
       font-weight: bold;
+      color: #333;
     }
 
     input {
@@ -59,10 +60,10 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
+      outline: none;
     }
 
     input:focus {
-      outline: none;
       border-color: #0b6b45;
     }
 
@@ -72,4 +73,192 @@
       padding: 13px;
       border: none;
       border-radius: 8px;
-      background: #
+      background: #0b6b45;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #message {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .success {
+      display: block !important;
+      background: #e8f7ee;
+      color: #146c3a;
+    }
+
+    .error {
+      display: block !important;
+      background: #fdecec;
+      color: #a12626;
+    }
+
+    .login-link {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .login-link a {
+      color: #0b6b45;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="signup-box">
+
+    <h2>নতুন User Account</h2>
+
+    <p class="subtitle">
+      আপনার নতুন অ্যাকাউন্ট তৈরি করুন
+    </p>
+
+    <form id="signupForm">
+
+      <label for="email">Email</label>
+
+      <input
+        type="email"
+        id="email"
+        placeholder="আপনার Email লিখুন"
+        autocomplete="email"
+        required
+      >
+
+      <label for="password">Password</label>
+
+      <input
+        type="password"
+        id="password"
+        placeholder="কমপক্ষে ৬ অক্ষর"
+        autocomplete="new-password"
+        minlength="6"
+        required
+      >
+
+      <label for="confirmPassword">
+        Confirm Password
+      </label>
+
+      <input
+        type="password"
+        id="confirmPassword"
+        placeholder="Password আবার লিখুন"
+        autocomplete="new-password"
+        minlength="6"
+        required
+      >
+
+      <button type="submit" id="signupButton">
+        Sign Up
+      </button>
+
+      <div id="message"></div>
+
+    </form>
+
+    <div class="login-link">
+      আগে থেকেই Account আছে?
+      <a href="login.html">Login করুন</a>
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /* =====================================================
+       SUPABASE CONFIGURATION
+       =====================================================
+
+       এখানে আপনার নিজের Supabase Project URL এবং
+       Publishable/Anon Key বসাতে হবে।
+
+       service_role / secret key এখানে ব্যবহার করবেন না।
+    */
+
+
+    const SUPABASE_URL =
+      "YOUR_SUPABASE_URL";
+
+
+    const SUPABASE_ANON_KEY =
+      "YOUR_SUPABASE_ANON_KEY";
+
+
+    /* =====================================================
+       SUPABASE CLIENT
+       ===================================================== */
+
+    let supabaseClient = null;
+
+
+    const form =
+      document.getElementById("signupForm");
+
+    const emailInput =
+      document.getElementById("email");
+
+    const passwordInput =
+      document.getElementById("password");
+
+    const confirmPasswordInput =
+      document.getElementById("confirmPassword");
+
+    const signupButton =
+      document.getElementById("signupButton");
+
+    const message =
+      document.getElementById("message");
+
+
+    /* =====================================================
+       MESSAGE FUNCTION
+       ===================================================== */
+
+    function showMessage(text, type) {
+
+      message.textContent = text;
+
+      message.className = type;
+
+    }
+
+
+    /* =====================================================
+       ERROR TRANSLATION
+       ===================================================== */
+
+    function translateError(errorMessage) {
+
+      const text =
+        String(errorMessage || "").toLowerCase();
+
+
+      if (text.includes("user already registered")) {
+
+        return "এই Email দিয়ে আগে থেকেই Account আছে। Login করুন.";
+
+      }
+
+
+      if (text.includes("

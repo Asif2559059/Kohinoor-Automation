@@ -183,7 +183,7 @@ async function signup() {
 
 
   if (checkError) {
-    message.textContent = "Username পরীক্ষা করা যায়নি।";
+    message.textContent = "Username পরীক্ষা করা যায়নি: " + checkError.message;
     message.style.color = "red";
     return;
 }

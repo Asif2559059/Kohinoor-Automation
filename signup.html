@@ -1,241 +1,151 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>নতুন User Account</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f6f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .box {
-      width: 90%;
-      max-width: 400px;
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
-    }
-
-    h2 {
-      text-align: center;
-      color: #0b6b45;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-top: 14px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
-
-    input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 20px;
-      padding: 13px;
-      border: none;
-      border-radius: 8px;
-      background: #0b6b45;
-      color: white;
-      font-size: 17px;
-    }
-
-    .back {
-      text-align: center;
-      margin-top: 18px;
-    }
-
-    .back a {
-      color: #0b6b45;
-    }
-
-    #message {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-
-<body>
-
-<div class="box">
-
-  <h2>কহিনুর কেমিক্যাল পিএলসি</h2>
-
-  <div class="subtitle">
-    নতুন User Account তৈরি করুন
-  </div>
-
-  <label>Username</label>
-  <input id="username" type="text" placeholder="Username লিখুন">
-
-  <label>Email</label>
-  <input id="email" type="email" placeholder="Email লিখুন">
-
-  <label>Password</label>
-  <input id="password" type="password" placeholder="Password লিখুন">
-
-  <label>Password আবার লিখুন</label>
-  <input id="confirmPassword" type="password" placeholder="Password আবার লিখুন">
-
-  <button onclick="signup()">Account তৈরি করুন</button>
-
-  <div id="message"></div>
-
-  <div class="back">
-    <a href="login.html">← Login পেজে ফিরে যান</a>
-  </div>
-
-</div>
-
 <script>
-
 const SUPABASE_URL =
-  "https://utzkpsohkoiawvuupgeb.supabase.co";
+    "https://utzkpsohkoiawvuupgeb.supabase.co";
 
 const SUPABASE_ANON_KEY =
-  "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
+    "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
 const supabaseClient =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+document.getElementById("signupForm").addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+    const message =
+        document.getElementById("message");
 
 
-async function signup() {
-
-  const username =
-    document.getElementById("username").value.trim();
-
-  const email =
-    document.getElementById("email").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-  const confirmPassword =
-    document.getElementById("confirmPassword").value;
-
-  const message =
-    document.getElementById("message");
-
-
-  if (!username || !email || !password || !confirmPassword) {
-    message.textContent = "সব ঘর পূরণ করুন।";
-    message.style.color = "red";
-    return;
-  }
-
-
-  if (password !== confirmPassword) {
-    message.textContent = "দুইটি Password একই নয়।";
-    message.style.color = "red";
-    return;
-  }
-
-
-  if (password.length < 6) {
-    message.textContent =
-      "Password কমপক্ষে ৬ অক্ষরের হতে হবে।";
-    message.style.color = "red";
-    return;
-  }
-
-
-  message.textContent = "Account তৈরি হচ্ছে...";
-  message.style.color = "#0b6b45";
-
-
-  const { data: existingUser, error: checkError } =
-    await supabaseClient
-      .from("profiles")
-      .select("id")
-      .eq("username", username)
-      .maybeSingle();
-
-
-  if (checkError) {
-    message.textContent = "Username পরীক্ষা করা যায়নি: " + checkError.message;
-    message.style.color = "red";
-    return;
-}
-
-  if (existingUser) {
-    message.textContent =
-      "এই Username আগে থেকেই ব্যবহার করা হয়েছে।";
-    message.style.color = "red";
-    return;
-  }
-
-
-  const { data: authData, error: authError } =
-    await supabaseClient.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-        data: {
-            username: username
-        }
+    // Username check
+    if (!username) {
+        message.textContent = "Username দিন";
+        message.style.color = "red";
+        return;
     }
-});
 
 
-  if (authError) {
-    message.textContent = authError.message;
-    message.style.color = "red";
-    return;
-  }
+    // Email check
+    if (!email) {
+        message.textContent = "Email দিন";
+        message.style.color = "red";
+        return;
+    }
 
 
-  if (!authData.user) {
+    // Password check
+    if (password.length < 6) {
+        message.textContent =
+            "Password কমপক্ষে ৬ অক্ষরের হতে হবে";
+        message.style.color = "red";
+        return;
+    }
+
+
+    // Confirm password
+    if (password !== confirmPassword) {
+        message.textContent =
+            "দুইটি Password একই নয়";
+        message.style.color = "red";
+        return;
+    }
+
+
     message.textContent =
-      "Account তৈরি করা যায়নি।";
-    message.style.color = "red";
-    return;
-  }
+        "Account তৈরি হচ্ছে...";
+    message.style.color = "#0b6b45";
 
 
-  message.textContent =
-    "Account সফলভাবে তৈরি হয়েছে!";
+    // Username আগে আছে কিনা পরীক্ষা
+    const { data: existingUser, error: checkError } =
+        await supabaseClient
+            .from("profiles")
+            .select("id")
+            .eq("username", username)
+            .maybeSingle();
 
-  message.style.color = "#0b6b45";
+
+    if (checkError) {
+        message.textContent =
+            "Username পরীক্ষা করা যায়নি: " +
+            checkError.message;
+        message.style.color = "red";
+        return;
+    }
 
 
-  setTimeout(function() {
-    window.location.href = "login.html";
-  }, 1500);
+    if (existingUser) {
+        message.textContent =
+            "এই Username আগে থেকেই ব্যবহার করা হয়েছে";
+        message.style.color = "red";
+        return;
+    }
 
-}
 
+    // Supabase Auth account তৈরি
+    const { data: authData, error: authError } =
+        await supabaseClient.auth.signUp({
+
+            email: email,
+
+            password: password,
+
+            options: {
+                data: {
+                    username: username
+                }
+            }
+
+        });
+
+
+    if (authError) {
+        message.textContent =
+            authError.message;
+        message.style.color = "red";
+        return;
+    }
+
+
+    if (!authData.user) {
+        message.textContent =
+            "Account তৈরি করা যায়নি";
+        message.style.color = "red";
+        return;
+    }
+
+
+    /*
+      এখানে profiles.insert() নেই।
+
+      Supabase Database Trigger
+      নিজে থেকেই profiles table-এ
+      username, email এবং role যোগ করবে।
+    */
+
+
+    message.textContent =
+        "Account সফলভাবে তৈরি হয়েছে!";
+    message.style.color = "#0b6b45";
+
+
+    setTimeout(function() {
+        window.location.href = "login.html";
+    }, 1500);
+
+});
 </script>
-
-</body>
-</html>

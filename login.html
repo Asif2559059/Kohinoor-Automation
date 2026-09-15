@@ -3,232 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>কহিনুর কেমিক্যাল পিএলসি — Login</title>
+  <title>নতুন User Account</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: Arial, sans-serif;
+      margin: 0; min-height: 100vh; display: flex; justify-content: center;
+      align-items: center; padding: 20px; font-family: Arial, sans-serif;
       background: #f3f6f5;
     }
-
-    .login-box {
-      width: 92%;
-      max-width: 400px;
-      background: white;
-      padding: 30px 25px;
-      border-radius: 18px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+    .signup-box {
+      width: 100%; max-width: 400px; background: #fff; padding: 28px 24px;
+      border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,.12);
     }
-
-    h2 {
-      text-align: center;
-      color: #0b6b45;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 25px;
-    }
-
-    label {
-      display: block;
-      margin: 15px 0 7px;
-      font-weight: bold;
-    }
-
+    h2 { margin: 0 0 8px; text-align: center; color: #0b6b45; }
+    .subtitle { margin: 0 0 22px; text-align: center; color: #666; font-size: 14px; }
+    label { display: block; margin: 14px 0 6px; font-weight: bold; color: #333; }
     input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 16px;
+      width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px;
+      font-size: 16px; outline: none;
     }
-
-    input:focus {
-      outline: none;
-      border-color: #0b6b45;
-    }
-
+    input:focus { border-color: #0b6b45; }
     button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 22px;
-      border: none;
-      border-radius: 10px;
-      background: #0b6b45;
-      color: white;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
+      width: 100%; margin-top: 22px; padding: 13px; border: 0; border-radius: 8px;
+      background: #0b6b45; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer;
     }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
+    button:disabled { opacity: .6; cursor: not-allowed; }
     #message {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
+      display: none; margin-top: 16px; padding: 12px; border-radius: 8px;
+      text-align: center; font-size: 14px; line-height: 1.5;
     }
+    .success { display: block !important; background: #e8f7ee; color: #146c3a; }
+    .error { display: block !important; background: #fdecec; color: #a12626; }
+    .login-link { margin-top: 18px; text-align: center; font-size: 14px; color: #555; }
+    .login-link a { color: #0b6b45; font-weight: bold; text-decoration: none; }
   </style>
 </head>
-
 <body>
+  <div class="signup-box">
+    <h2>নতুন User Account</h2>
+    <p class="subtitle">আপনার নতুন অ্যাকাউন্ট তৈরি করুন</p>
 
-  <div class="login-box">
+    <form id="signupForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="আপনার Email লিখুন" autocomplete="email" required>
 
-    <h2>কহিনুর কেমিক্যাল পিএলসি</h2>
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="কমপক্ষে ৬ অক্ষর" autocomplete="new-password" minlength="6" required>
 
-    <div class="subtitle">
-      অর্ডার অটোমেশন
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" placeholder="Password আবার লিখুন" autocomplete="new-password" minlength="6" required>
+
+      <button type="submit" id="signupButton">Sign Up</button>
+      <div id="message"></div>
+    </form>
+
+    <div class="login-link">
+      আগে থেকেই Account আছে? <a href="login.html">Login করুন</a>
     </div>
-
-    <label for="username">Username</label>
-    <input
-      id="username"
-      type="text"
-      placeholder="Username লিখুন"
-      autocomplete="username"
-    >
-
-    <label for="password">Password</label>
-    <input
-      id="password"
-      type="password"
-      placeholder="Password লিখুন"
-      autocomplete="current-password"
-    >
-
-    <button onclick="login()">Login</button>
-
-    <div id="message"></div>
-
   </div>
 
-<script>
+  <script>
+    const SUPABASE_URL = "https://utzkpsohkoiawvuupgeb.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
-  const SUPABASE_URL =
-    "https://utzkpsohkoiawvuupgeb.supabase.co";
+    // Supabase Dashboard > Authentication > URL Configuration-এ
+    // এই URL-টিও Redirect URL হিসেবে যোগ করতে হবে।
+    const EMAIL_REDIRECT_URL =
+      "https://Asif2559059.github.io/Kohinoor-Automation/login.html";
 
-  const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0emtwc29oa29pYXd2dXVwZ2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMDY0OTEsImV4cCI6MjEwNDY4MjQ5MX0.xJIYFw2KEN-4bDXUJ8BkuWcFEtfnSpyvJMaBCMX_LgE";
+    const form = document.getElementById("signupForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+    const signupButton = document.getElementById("signupButton");
+    const message = document.getElementById("message");
 
-  const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-
-  async function login() {
-
-    const username =
-      document.getElementById("username").value.trim();
-
-    const password =
-      document.getElementById("password").value;
-
-    const message =
-      document.getElementById("message");
-
-
-    if (!username || !password) {
-
-      message.textContent =
-        "Username এবং Password দিন";
-
-      message.style.color = "red";
-
-      return;
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = type;
     }
 
+    function translateError(errorMessage) {
+      const text = String(errorMessage || "").toLowerCase();
+      if (text.includes("user already registered")) return "এই Email দিয়ে আগে থেকেই Account আছে। Login করুন।";
+      if (text.includes("password should be at least")) return "Password কমপক্ষে ৬ অক্ষরের হতে হবে।";
+      if (text.includes("invalid email")) return "সঠিক Email address দিন।";
+      if (text.includes("email rate limit") || text.includes("rate limit")) return "Email পাঠানোর সীমা অতিক্রম হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
+      return "Sign Up করা যায়নি: " + errorMessage;
+    }
 
-    message.textContent = "Login হচ্ছে...";
+    let supabaseClient = null;
 
-    message.style.color = "#0b6b45";
+    if (!window.supabase) {
+      showMessage("Supabase library load হয়নি। Internet connection পরীক্ষা করুন।", "error");
+    } else {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } catch (error) {
+        showMessage("Supabase configuration ভুল হয়েছে।", "error");
+      }
+    }
 
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
 
-    // Username থেকে Email বের করা
-    const { data: userData, error: userError } =
-      await supabaseClient.rpc(
-        "get_login_email",
-        {
-          p_username: username
+      if (!supabaseClient) {
+        showMessage("Supabase configuration ঠিক করা হয়নি।", "error");
+        return;
+      }
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+
+      if (!email) return showMessage("Email দিন।", "error");
+      if (password.length < 6) return showMessage("Password কমপক্ষে ৬ অক্ষরের হতে হবে।", "error");
+      if (password !== confirmPassword) return showMessage("দুইটি Password একই নয়।", "error");
+
+      signupButton.disabled = true;
+      signupButton.textContent = "Account তৈরি হচ্ছে...";
+      message.className = "";
+      message.textContent = "";
+
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: EMAIL_REDIRECT_URL
+          }
+        });
+
+        if (error) {
+          showMessage(translateError(error.message), "error");
+          return;
         }
-      );
 
+        if (data.user && !data.session) {
+          showMessage(
+            "Account তৈরি হয়েছে। আপনার Email inbox-এ confirmation link পাঠানো হয়েছে। Email confirm করার পর Login করুন।",
+            "success"
+          );
+          form.reset();
+          return;
+        }
 
-    if (
-      userError ||
-      !userData ||
-      userData.length === 0
-    ) {
+        if (data.user && data.session) {
+          showMessage("Account সফলভাবে তৈরি হয়েছে। Login page-এ নেওয়া হচ্ছে...", "success");
+          setTimeout(() => { window.location.href = EMAIL_REDIRECT_URL; }, 1200);
+          return;
+        }
 
-      message.textContent =
-        "Username পাওয়া যায়নি";
-
-      message.style.color = "red";
-
-      return;
-    }
-
-
-    const email =
-      userData[0].email;
-
-
-    // Supabase Login
-    const { error } =
-      await supabaseClient.auth.signInWithPassword({
-
-        email: email,
-
-        password: password
-
-      });
-
-
-    if (error) {
-
-      message.textContent =
-        "Username অথবা Password ভুল";
-
-      message.style.color = "red";
-
-      return;
-    }
-
-
-    message.textContent =
-      "Login সফল হয়েছে!";
-
-    message.style.color = "#0b6b45";
-
-
-    // মূল অ্যাপে পাঠানো
-    setTimeout(function() {
-
-      window.location.href = "index.html";
-
-    }, 500);
-
-  }
-
-</script>
-
+        showMessage("Account তৈরি করা যায়নি। আবার চেষ্টা করুন।", "error");
+      } catch (error) {
+        showMessage("একটি অপ্রত্যাশিত সমস্যা হয়েছে: " + (error.message || error), "error");
+      } finally {
+        signupButton.disabled = false;
+        signupButton.textContent = "Sign Up";
+      }
+    });
+  </script>
 </body>
 </html>

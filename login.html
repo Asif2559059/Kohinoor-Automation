@@ -137,6 +137,23 @@
 
     <form id="signupForm">
 
+      <!-- USERNAME -->
+
+      <label for="username">Username</label>
+
+      <input
+        type="text"
+        id="username"
+        placeholder="আপনার Username লিখুন"
+        autocomplete="username"
+        minlength="3"
+        maxlength="50"
+        required
+      >
+
+
+      <!-- EMAIL -->
+
       <label for="email">Email</label>
 
       <input
@@ -147,6 +164,8 @@
         required
       >
 
+
+      <!-- PASSWORD -->
 
       <label for="password">Password</label>
 
@@ -159,6 +178,8 @@
         required
       >
 
+
+      <!-- CONFIRM PASSWORD -->
 
       <label for="confirmPassword">Confirm Password</label>
 
@@ -231,6 +252,9 @@
     const form =
       document.getElementById("signupForm");
 
+    const usernameInput =
+      document.getElementById("username");
+
     const emailInput =
       document.getElementById("email");
 
@@ -299,6 +323,21 @@
       }
 
 
+      if (
+        text.includes("username") &&
+        text.includes("duplicate")
+      ) {
+        return "এই Username আগে থেকেই ব্যবহার করা হয়েছে। অন্য Username দিন।";
+      }
+
+
+      if (
+        text.includes("user_profiles_username_unique")
+      ) {
+        return "এই Username আগে থেকেই ব্যবহার করা হয়েছে। অন্য Username দিন।";
+      }
+
+
       return "Sign Up করা যায়নি: " + errorMessage;
     }
 
@@ -314,6 +353,9 @@
         event.preventDefault();
 
 
+        const username =
+          usernameInput.value.trim();
+
         const email =
           emailInput.value.trim();
 
@@ -324,7 +366,31 @@
           confirmPasswordInput.value;
 
 
-        // Validation
+        // ======================================
+        // VALIDATION
+        // ======================================
+
+        if (!username) {
+
+          showMessage(
+            "Username দিন।",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if (username.length < 3) {
+
+          showMessage(
+            "Username কমপক্ষে ৩ অক্ষরের হতে হবে।",
+            "error"
+          );
+
+          return;
+        }
+
 
         if (!email) {
 
@@ -359,7 +425,9 @@
         }
 
 
-        // Button loading
+        // ======================================
+        // BUTTON LOADING
+        // ======================================
 
         signupButton.disabled = true;
 
@@ -372,6 +440,10 @@
 
 
         try {
+
+          // ====================================
+          // SUPABASE SIGN UP
+          // ====================================
 
           const {
             data,
@@ -390,8 +462,7 @@
 
               data: {
 
-                username:
-                  email.split("@")[0],
+                username: username,
 
                 role: "user"
 
@@ -402,7 +473,9 @@
           });
 
 
-          // Error
+          // ====================================
+          // ERROR
+          // ====================================
 
           if (error) {
 
@@ -420,57 +493,70 @@
           }
 
 
-          // Email confirmation required
+          // ====================================
+          // USER CREATED
+          // ====================================
 
-          if (
-            data.user &&
-            !data.session
-          ) {
+          if (data.user) {
+
+            /*
+             * আমাদের Supabase trigger
+             * automatically user_profiles table-এ
+             * username + email + pending status
+             * তৈরি করবে।
+             */
+
+            // ==================================
+            // EMAIL CONFIRMATION REQUIRED
+            // ==================================
+
+            if (!data.session) {
+
+              showMessage(
+
+                "Account তৈরি হয়েছে। আপনার Email inbox-এ confirmation link পাঠানো হয়েছে। Email confirm করার পর Admin approval-এর জন্য অপেক্ষা করুন।",
+
+                "success"
+
+              );
+
+              form.reset();
+
+              return;
+            }
+
+
+            // ==================================
+            // SESSION CREATED
+            // ==================================
+
+            /*
+             * Email confirmation বন্ধ থাকলেও
+             * account সরাসরি approved হবে না।
+             *
+             * user_profiles status থাকবে pending.
+             */
 
             showMessage(
 
-              "Account তৈরি হয়েছে। আপনার Email inbox-এ confirmation link পাঠানো হয়েছে। Email confirm করার পর Login page-এ আসবেন।",
+              "Account সফলভাবে তৈরি হয়েছে। Admin approval-এর জন্য অপেক্ষা করুন। Approval হলে Login করতে পারবেন।",
 
               "success"
 
             );
-
 
             form.reset();
 
-            return;
-          }
-
-
-          // Already logged in
-
-          if (
-            data.user &&
-            data.session
-          ) {
-
-            showMessage(
-
-              "Account সফলভাবে তৈরি হয়েছে। Login page-এ নেওয়া হচ্ছে...",
-
-              "success"
-
-            );
-
-
-            setTimeout(
-              function() {
-
-                window.location.href =
-                  EMAIL_REDIRECT_URL;
-
-              },
-              1000
-            );
+            // নিরাপত্তার জন্য session sign out
+            await supabaseClient.auth.signOut();
 
             return;
           }
 
+
+          // ====================================
+          // UNKNOWN RESULT
+          // ====================================
 
           showMessage(
             "Account তৈরি করা যায়নি। আবার চেষ্টা করুন।",
@@ -480,7 +566,10 @@
 
         } catch (error) {
 
-          console.error(error);
+          console.error(
+            "Signup Exception:",
+            error
+          );
 
           showMessage(
 

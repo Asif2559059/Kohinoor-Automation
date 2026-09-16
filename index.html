@@ -2688,10 +2688,9 @@ renderOrder();
 updateDashboard();
 
 
-/* =========================
+/* ========fu===========
    SUPABASE PRODUCTS LOAD
 ========================= */
-
 async function loadProductsFromSupabase(){
 
   try{
@@ -2711,7 +2710,7 @@ async function loadProductsFromSupabase(){
     if(error){
 
       console.warn(
-        'Products load error:',
+        'Supabase load error:',
         error.message
       );
 
@@ -2721,21 +2720,52 @@ async function loadProductsFromSupabase(){
 
     if(data && data.length){
 
+      /*
+       * LocalStorage-এর পুরোনো পণ্য আগে রাখা হচ্ছে।
+       * Supabase-এর একই code থাকলে Supabase-এর
+       * তথ্য ব্যবহার হবে।
+       */
+
+      const productMap =
+        new Map(
+          products.map(
+            p => [
+              String(p.code),
+              p
+            ]
+          )
+        );
+
+
+      data.forEach(p => {
+
+        productMap.set(
+          String(p.code || ''),
+          {
+            code:String(p.code || ''),
+
+            name:String(p.name || ''),
+
+            pack:String(p.pack || ''),
+
+            price:Number(p.price) || 0,
+
+            stock:Number(p.stock) || 0
+          }
+        );
+
+      });
+
+
       products =
-        data.map(p=>({
+        Array.from(
+          productMap.values()
+        );
 
-          code:String(p.code || ''),
 
-          name:String(p.name || ''),
-
-          pack:String(p.pack || ''),
-
-          price:Number(p.price)||0,
-
-          stock:Number(p.stock)||0
-
-        }));
-
+      /*
+       * সব পণ্য আবার LocalStorage-এ রাখা হচ্ছে
+       */
 
       localStorage.setItem(
         KEY,
@@ -2762,5 +2792,9 @@ async function loadProductsFromSupabase(){
 
 }
 
+
+/*
+ * পেজ চালু হলে Supabase থেকে পণ্য লোড হবে
+ */
 
 loadProductsFromSupabase();

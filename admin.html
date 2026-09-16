@@ -13,6 +13,10 @@
 
 <style>
 
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   background:#f4f7f6;
@@ -24,6 +28,10 @@ header{
   background:#087f50;
   color:#fff;
   padding:18px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
 
 header h1{
@@ -83,6 +91,70 @@ button:disabled{
   cursor:not-allowed;
 }
 
+.refresh{
+  width:100%;
+}
+
+.order{
+  background:#fff;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  border-left:5px solid #087f50;
+}
+
+.order h3{
+  margin:0 0 12px;
+  color:#087f50;
+}
+
+.info{
+  line-height:1.9;
+  font-size:15px;
+}
+
+.info b{
+  color:#333;
+}
+
+.item{
+  background:#f4f7f6;
+  padding:11px;
+  border-radius:8px;
+  margin-top:10px;
+  line-height:1.8;
+}
+
+.total{
+  margin-top:12px;
+  padding:12px;
+  background:#e8f5ee;
+  border-radius:8px;
+  font-size:18px;
+  font-weight:bold;
+  text-align:right;
+}
+
+.status{
+  margin-top:14px;
+}
+
+.status label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+
+.status select{
+  width:100%;
+  padding:11px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+  background:white;
+}
+
 .call{
   display:inline-block;
   background:#1565c0;
@@ -99,44 +171,10 @@ button:disabled{
   width:100%;
 }
 
-.status{
-  margin-top:12px;
-}
-
-.status select{
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:16px;
-  background:white;
-}
-
-.order{
-  background:#fff;
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-  border-left:5px solid #087f50;
-}
-
-.order h3{
-  margin-top:0;
-  color:#087f50;
-}
-
-.item{
-  background:#f4f7f6;
-  padding:10px;
-  border-radius:7px;
+.delete{
+  background:#dc3545;
   margin-top:8px;
-}
-
-.empty{
-  text-align:center;
-  padding:30px;
-  color:#777;
+  width:100%;
 }
 
 .small{
@@ -145,10 +183,61 @@ button:disabled{
   margin-top:6px;
 }
 
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:#777;
+}
 
-/* ============================= */
-/* USER APPROVAL */
-/* ============================= */
+.error{
+  background:#f8d7da;
+  color:#721c24;
+  padding:14px;
+  border-radius:8px;
+  line-height:1.7;
+}
+
+.success{
+  background:#d4edda;
+  color:#155724;
+  padding:14px;
+  border-radius:8px;
+  line-height:1.7;
+}
+
+.loading{
+  text-align:center;
+  padding:30px;
+  color:#666;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.badge-pending{
+  background:#fff3cd;
+  color:#856404;
+}
+
+.badge-processing{
+  background:#cfe2ff;
+  color:#084298;
+}
+
+.badge-delivery{
+  background:#cff4fc;
+  color:#055160;
+}
+
+.badge-completed{
+  background:#d1e7dd;
+  color:#0f5132;
+}
 
 #userApprovalSection{
   display:none;
@@ -237,19 +326,9 @@ button:disabled{
   color:#721c24;
 }
 
-
-/* ============================= */
-/* HIDDEN SECTIONS */
-/* ============================= */
-
 #adminContent{
   display:none;
 }
-
-
-/* ============================= */
-/* MOBILE */
-/* ============================= */
 
 @media(max-width:600px){
 
@@ -272,13 +351,8 @@ button:disabled{
 
 </head>
 
-
 <body>
 
-
-<!-- ================================= -->
-<!-- HEADER -->
-<!-- ================================= -->
 
 <header>
 
@@ -294,8 +368,7 @@ button:disabled{
 
     <button onclick="showUsers()">
       👥 ইউজার Approval
-      <span id="pendingCount"
-            class="users-count">
+      <span id="pendingCount" class="users-count">
         0
       </span>
     </button>
@@ -317,68 +390,62 @@ button:disabled{
 </header>
 
 
-<!-- ================================= -->
-<!-- MAIN -->
-<!-- ================================= -->
-
 <main id="adminContent">
 
 
-  <!-- ================================= -->
-  <!-- USER APPROVAL SECTION -->
-  <!-- ================================= -->
+<section id="orderSection">
 
-  <section id="userApprovalSection">
+  <div class="card">
 
-    <div class="card">
+    <button
+      class="refresh"
+      onclick="loadOrders()"
+    >
+      🔄 Supabase থেকে অর্ডার Refresh
+    </button>
 
-      <h2>
-        👥 User Management
-      </h2>
-
-      <p>
-        নতুন User-এর Account Approve অথবা Reject করুন।
-      </p>
-
-      <div id="userMessage"
-           class="message">
-      </div>
-
+    <div
+      id="status"
+      class="loading"
+    >
+      অর্ডার লোড হচ্ছে...
     </div>
 
+  </div>
 
-    <div id="usersBox">
+  <div id="ordersBox"></div>
 
-      <div class="card empty">
-        ইউজার লোড হচ্ছে...
-      </div>
+</section>
 
+
+<section id="userApprovalSection">
+
+  <div class="card">
+
+    <h2>
+      👥 User Management
+    </h2>
+
+    <p>
+      নতুন User-এর Account Approve অথবা Reject করুন।
+    </p>
+
+    <div
+      id="userMessage"
+      class="message"
+    ></div>
+
+  </div>
+
+  <div id="usersBox">
+
+    <div class="card empty">
+      ইউজার লোড হচ্ছে...
     </div>
 
-  </section>
+  </div>
 
-
-  <!-- ================================= -->
-  <!-- ORDER SECTION -->
-  <!-- ================================= -->
-
-  <section id="orderSection">
-
-    <div class="card">
-
-      <button onclick="loadOrders()">
-        🔄 অর্ডার রিফ্রেশ করুন
-      </button>
-
-      <div id="status">
-        অর্ডার লোড হচ্ছে...
-      </div>
-
-    </div>
-
-    <div id="ordersBox"></div>
-
-  </section>
+</section>
 
 
 </main>
@@ -387,133 +454,171 @@ button:disabled{
 <script>
 
 
-// ======================================================
-// SUPABASE CONFIG
-// ======================================================
+// =====================================================
+// SUPABASE
+// =====================================================
 
 const SUPABASE_URL =
 "https://utzkpsohkoiawvuupgeb.supabase.co";
 
-
 const SUPABASE_ANON_KEY =
 "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
-
 const supabaseClient =
-supabase.createClient(
+window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
 
-// ======================================================
+// =====================================================
 // ADMIN EMAIL
-// ======================================================
+// =====================================================
 
 const ADMIN_EMAIL =
 "mdyeamin10288@gmail.com";
 
 
-// ======================================================
-// GOOGLE SHEET CONFIG
-// ======================================================
-
-const SHEET_ID =
-"1gM9f1Aze4Hp7bWvTngCnwBgZJRQD1dDhHocNNv7tDgI";
-
-const SHEET_NAME =
-"Form Responses 1";
-
-const STATUS_KEY =
-"kohinoor_order_status";
-
-
-// ======================================================
-// ADMIN CHECK
-// ======================================================
+// =====================================================
+// AUTH / ADMIN CHECK
+// =====================================================
 
 async function checkAdmin(){
 
-  const {
-    data:{
-      session
+  try{
+
+    const {
+      data:{
+        session
+      },
+      error
+    } =
+    await supabaseClient.auth.getSession();
+
+
+    if(error){
+
+      console.error(error);
+
+      alert(
+        "Login session পাওয়া যায়নি।"
+      );
+
+      window.location.href =
+      "login.html";
+
+      return false;
     }
-  } =
-  await supabaseClient.auth.getSession();
 
 
-  if(!session){
+    if(!session){
 
-    window.location.href =
-    "login.html";
+      window.location.href =
+      "login.html";
 
-    return false;
+      return false;
+    }
+
+
+    const email =
+    session.user.email || "";
+
+
+    if(
+      email.toLowerCase() !==
+      ADMIN_EMAIL.toLowerCase()
+    ){
+
+      await supabaseClient.auth.signOut();
+
+      alert(
+        "শুধুমাত্র Admin এই পেজে প্রবেশ করতে পারবেন।"
+      );
+
+      window.location.href =
+      "login.html";
+
+      return false;
+    }
+
+
+    // ===============================================
+    // APP ADMINS CHECK
+    // ===============================================
+
+    const {
+      data,
+      error:adminError
+    } =
+    await supabaseClient
+      .from("app_admins")
+      .select("user_id")
+      .eq(
+        "user_id",
+        session.user.id
+      )
+      .maybeSingle();
+
+
+    if(adminError){
+
+      console.error(
+        "Admin check error:",
+        adminError
+      );
+
+      alert(
+        "Admin permission check করতে সমস্যা হয়েছে:\n\n" +
+        adminError.message
+      );
+
+      return false;
+    }
+
+
+    if(!data){
+
+      await supabaseClient.auth.signOut();
+
+      alert(
+        "এই Account-এ Admin permission নেই।"
+      );
+
+      window.location.href =
+      "login.html";
+
+      return false;
+    }
+
+
+    document.getElementById(
+      "adminContent"
+    ).style.display =
+    "block";
+
+
+    return true;
+
   }
+  catch(error){
 
-
-  // Email check
-  if(
-    !session.user.email ||
-    session.user.email.toLowerCase()
-      !== ADMIN_EMAIL.toLowerCase()
-  ){
-
-    await supabaseClient.auth.signOut();
+    console.error(error);
 
     alert(
-      "শুধুমাত্র Admin এই পেজে প্রবেশ করতে পারবেন।"
+      "Admin check করতে সমস্যা হয়েছে:\n\n" +
+      error.message
     );
 
-    window.location.href =
-    "login.html";
-
     return false;
+
   }
 
-
-  // app_admins table check
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
-    .from("app_admins")
-    .select("user_id")
-    .eq("user_id",session.user.id)
-    .maybeSingle();
-
-
-  if(
-    error ||
-    !data
-  ){
-
-    await supabaseClient.auth.signOut();
-
-    alert(
-      "এই Account-এ Admin permission নেই।"
-    );
-
-    window.location.href =
-    "login.html";
-
-    return false;
-  }
-
-
-  document.getElementById(
-    "adminContent"
-  ).style.display =
-  "block";
-
-
-  return true;
 }
 
 
-// ======================================================
+// =====================================================
 // LOGOUT
-// ======================================================
+// =====================================================
 
 async function adminLogout(){
 
@@ -521,12 +626,13 @@ async function adminLogout(){
 
   window.location.href =
   "login.html";
+
 }
 
 
-// ======================================================
+// =====================================================
 // SECTION SWITCH
-// ======================================================
+// =====================================================
 
 function showOrders(){
 
@@ -560,9 +666,1153 @@ function showUsers(){
 }
 
 
-// ======================================================
+// =====================================================
+// ESCAPE HTML
+// =====================================================
+
+function escapeHtml(value){
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+
+    return "";
+
+  }
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+// =====================================================
+// DATE
+// =====================================================
+
+function formatDate(value){
+
+  if(!value){
+    return "-";
+  }
+
+  try{
+
+    const date =
+    new Date(value);
+
+    if(
+      isNaN(
+        date.getTime()
+      )
+    ){
+
+      return escapeHtml(
+        value
+      );
+
+    }
+
+    return date.toLocaleString(
+      "bn-BD",
+      {
+        year:"numeric",
+        month:"2-digit",
+        day:"2-digit",
+        hour:"2-digit",
+        minute:"2-digit"
+      }
+    );
+
+  }
+  catch(e){
+
+    return escapeHtml(
+      value
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// NUMBER
+// =====================================================
+
+function formatMoney(value){
+
+  const number =
+  Number(value || 0);
+
+  return number.toLocaleString(
+    "bn-BD",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
+
+}
+
+
+// =====================================================
+// PRODUCT DATA NORMALIZER
+// =====================================================
+
+function getProductArray(order){
+
+  let products =
+  order.products;
+
+
+  if(!products){
+
+    return [];
+
+  }
+
+
+  if(
+    typeof products ===
+    "string"
+  ){
+
+    try{
+
+      products =
+      JSON.parse(
+        products
+      );
+
+    }
+    catch(e){
+
+      return [];
+
+    }
+
+  }
+
+
+  if(
+    Array.isArray(products)
+  ){
+
+    return products;
+
+  }
+
+
+  return [];
+
+}
+
+
+// =====================================================
+// ORDER STATUS
+// =====================================================
+
+function statusText(status){
+
+  switch(status){
+
+    case "processing":
+      return "🔄 প্রসেসিং";
+
+    case "delivery":
+      return "🚚 ডেলিভারি";
+
+    case "completed":
+      return "✅ সম্পন্ন";
+
+    case "rejected":
+      return "❌ বাতিল";
+
+    default:
+      return "🆕 নতুন";
+
+  }
+
+}
+
+
+function statusClass(status){
+
+  switch(status){
+
+    case "processing":
+      return "badge-processing";
+
+    case "delivery":
+      return "badge-delivery";
+
+    case "completed":
+      return "badge-completed";
+
+    default:
+      return "badge-pending";
+
+  }
+
+}
+
+
+// =====================================================
+// LOAD ORDERS FROM SUPABASE
+// =====================================================
+
+async function loadOrders(){
+
+  const statusBox =
+  document.getElementById(
+    "status"
+  );
+
+  const ordersBox =
+  document.getElementById(
+    "ordersBox"
+  );
+
+
+  statusBox.className =
+  "loading";
+
+  statusBox.textContent =
+  "Supabase থেকে অর্ডার লোড হচ্ছে...";
+
+
+  ordersBox.innerHTML =
+  "";
+
+
+  try{
+
+    // ===============================================
+    // ADMIN USER
+    // ===============================================
+
+    const {
+      data:{
+        user
+      },
+      error:userError
+    } =
+    await supabaseClient.auth.getUser();
+
+
+    if(userError){
+
+      throw userError;
+
+    }
+
+
+    if(!user){
+
+      window.location.href =
+      "login.html";
+
+      return;
+
+    }
+
+
+    // ===============================================
+    // SUPABASE ORDERS
+    // ===============================================
+
+    const {
+      data:orders,
+      error
+    } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    const orderList =
+    orders || [];
+
+
+    if(
+      orderList.length === 0
+    ){
+
+      statusBox.textContent =
+      "কোনো অর্ডার পাওয়া যায়নি।";
+
+      ordersBox.innerHTML = `
+
+        <div class="card empty">
+
+          <div style="font-size:45px;">
+            📦
+          </div>
+
+          <h3>
+            এখনো কোনো অর্ডার নেই
+          </h3>
+
+          <p>
+            User পেজ থেকে নতুন অর্ডার দিলে
+            এখানে দেখা যাবে।
+          </p>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    statusBox.className =
+    "success";
+
+    statusBox.textContent =
+    "✅ " +
+    orderList.length +
+    " টি অর্ডার পাওয়া গেছে";
+
+
+    orderList.forEach(
+      (
+        order,
+        index
+      ) => {
+
+        renderOrder(
+          order,
+          index
+        );
+
+      }
+    );
+
+  }
+  catch(error){
+
+    console.error(
+      "LOAD ORDERS ERROR:",
+      error
+    );
+
+
+    statusBox.className =
+    "error";
+
+    statusBox.innerHTML = `
+
+      <b>
+        ❌ অর্ডার লোড করা যায়নি
+      </b>
+
+      <br><br>
+
+      ${escapeHtml(
+        error.message
+      )}
+
+      <br><br>
+
+      <small>
+        Supabase Table/RLS Policy পরীক্ষা করুন।
+      </small>
+
+    `;
+
+  }
+
+}
+
+
+// =====================================================
+// RENDER ORDER
+// =====================================================
+
+function renderOrder(
+  order,
+  index
+){
+
+  const ordersBox =
+  document.getElementById(
+    "ordersBox"
+  );
+
+
+  const orderId =
+  order.id;
+
+
+  const products =
+  getProductArray(
+    order
+  );
+
+
+  const currentStatus =
+  order.status ||
+  "pending";
+
+
+  let productHtml =
+  "";
+
+
+  if(
+    products.length === 0
+  ){
+
+    productHtml = `
+
+      <div class="item">
+        কোনো পণ্যের তথ্য পাওয়া যায়নি।
+      </div>
+
+    `;
+
+  }
+  else{
+
+    products.forEach(
+      (
+        product,
+        productIndex
+      ) => {
+
+        const name =
+        product.name ||
+        product.product_name ||
+        "-";
+
+
+        const pack =
+        product.pack ||
+        product.unit ||
+        "";
+
+
+        const quantity =
+        product.quantity ||
+        product.qty ||
+        0;
+
+
+        const price =
+        product.price ||
+        0;
+
+
+        const subtotal =
+        product.subtotal ??
+        product.total ??
+        (
+          Number(quantity) *
+          Number(price)
+        );
+
+
+        productHtml += `
+
+          <div class="item">
+
+            <b>
+              ${escapeHtml(name)}
+            </b>
+
+            ${
+              pack
+              ?
+              `
+              <br>
+              প্যাক:
+              ${escapeHtml(pack)}
+              `
+              :
+              ""
+            }
+
+            <br>
+
+            পরিমাণ:
+            <b>
+              ${escapeHtml(quantity)}
+            </b>
+
+            ${
+              price
+              ?
+              `
+              <br>
+              মূল্য:
+              ৳${formatMoney(price)}
+              `
+              :
+              ""
+            }
+
+            <br>
+
+            মোট:
+            <b>
+              ৳${formatMoney(subtotal)}
+            </b>
+
+          </div>
+
+        `;
+
+      }
+    );
+
+  }
+
+
+  const safeMobile =
+  String(
+    order.mobile ||
+    ""
+  )
+  .replace(
+    /[^0-9+]/g,
+    ""
+  );
+
+
+  const orderNumber =
+  index + 1;
+
+
+  const div =
+  document.createElement(
+    "div"
+  );
+
+
+  div.className =
+  "order";
+
+
+  div.id =
+  "order_" +
+  escapeHtml(
+    String(orderId)
+  );
+
+
+  div.innerHTML = `
+
+    <h3>
+      📦 অর্ডার #${orderNumber}
+    </h3>
+
+
+    <div class="info">
+
+      <b>
+        অর্ডার ID:
+      </b>
+
+      ${escapeHtml(
+        String(orderId)
+      )}
+
+      <br>
+
+
+      <b>
+        অর্ডারের সময়:
+      </b>
+
+      ${formatDate(
+        order.created_at
+      )}
+
+      <br>
+
+
+      <b>
+        অর্ডার তারিখ:
+      </b>
+
+      ${formatDate(
+        order.order_date
+      )}
+
+      <br>
+
+
+      <b>
+        ডেলিভারি তারিখ:
+      </b>
+
+      ${formatDate(
+        order.delivery_date
+      )}
+
+      <br><br>
+
+
+      <b>
+        🏪 দোকানের নাম:
+      </b>
+
+      ${escapeHtml(
+        order.shop
+      )}
+
+      <br>
+
+
+      <b>
+        📍 ঠিকানা:
+      </b>
+
+      ${escapeHtml(
+        order.address
+      )}
+
+      <br>
+
+
+      <b>
+        📞 মোবাইল:
+      </b>
+
+      ${escapeHtml(
+        order.mobile
+      )}
+
+      <br>
+
+
+      <b>
+        👤 প্রতিনিধি:
+      </b>
+
+      ${escapeHtml(
+        order.representative
+      )}
+
+    </div>
+
+
+    ${
+      safeMobile
+      ?
+      `
+      <a
+        class="call"
+        href="tel:${safeMobile}"
+      >
+        📞 সরাসরি কল করুন
+      </a>
+      `
+      :
+      ""
+    }
+
+
+    <h4>
+      🛒 পণ্যসমূহ
+    </h4>
+
+
+    ${productHtml}
+
+
+    <div class="total">
+
+      মোট অর্ডার:
+      ৳${formatMoney(
+        order.total
+      )}
+
+    </div>
+
+
+    ${
+      order.note
+      ?
+      `
+      <div class="item">
+
+        <b>
+          📝 মন্তব্য:
+        </b>
+
+        <br>
+
+        ${escapeHtml(
+          order.note
+        )}
+
+      </div>
+      `
+      :
+      ""
+    }
+
+
+    <div class="status">
+
+      <label>
+        📌 অর্ডারের Status
+      </label>
+
+
+      <select
+        onchange="
+          updateOrderStatus(
+            '${escapeHtml(
+              String(orderId)
+            )}',
+            this.value
+          )
+        "
+      >
+
+        <option
+          value="pending"
+          ${
+            currentStatus === "pending"
+            ? "selected"
+            : ""
+          }
+        >
+          🆕 নতুন
+        </option>
+
+
+        <option
+          value="processing"
+          ${
+            currentStatus === "processing"
+            ? "selected"
+            : ""
+          }
+        >
+          🔄 প্রসেসিং
+        </option>
+
+
+        <option
+          value="delivery"
+          ${
+            currentStatus === "delivery"
+            ? "selected"
+            : ""
+          }
+        >
+          🚚 ডেলিভারি
+        </option>
+
+
+        <option
+          value="completed"
+          ${
+            currentStatus === "completed"
+            ? "selected"
+            : ""
+          }
+        >
+          ✅ সম্পন্ন
+        </option>
+
+
+        <option
+          value="rejected"
+          ${
+            currentStatus === "rejected"
+            ? "selected"
+            : ""
+          }
+        >
+          ❌ বাতিল
+        </option>
+
+      </select>
+
+
+      <div class="small">
+
+        বর্তমান:
+        <span class="
+          badge
+          ${statusClass(
+            currentStatus
+          )}
+        ">
+          ${statusText(
+            currentStatus
+          )}
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <button
+      class="print"
+      onclick="
+        printOrder(
+          '${escapeHtml(
+            String(orderId)
+          )}'
+        )
+      "
+    >
+      🖨️ মেমো প্রিন্ট করুন
+    </button>
+
+
+    <button
+      class="delete"
+      onclick="
+        deleteOrder(
+          '${escapeHtml(
+            String(orderId)
+          )}'
+        )
+      "
+    >
+      🗑️ অর্ডার Delete
+    </button>
+
+  `;
+
+
+  ordersBox.appendChild(
+    div
+  );
+
+}
+
+
+// =====================================================
+// UPDATE ORDER STATUS
+// =====================================================
+
+async function updateOrderStatus(
+  orderId,
+  newStatus
+){
+
+  try{
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("orders")
+      .update({
+        status:newStatus,
+        updated_at:
+          new Date().toISOString()
+      })
+      .eq(
+        "id",
+        orderId
+      );
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    alert(
+      "অর্ডারের Status সফলভাবে পরিবর্তন হয়েছে।"
+    );
+
+
+    await loadOrders();
+
+  }
+  catch(error){
+
+    console.error(
+      "STATUS UPDATE ERROR:",
+      error
+    );
+
+
+    alert(
+      "Status পরিবর্তন করা যায়নি:\n\n" +
+      error.message
+    );
+
+
+    await loadOrders();
+
+  }
+
+}
+
+
+// =====================================================
+// DELETE ORDER
+// =====================================================
+
+async function deleteOrder(
+  orderId
+){
+
+  const ok =
+  confirm(
+    "এই অর্ডারটি স্থায়ীভাবে Delete করতে চান?"
+  );
+
+
+  if(!ok){
+    return;
+  }
+
+
+  try{
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("orders")
+      .delete()
+      .eq(
+        "id",
+        orderId
+      );
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    alert(
+      "অর্ডার Delete হয়েছে।"
+    );
+
+
+    await loadOrders();
+
+  }
+  catch(error){
+
+    console.error(
+      "DELETE ORDER ERROR:",
+      error
+    );
+
+
+    alert(
+      "অর্ডার Delete করা যায়নি:\n\n" +
+      error.message
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// PRINT ORDER
+// =====================================================
+
+function printOrder(
+  orderId
+){
+
+  const element =
+  document.getElementById(
+    "order_" +
+    orderId
+  );
+
+
+  if(!element){
+
+    alert(
+      "অর্ডার পাওয়া যায়নি।"
+    );
+
+    return;
+
+  }
+
+
+  const printWindow =
+  window.open(
+    "",
+    "_blank",
+    "width=800,height=900"
+  );
+
+
+  if(!printWindow){
+
+    alert(
+      "Browser popup block করেছে।"
+    );
+
+    return;
+
+  }
+
+
+  const content =
+  element.innerHTML;
+
+
+  printWindow.document.write(`
+
+    <!doctype html>
+
+    <html lang="bn">
+
+    <head>
+
+      <meta charset="utf-8">
+
+      <title>
+        অর্ডার মেমো
+      </title>
+
+      <style>
+
+        body{
+          font-family:
+          Arial,
+          "Noto Sans Bengali",
+          sans-serif;
+
+          padding:25px;
+          color:#000;
+        }
+
+        .memo{
+          max-width:700px;
+          margin:auto;
+        }
+
+        .company{
+          text-align:center;
+          border-bottom:
+          2px solid #000;
+
+          padding-bottom:12px;
+          margin-bottom:18px;
+        }
+
+        .company h1{
+          margin:0;
+          font-size:25px;
+        }
+
+        .company p{
+          margin:5px 0;
+        }
+
+        h3{
+          color:#000;
+        }
+
+        button,
+        select,
+        .call{
+          display:none !important;
+        }
+
+        .item{
+          background:#f4f4f4;
+          padding:10px;
+          margin-top:8px;
+          border-radius:6px;
+        }
+
+        .total{
+          margin-top:20px;
+          text-align:right;
+          font-size:18px;
+          font-weight:bold;
+        }
+
+      </style>
+
+    </head>
+
+
+    <body>
+
+      <div class="memo">
+
+        <div class="company">
+
+          <h1>
+            কহিনুর কেমিক্যাল পিএলসি
+          </h1>
+
+          <p>
+            অর্ডার মেমো
+          </p>
+
+        </div>
+
+        ${content}
+
+      </div>
+
+
+      <script>
+
+        window.onload=function(){
+
+          window.print();
+
+        };
+
+      <\/script>
+
+    </body>
+
+    </html>
+
+  `);
+
+
+  printWindow.document.close();
+
+}
+
+
+// =====================================================
 // USER MESSAGE
-// ======================================================
+// =====================================================
 
 function showUserMessage(
   text,
@@ -574,16 +1824,21 @@ function showUserMessage(
     "userMessage"
   );
 
+
   box.textContent =
   text;
+
 
   box.className =
   "message " +
   (
     type === "success"
-    ? "success-message"
-    : "error-message"
+    ?
+    "success-message"
+    :
+    "error-message"
   );
+
 
   box.style.display =
   "block";
@@ -591,9 +1846,9 @@ function showUserMessage(
 }
 
 
-// ======================================================
+// =====================================================
 // LOAD USERS
-// ======================================================
+// =====================================================
 
 async function loadUsers(){
 
@@ -604,9 +1859,11 @@ async function loadUsers(){
 
 
   box.innerHTML = `
-    <div class="card empty">
+
+    <div class="card loading">
       ইউজার লোড হচ্ছে...
     </div>
+
   `;
 
 
@@ -623,17 +1880,8 @@ async function loadUsers(){
 
     if(error){
 
-      console.error(error);
+      throw error;
 
-      box.innerHTML = `
-        <div class="card">
-          <b>ইউজার লোড করা যায়নি।</b>
-          <br><br>
-          ${escapeHtml(error.message)}
-        </div>
-      `;
-
-      return;
     }
 
 
@@ -641,11 +1889,11 @@ async function loadUsers(){
     data || [];
 
 
-    // Pending count
     const pendingUsers =
     users.filter(
       user =>
-      user.status === "pending"
+      user.status ===
+      "pending"
     );
 
 
@@ -655,10 +1903,14 @@ async function loadUsers(){
     pendingUsers.length;
 
 
-    if(users.length === 0){
+    if(
+      users.length === 0
+    ){
 
       box.innerHTML = `
+
         <div class="card empty">
+
           <div style="font-size:40px;">
             🎉
           </div>
@@ -667,17 +1919,17 @@ async function loadUsers(){
             কোনো User পাওয়া যায়নি
           </h3>
 
-          <p>
-            নতুন User Signup করলে এখানে দেখা যাবে।
-          </p>
         </div>
+
       `;
 
       return;
+
     }
 
 
-    box.innerHTML = "";
+    box.innerHTML =
+    "";
 
 
     users.forEach(
@@ -688,14 +1940,16 @@ async function loadUsers(){
           "div"
         );
 
+
         div.className =
         "user-card";
 
 
-        let statusClass =
+        let statusClassName =
         "pending";
 
-        let statusText =
+
+        let statusTextValue =
         "⏳ Pending";
 
 
@@ -704,10 +1958,10 @@ async function loadUsers(){
           "approved"
         ){
 
-          statusClass =
+          statusClassName =
           "approved";
 
-          statusText =
+          statusTextValue =
           "✅ Approved";
 
         }
@@ -718,23 +1972,13 @@ async function loadUsers(){
           "rejected"
         ){
 
-          statusClass =
+          statusClassName =
           "rejected";
 
-          statusText =
+          statusTextValue =
           "❌ Rejected";
 
         }
-
-
-        const date =
-        user.created_at
-        ? new Date(
-            user.created_at
-          ).toLocaleString(
-            "bn-BD"
-          )
-        : "-";
 
 
         div.innerHTML = `
@@ -755,8 +1999,10 @@ async function loadUsers(){
 
             <br>
 
-            <b>Account তৈরি:</b>
-            ${escapeHtml(date)}
+            <b>Account:</b>
+            ${formatDate(
+              user.created_at
+            )}
 
             <br>
 
@@ -764,9 +2010,9 @@ async function loadUsers(){
 
             <span class="
               user-status
-              ${statusClass}
+              ${statusClassName}
             ">
-              ${statusText}
+              ${statusTextValue}
             </span>
 
           </div>
@@ -776,13 +2022,16 @@ async function loadUsers(){
             user.status === "pending"
             ?
             `
+
             <div class="user-actions">
 
               <button
                 class="approve-btn"
                 onclick="
                   approveUser(
-                    '${user.id}',
+                    '${escapeHtml(
+                      user.id
+                    )}',
                     this
                   )
                 "
@@ -795,7 +2044,9 @@ async function loadUsers(){
                 class="reject-btn"
                 onclick="
                   rejectUser(
-                    '${user.id}',
+                    '${escapeHtml(
+                      user.id
+                    )}',
                     this
                   )
                 "
@@ -804,18 +2055,22 @@ async function loadUsers(){
               </button>
 
             </div>
+
             `
             :
             user.status === "approved"
             ?
             `
+
             <div class="user-actions">
 
               <button
                 class="reject-btn"
                 onclick="
                   rejectUser(
-                    '${user.id}',
+                    '${escapeHtml(
+                      user.id
+                    )}',
                     this
                   )
                 "
@@ -824,16 +2079,20 @@ async function loadUsers(){
               </button>
 
             </div>
+
             `
             :
             `
+
             <div class="user-actions">
 
               <button
                 class="approve-btn"
                 onclick="
                   approveUser(
-                    '${user.id}',
+                    '${escapeHtml(
+                      user.id
+                    )}',
                     this
                   )
                 "
@@ -842,13 +2101,16 @@ async function loadUsers(){
               </button>
 
             </div>
+
             `
           }
 
         `;
 
 
-        box.appendChild(div);
+        box.appendChild(
+          div
+        );
 
       }
     );
@@ -856,12 +2118,28 @@ async function loadUsers(){
   }
   catch(error){
 
-    console.error(error);
+    console.error(
+      "USER LOAD ERROR:",
+      error
+    );
+
 
     box.innerHTML = `
-      <div class="card">
-        User load করতে সমস্যা হয়েছে।
+
+      <div class="card error">
+
+        <b>
+          ইউজার লোড করা যায়নি
+        </b>
+
+        <br><br>
+
+        ${escapeHtml(
+          error.message
+        )}
+
       </div>
+
     `;
 
   }
@@ -869,31 +2147,28 @@ async function loadUsers(){
 }
 
 
-// ======================================================
+// =====================================================
 // APPROVE USER
-// ======================================================
+// =====================================================
 
 async function approveUser(
   userId,
   button
 ){
 
-  const ok =
-  confirm(
-    "এই User-কে Approve করতে চান?"
-  );
+  if(
+    !confirm(
+      "এই User-কে Approve করতে চান?"
+    )
+  ){
 
-
-  if(!ok){
     return;
+
   }
 
 
   button.disabled =
   true;
-
-  button.textContent =
-  "Approving...";
 
 
   try{
@@ -912,21 +2187,8 @@ async function approveUser(
 
     if(error){
 
-      console.error(error);
+      throw error;
 
-      showUserMessage(
-        "Approve করা যায়নি: " +
-        error.message,
-        "error"
-      );
-
-      button.disabled =
-      false;
-
-      button.textContent =
-      "✅ Approve";
-
-      return;
     }
 
 
@@ -944,46 +2206,42 @@ async function approveUser(
     console.error(error);
 
     showUserMessage(
-      "Approve করতে সমস্যা হয়েছে।",
+      "Approve করা যায়নি: " +
+      error.message,
       "error"
     );
 
+
     button.disabled =
     false;
-
-    button.textContent =
-    "✅ Approve";
 
   }
 
 }
 
 
-// ======================================================
+// =====================================================
 // REJECT USER
-// ======================================================
+// =====================================================
 
 async function rejectUser(
   userId,
   button
 ){
 
-  const ok =
-  confirm(
-    "এই User-কে Reject করতে চান?"
-  );
+  if(
+    !confirm(
+      "এই User-কে Reject করতে চান?"
+    )
+  ){
 
-
-  if(!ok){
     return;
+
   }
 
 
   button.disabled =
   true;
-
-  button.textContent =
-  "Rejecting...";
 
 
   try{
@@ -1002,21 +2260,8 @@ async function rejectUser(
 
     if(error){
 
-      console.error(error);
+      throw error;
 
-      showUserMessage(
-        "Reject করা যায়নি: " +
-        error.message,
-        "error"
-      );
-
-      button.disabled =
-      false;
-
-      button.textContent =
-      "❌ Reject";
-
-      return;
     }
 
 
@@ -1034,726 +2279,23 @@ async function rejectUser(
     console.error(error);
 
     showUserMessage(
-      "Reject করতে সমস্যা হয়েছে।",
+      "Reject করা যায়নি: " +
+      error.message,
       "error"
     );
+
 
     button.disabled =
     false;
 
-    button.textContent =
-    "❌ Reject";
-
   }
 
 }
 
 
-// ======================================================
-// ESCAPE HTML
-// ======================================================
-
-function escapeHtml(value){
-
-  if(
-    value === null ||
-    value === undefined
-  ){
-
-    return "";
-
-  }
-
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-// ======================================================
-// ORDER STATUS
-// ======================================================
-
-function formatDate(value){
-
-  if(!value) return "";
-
-
-  let match =
-  String(value).match(
-    /Date\((\d+),(\d+),(\d+),(\d+),(\d+),(\d+)\)/
-  );
-
-
-  if(match){
-
-    const year =
-    Number(match[1]);
-
-    const month =
-    Number(match[2]) + 1;
-
-    const day =
-    Number(match[3]);
-
-    const hour =
-    Number(match[4]);
-
-    const minute =
-    Number(match[5]);
-
-
-    const dd =
-    String(day).padStart(
-      2,"0"
-    );
-
-    const mm =
-    String(month).padStart(
-      2,"0"
-    );
-
-    const hh =
-    String(hour).padStart(
-      2,"0"
-    );
-
-    const min =
-    String(minute).padStart(
-      2,"0"
-    );
-
-
-    return `
-      ${dd}/${mm}/${year}
-      ${hh}:${min}
-    `;
-
-  }
-
-
-  return value;
-
-}
-
-
-function getStatuses(){
-
-  try{
-
-    return JSON.parse(
-      localStorage.getItem(
-        STATUS_KEY
-      ) || "{}"
-    );
-
-  }
-  catch(e){
-
-    return {};
-
-  }
-
-}
-
-
-function changeStatus(
-  orderNumber,
-  value
-){
-
-  const statuses =
-  getStatuses();
-
-
-  statuses[orderNumber] =
-  value;
-
-
-  localStorage.setItem(
-    STATUS_KEY,
-    JSON.stringify(statuses)
-  );
-
-}
-
-
-// ======================================================
-// PRINT ORDER
-// ======================================================
-
-function printOrder(
-  orderId
-){
-
-  const order =
-  document.getElementById(
-    orderId
-  );
-
-
-  if(!order){
-
-    alert(
-      "অর্ডার পাওয়া যায়নি"
-    );
-
-    return;
-
-  }
-
-
-  const printWindow =
-  window.open(
-    "",
-    "_blank",
-    "width=800,height=900"
-  );
-
-
-  printWindow.document.write(`
-
-<!doctype html>
-
-<html lang="bn">
-
-<head>
-
-<meta charset="utf-8">
-
-<title>অর্ডার মেমো</title>
-
-<style>
-
-body{
-  font-family:Arial,"Noto Sans Bengali",sans-serif;
-  padding:25px;
-  color:#000;
-}
-
-.memo{
-  max-width:700px;
-  margin:auto;
-}
-
-.company{
-  text-align:center;
-  border-bottom:2px solid #000;
-  padding-bottom:12px;
-  margin-bottom:18px;
-}
-
-.company h1{
-  margin:0;
-  font-size:25px;
-}
-
-.company p{
-  margin:5px 0;
-}
-
-h2{
-  text-align:center;
-  margin:15px 0;
-}
-
-.info{
-  line-height:1.8;
-}
-
-.total{
-  margin-top:20px;
-  text-align:right;
-  font-size:18px;
-  font-weight:bold;
-}
-
-.signature{
-  display:flex;
-  justify-content:space-between;
-  margin-top:60px;
-}
-
-@media print{
-
-  body{
-    padding:0;
-  }
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="memo">
-
-<div class="company">
-
-<h1>
-কহিনুর কেমিক্যাল পিএলসি
-</h1>
-
-<p>
-অর্ডার মেমো
-</p>
-
-</div>
-
-<h2>
-অর্ডার ${order.dataset.order}
-</h2>
-
-<div class="info">
-
-${order.querySelector(
-  ".memoContent"
-).innerHTML}
-
-</div>
-
-<div class="signature">
-
-<div>
-ক্রেতার স্বাক্ষর
-</div>
-
-<div>
-অনুমোদনকারী
-</div>
-
-</div>
-
-</div>
-
-
-<script>
-
-window.onload=function(){
-  window.print();
-};
-
-<\/script>
-
-</body>
-
-</html>
-
-`);
-
-
-  printWindow.document.close();
-
-}
-
-
-// ======================================================
-// LOAD ORDERS
-// ======================================================
-
-async function loadOrders(){
-
-  const status =
-  document.getElementById(
-    "status"
-  );
-
-
-  const ordersBox =
-  document.getElementById(
-    "ordersBox"
-  );
-
-
-  status.textContent =
-  "অর্ডার লোড হচ্ছে...";
-
-
-  ordersBox.innerHTML =
-  "";
-
-
-  try{
-
-    const url =
-      "https://docs.google.com/spreadsheets/d/" +
-      SHEET_ID +
-      "/gviz/tq?tqx=out:json&sheet=" +
-      encodeURIComponent(
-        SHEET_NAME
-      );
-
-
-    const response =
-    await fetch(url);
-
-
-    if(!response.ok){
-
-      throw new Error(
-        "Google Sheet খোলা যাচ্ছে না"
-      );
-
-    }
-
-
-    const text =
-    await response.text();
-
-
-    const start =
-    text.indexOf("{");
-
-
-    const end =
-    text.lastIndexOf("}");
-
-
-    if(
-      start === -1 ||
-      end === -1
-    ){
-
-      throw new Error(
-        "Sheet data পাওয়া যায়নি"
-      );
-
-    }
-
-
-    const data =
-    JSON.parse(
-      text.substring(
-        start,
-        end + 1
-      )
-    );
-
-
-    const rows =
-    data.table.rows || [];
-
-
-    if(rows.length === 0){
-
-      status.textContent =
-      "কোনো অর্ডার পাওয়া যায়নি।";
-
-
-      ordersBox.innerHTML =
-      `
-      <div class="card empty">
-        এখনও কোনো অর্ডার নেই।
-      </div>
-      `;
-
-      return;
-
-    }
-
-
-    status.textContent =
-    rows.length +
-    " টি অর্ডার পাওয়া গেছে";
-
-
-    const statuses =
-    getStatuses();
-
-
-    rows.reverse().forEach(
-      (row,index)=>{
-
-        const c =
-        row.c || [];
-
-
-        function val(n){
-
-          return c[n] &&
-            c[n].v != null
-            ? c[n].v
-            : "";
-
-        }
-
-
-        const timestamp =
-        val(0);
-
-        const shop =
-        val(1);
-
-        const customer =
-        val(2);
-
-        const mobile =
-        val(3);
-
-        const address =
-        val(4);
-
-        const product =
-        val(5);
-
-        const quantity =
-        val(6);
-
-        const note =
-        val(7);
-
-
-        const orderNumber =
-        rows.length - index;
-
-
-        const currentStatus =
-        statuses[orderNumber] ||
-        "নতুন";
-
-
-        const div =
-        document.createElement(
-          "div"
-        );
-
-
-        div.className =
-        "order";
-
-
-        div.id =
-        "order_" +
-        orderNumber;
-
-
-        div.dataset.order =
-        orderNumber;
-
-
-        const safeMobile =
-        String(mobile)
-          .replace(
-            /[^0-9+]/g,
-            ""
-          );
-
-
-        div.innerHTML = `
-
-<h3>
-অর্ডার #${orderNumber}
-</h3>
-
-
-<div class="memoContent">
-
-<b>তারিখ:</b>
-${formatDate(timestamp)}
-
-<br>
-
-<b>দোকানের নাম:</b>
-${escapeHtml(shop)}
-
-<br>
-
-<b>ক্রেতার নাম:</b>
-${escapeHtml(customer)}
-
-<br>
-
-<b>মোবাইল:</b>
-${escapeHtml(mobile)}
-
-<br>
-
-<b>ঠিকানা:</b>
-${escapeHtml(address)}
-
-
-<div class="item">
-
-<b>পণ্য:</b>
-${escapeHtml(product)}
-
-<br>
-
-<b>পরিমাণ:</b>
-${escapeHtml(quantity)}
-
-</div>
-
-
-${
-  note
-  ?
-  `
-  <p>
-  <b>মন্তব্য:</b>
-  ${escapeHtml(note)}
-  </p>
-  `
-  :
-  ""
-}
-
-</div>
-
-
-${
-  safeMobile
-  ?
-  `
-  <a
-    class="call"
-    href="tel:${safeMobile}"
-  >
-    📞 সরাসরি কল করুন
-  </a>
-  `
-  :
-  ""
-}
-
-
-<div class="status">
-
-<b>
-অর্ডারের Status:
-</b>
-
-
-<select
-  onchange="
-    changeStatus(
-      ${orderNumber},
-      this.value
-    )
-  "
->
-
-<option
-  value="নতুন"
-  ${
-    currentStatus === "নতুন"
-    ? "selected"
-    : ""
-  }
->
-🆕 নতুন
-</option>
-
-
-<option
-  value="প্রসেসিং"
-  ${
-    currentStatus === "প্রসেসিং"
-    ? "selected"
-    : ""
-  }
->
-🔄 প্রসেসিং
-</option>
-
-
-<option
-  value="ডেলিভারি"
-  ${
-    currentStatus === "ডেলিভারি"
-    ? "selected"
-    : ""
-  }
->
-🚚 ডেলিভারি
-</option>
-
-
-<option
-  value="সম্পন্ন"
-  ${
-    currentStatus === "সম্পন্ন"
-    ? "selected"
-    : ""
-  }
->
-✅ সম্পন্ন
-</option>
-
-</select>
-
-
-<div class="small">
-Status এই Admin ফোনে সংরক্ষিত হবে।
-</div>
-
-</div>
-
-
-<button
-  class="print"
-  onclick="
-    printOrder(
-      'order_${orderNumber}'
-    )
-  "
->
-🖨️ মেমো প্রিন্ট করুন
-</button>
-
-`;
-
-
-        ordersBox.appendChild(
-          div
-        );
-
-      }
-    );
-
-
-  }
-  catch(error){
-
-    console.error(error);
-
-
-    status.textContent =
-    "❌ অর্ডার লোড করা যায়নি";
-
-
-    ordersBox.innerHTML =
-    `
-    <div class="card">
-
-      <b>
-      সমস্যা হয়েছে:
-      </b>
-
-      <br>
-
-      ${escapeHtml(
-        error.message
-      )}
-
-    </div>
-    `;
-
-  }
-
-}
-
-
-// ======================================================
+// =====================================================
 // INITIALIZE
-// ======================================================
+// =====================================================
 
 async function initialize(){
 
@@ -1762,28 +2304,28 @@ async function initialize(){
 
 
   if(!isAdmin){
+
     return;
+
   }
 
 
-  // প্রথমে Order section
   showOrders();
 
 
-  // Pending user count
-  await loadUsers();
-
-
-  // Order load
   await loadOrders();
+
+
+  await loadUsers();
 
 }
 
 
+// START
+
 initialize();
 
 </script>
-
 
 </body>
 </html>

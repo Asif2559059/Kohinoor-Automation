@@ -51,40 +51,62 @@ async function saveOrder() {
 
 
     // =========================
-    // LOGIN CHECK
+    // CHECK LOGIN
     // =========================
 
     const {
-      data,
+      data: sessionData,
       error: sessionError
     } = await supabaseClient.auth.getSession();
 
+
     if (sessionError) {
+
+      console.error(
+        "SESSION ERROR:",
+        sessionError
+      );
+
       alert(
-        "Login তথ্য পাওয়া যায়নি:\n\n" +
+        "Login তথ্য পাওয়া যায়নি।\n\n" +
         sessionError.message
       );
+
       return;
     }
 
-    const session = data.session;
+
+    const session =
+      sessionData.session;
+
 
     if (!session || !session.user) {
-      alert("আগে Login করুন।");
+
+      alert(
+        "আপনি Login করা নেই।\n\n" +
+        "আগে Login করুন।"
+      );
+
       return;
     }
 
-    const userId = session.user.id;
+
+    const userId =
+      session.user.id;
 
 
     // =========================
-    // ORDER DATA
+    // CALCULATE TOTAL
     // =========================
 
-    const total = calc();
+    const total =
+      calc();
+
 
     const productsData =
-      JSON.parse(JSON.stringify(order));
+      JSON.parse(
+        JSON.stringify(order)
+      );
 
 
     // =========================
@@ -93,34 +115,181 @@ async function saveOrder() {
 
     const {
       error: insertError
-    } = await supabaseClient
-      .from("orders")
-      .insert([{
-        user_id: userId,
-        shop: shop,
-        address: address,
-        mobile: mobile,
-        representative: representative,
-        order_date: orderDate,
-        delivery_date: deliveryDate,
-        note: note,
-        products: productsData,
-        total: total,
-        status: "pending"
-      }]);
+    } =
+      await supabaseClient
+        .from("orders")
+        .insert([{
+
+          user_id:
+            userId,
+
+          shop:
+            shop,
+
+          address:
+            address,
+
+          mobile:
+            mobile,
+
+          representative:
+            representative,
+
+          order_date:
+            orderDate,
+
+          delivery_date:
+            deliveryDate,
+
+          note:
+            note,
+
+          products:
+            productsData,
+
+          total:
+            total,
+
+          status:
+            "pending"
+
+        }]);
 
 
     // =========================
-    // ERROR
+    // INSERT ERROR
     // =========================
 
     if (insertError) {
 
       console.error(
-        "ORDER INSERT ERROR:",
+        "SUPABASE ORDER ERROR:",
         insertError
       );
 
       alert(
-        "❌ অর্ডার পাঠানো যায়নি!\n\n" +
-       
+        "❌ অর্ডার Supabase-এ সেভ হয়নি!\n\n" +
+        "Error:\n" +
+        insertError.message
+      );
+
+      return;
+    }
+
+
+    // =========================
+    // SAVE LOCAL COPY
+    // =========================
+
+    const localOrder = {
+
+      id:
+        Date.now().toString(),
+
+      user_id:
+        userId,
+
+      shop:
+        shop,
+
+      address:
+        address,
+
+      mobile:
+        mobile,
+
+      representative:
+        representative,
+
+      order_date:
+        orderDate,
+
+      delivery_date:
+        deliveryDate,
+
+      note:
+        note,
+
+      products:
+        productsData,
+
+      total:
+        total,
+
+      status:
+        "pending",
+
+      created_at:
+        new Date().toISOString()
+
+    };
+
+
+    const localOrders =
+      getOrders();
+
+
+    localOrders.unshift(
+      localOrder
+    );
+
+
+    saveOrdersLocal(
+      localOrders
+    );
+
+
+    // =========================
+    // SUCCESS
+    // =========================
+
+    alert(
+      "✅ অর্ডার সফলভাবে পাঠানো হয়েছে।"
+    );
+
+
+    // =========================
+    // CLEAR FORM
+    // =========================
+
+    order = [];
+
+
+    $("shop").value = "";
+
+    $("address").value = "";
+
+    $("mobile").value = "";
+
+    $("representative").value = "";
+
+    $("orderDate").value =
+      today();
+
+    $("deliveryDate").value = "";
+
+    $("note").value = "";
+
+
+    // =========================
+    // REFRESH
+    // =========================
+
+    renderOrder();
+
+
+  } catch (error) {
+
+    console.error(
+      "SAVE ORDER ERROR:",
+      error
+    );
+
+    alert(
+      "❌ অর্ডার করার সময় সমস্যা হয়েছে!\n\n" +
+      error.message
+    );
+
+  }
+
+}

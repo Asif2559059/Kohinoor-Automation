@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Kohinoor Automation - Login</title>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -170,6 +169,7 @@
     <form id="loginForm">
 
       <div class="form-group">
+
         <label for="email">Email</label>
 
         <input
@@ -179,9 +179,12 @@
           autocomplete="email"
           required
         >
+
       </div>
 
+
       <div class="form-group">
+
         <label for="password">Password</label>
 
         <input
@@ -191,25 +194,41 @@
           autocomplete="current-password"
           required
         >
+
       </div>
 
+
       <div class="forgot">
+
         <a href="#" id="forgotPassword">
           Forgot Password?
         </a>
+
       </div>
 
-      <button type="submit" class="login-btn" id="loginBtn">
+
+      <button
+        type="submit"
+        class="login-btn"
+        id="loginBtn"
+      >
         Login
       </button>
 
     </form>
 
+
     <div id="message" class="message"></div>
 
+
     <div class="links">
+
       Don't have an account?
-      <a href="login.html">Sign Up</a>
+
+      <a href="signup.html">
+        Sign Up
+      </a>
+
     </div>
 
   </div>
@@ -221,31 +240,71 @@
     // SUPABASE CONFIGURATION
     // ============================================
 
-   const SUPABASE_URL = "https://utzkpsohkoiawvuupgeb.supabase.co";
+    const SUPABASE_URL =
+      "https://utzkpsohkoiawvuupgeb.supabase.co";
 
-const SUPABASE_ANON_KEY =
-"sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
 
-    // Create Supabase client
+    // ============================================
+    // ADMIN EMAIL
+    // ============================================
+
+    const ADMIN_EMAIL =
+      "mdyeamin10288@gmail.com";
+
+
+    // ============================================
+    // DASHBOARD
+    // ============================================
+
+    const DASHBOARD_URL =
+      "index.html";
+
+
+    // ============================================
+    // ADMIN PAGE
+    // ============================================
+
+    const ADMIN_URL =
+      "admin.html";
+
+
+    // ============================================
+    // SUPABASE CLIENT
+    // ============================================
+
     const { createClient } = supabase;
 
-    const supabaseClient = createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
+    const supabaseClient =
+      createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
 
 
     // ============================================
     // ELEMENTS
     // ============================================
 
-    const loginForm = document.getElementById("loginForm");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const loginBtn = document.getElementById("loginBtn");
-    const message = document.getElementById("message");
-    const forgotPassword = document.getElementById("forgotPassword");
+    const loginForm =
+      document.getElementById("loginForm");
+
+    const emailInput =
+      document.getElementById("email");
+
+    const passwordInput =
+      document.getElementById("password");
+
+    const loginBtn =
+      document.getElementById("loginBtn");
+
+    const message =
+      document.getElementById("message");
+
+    const forgotPassword =
+      document.getElementById("forgotPassword");
 
 
     // ============================================
@@ -256,7 +315,57 @@ const SUPABASE_ANON_KEY =
 
       message.textContent = text;
 
-      message.className = "message " + type;
+      message.className =
+        "message " + type;
+
+    }
+
+
+    // ============================================
+    // CHECK USER PROFILE
+    // ============================================
+
+    async function checkUserProfile(user) {
+
+      const { data: profile, error } =
+        await supabaseClient
+          .from("user_profiles")
+          .select(
+            "id, username, email, status, created_at"
+          )
+          .eq("id", user.id)
+          .maybeSingle();
+
+
+      if (error) {
+
+        console.error(
+          "Profile error:",
+          error
+        );
+
+        return {
+          success: false,
+          error: error.message
+        };
+
+      }
+
+
+      if (!profile) {
+
+        return {
+          success: false,
+          error: "USER_PROFILE_NOT_FOUND"
+        };
+
+      }
+
+
+      return {
+        success: true,
+        profile: profile
+      };
 
     }
 
@@ -265,154 +374,384 @@ const SUPABASE_ANON_KEY =
     // LOGIN
     // ============================================
 
-    loginForm.addEventListener("submit", async function(event) {
+    loginForm.addEventListener(
+      "submit",
+      async function(event) {
 
-      event.preventDefault();
-
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-
-      if (!email || !password) {
-
-        showMessage(
-          "Please enter your email and password.",
-          "error"
-        );
-
-        return;
-      }
+        event.preventDefault();
 
 
-      loginBtn.disabled = true;
-      loginBtn.textContent = "Logging in...";
+        const email =
+          emailInput.value.trim();
 
-      message.className = "message";
-
-
-      try {
-
-        const { data, error } =
-          await supabaseClient.auth.signInWithPassword({
-
-            email: email,
-            password: password
-
-          });
+        const password =
+          passwordInput.value;
 
 
-        if (error) {
-
-          console.error("Login error:", error);
+        if (!email || !password) {
 
           showMessage(
-            "Login failed: " + error.message,
+            "Email এবং Password দিন।",
             "error"
           );
 
-          loginBtn.disabled = false;
-          loginBtn.textContent = "Login";
-
           return;
+
         }
 
 
-        if (data && data.user) {
+        loginBtn.disabled = true;
+
+        loginBtn.textContent =
+          "Checking...";
+
+        message.className =
+          "message";
+
+
+        try {
+
+          // ======================================
+          // SUPABASE LOGIN
+          // ======================================
+
+          const { data, error } =
+            await supabaseClient.auth
+              .signInWithPassword({
+
+                email: email,
+
+                password: password
+
+              });
+
+
+          // ======================================
+          // LOGIN ERROR
+          // ======================================
+
+          if (error) {
+
+            console.error(
+              "Login error:",
+              error
+            );
+
+            showMessage(
+              "Login failed: " +
+              error.message,
+              "error"
+            );
+
+            return;
+
+          }
+
+
+          if (!data || !data.user) {
+
+            showMessage(
+              "Login করা যায়নি। আবার চেষ্টা করুন।",
+              "error"
+            );
+
+            return;
+
+          }
+
+
+          const user =
+            data.user;
+
+
+          // ======================================
+          // ADMIN CHECK
+          // ======================================
+
+          if (
+            user.email &&
+            user.email.toLowerCase() ===
+            ADMIN_EMAIL.toLowerCase()
+          ) {
+
+            showMessage(
+              "Admin Login successful! Redirecting...",
+              "success"
+            );
+
+
+            setTimeout(
+              function() {
+
+                window.location.href =
+                  ADMIN_URL;
+
+              },
+              500
+            );
+
+
+            return;
+
+          }
+
+
+          // ======================================
+          // USER PROFILE CHECK
+          // ======================================
+
+          const result =
+            await checkUserProfile(user);
+
+
+          if (!result.success) {
+
+            console.error(
+              "Profile check failed:",
+              result.error
+            );
+
+
+            await supabaseClient.auth.signOut();
+
+
+            showMessage(
+              "আপনার User Profile পাওয়া যায়নি। Admin-এর সাথে যোগাযোগ করুন।",
+              "error"
+            );
+
+
+            return;
+
+          }
+
+
+          const profile =
+            result.profile;
+
+
+          // ======================================
+          // PENDING
+          // ======================================
+
+          if (
+            profile.status === "pending"
+          ) {
+
+            await supabaseClient.auth.signOut();
+
+
+            showMessage(
+
+              "আপনার Account এখনো Admin Approval-এর অপেক্ষায় আছে। Admin Approve করার পর আবার Login করুন।",
+
+              "error"
+
+            );
+
+
+            return;
+
+          }
+
+
+          // ======================================
+          // REJECTED
+          // ======================================
+
+          if (
+            profile.status === "rejected"
+          ) {
+
+            await supabaseClient.auth.signOut();
+
+
+            showMessage(
+
+              "দুঃখিত, আপনার Account Admin Reject করেছেন। Admin-এর সাথে যোগাযোগ করুন।",
+
+              "error"
+
+            );
+
+
+            return;
+
+          }
+
+
+          // ======================================
+          // APPROVED
+          // ======================================
+
+          if (
+            profile.status === "approved"
+          ) {
+
+            /*
+             * Profile information localStorage-এ
+             * রাখা হচ্ছে যাতে Dashboard-এ
+             * Username/Email দেখানো যায়।
+             */
+
+            localStorage.setItem(
+              "kohinoor_user_profile",
+              JSON.stringify(profile)
+            );
+
+
+            showMessage(
+
+              "Login successful! Welcome " +
+              profile.username +
+              ".",
+
+              "success"
+
+            );
+
+
+            setTimeout(
+              function() {
+
+                window.location.href =
+                  DASHBOARD_URL;
+
+              },
+              700
+            );
+
+
+            return;
+
+          }
+
+
+          // ======================================
+          // UNKNOWN STATUS
+          // ======================================
+
+          await supabaseClient.auth.signOut();
+
 
           showMessage(
-            "Login successful! Redirecting...",
-            "success"
+
+            "আপনার Account Status সঠিক নয়। Admin-এর সাথে যোগাযোগ করুন।",
+
+            "error"
+
           );
 
 
-          // Small delay so user can see success message
-          setTimeout(function() {
+        } catch (err) {
 
-            window.location.href = "index.html";
+          console.error(
+            "Login exception:",
+            err
+          );
 
-          }, 700);
+
+          showMessage(
+
+            "একটি অপ্রত্যাশিত সমস্যা হয়েছে। আবার চেষ্টা করুন।",
+
+            "error"
+
+          );
+
+        } finally {
+
+          loginBtn.disabled = false;
+
+          loginBtn.textContent =
+            "Login";
 
         }
 
-      } catch (err) {
-
-        console.error(err);
-
-        showMessage(
-          "Something went wrong. Please try again.",
-          "error"
-        );
-
-        loginBtn.disabled = false;
-        loginBtn.textContent = "Login";
-
       }
-
-    });
+    );
 
 
     // ============================================
     // FORGOT PASSWORD
     // ============================================
 
-    forgotPassword.addEventListener("click", async function(event) {
+    forgotPassword.addEventListener(
+      "click",
+      async function(event) {
 
-      event.preventDefault();
-
-      const email = emailInput.value.trim();
-
-      if (!email) {
-
-        showMessage(
-          "Please enter your email first.",
-          "error"
-        );
-
-        emailInput.focus();
-
-        return;
-      }
+        event.preventDefault();
 
 
-      try {
-
-        const { error } =
-          await supabaseClient.auth.resetPasswordForEmail(
-            email,
-            {
-              redirectTo:
-                "https://Asif2559059.github.io/Kohinoor-Automation/signin.html"
-            }
-          );
+        const email =
+          emailInput.value.trim();
 
 
-        if (error) {
+        if (!email) {
 
           showMessage(
-            "Password reset failed: " + error.message,
+            "আগে আপনার Email লিখুন।",
             "error"
           );
 
+          emailInput.focus();
+
           return;
+
         }
 
 
-        showMessage(
-          "Password reset link has been sent to your email.",
-          "success"
-        );
+        try {
 
-      } catch (err) {
+          const { error } =
+            await supabaseClient.auth
+              .resetPasswordForEmail(
+                email,
+                {
+                  redirectTo:
+                    "https://Asif2559059.github.io/Kohinoor-Automation/signin.html"
+                }
+              );
 
-        console.error(err);
 
-        showMessage(
-          "Unable to send password reset email.",
-          "error"
-        );
+          if (error) {
+
+            showMessage(
+              "Password reset failed: " +
+              error.message,
+              "error"
+            );
+
+            return;
+
+          }
+
+
+          showMessage(
+
+            "Password reset link আপনার Email-এ পাঠানো হয়েছে।",
+
+            "success"
+
+          );
+
+
+        } catch (err) {
+
+          console.error(err);
+
+          showMessage(
+
+            "Password reset email পাঠানো যায়নি।",
+
+            "error"
+
+          );
+
+        }
 
       }
-
-    });
+    );
 
 
     // ============================================
@@ -421,19 +760,75 @@ const SUPABASE_ANON_KEY =
 
     async function checkSession() {
 
-      const { data } =
+      const {
+        data
+      } =
         await supabaseClient.auth.getSession();
 
-      if (data.session) {
 
-        // Already logged in
-        // Uncomment this if you want automatic redirect
+      if (
+        data &&
+        data.session &&
+        data.session.user
+      ) {
 
-        // window.location.href = "index.html";
+        const user =
+          data.session.user;
+
+
+        // ========================================
+        // ADMIN
+        // ========================================
+
+        if (
+          user.email &&
+          user.email.toLowerCase() ===
+          ADMIN_EMAIL.toLowerCase()
+        ) {
+
+          window.location.href =
+            ADMIN_URL;
+
+          return;
+
+        }
+
+
+        // ========================================
+        // NORMAL USER
+        // ========================================
+
+        const result =
+          await checkUserProfile(user);
+
+
+        if (
+          result.success &&
+          result.profile.status === "approved"
+        ) {
+
+          localStorage.setItem(
+            "kohinoor_user_profile",
+            JSON.stringify(result.profile)
+          );
+
+
+          window.location.href =
+            DASHBOARD_URL;
+
+
+          return;
+
+        }
+
+
+        // Pending / Rejected / Profile missing
+        await supabaseClient.auth.signOut();
 
       }
 
     }
+
 
     checkSession();
 

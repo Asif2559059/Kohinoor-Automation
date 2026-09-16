@@ -15,84 +15,107 @@
 
 body{
   margin:0;
-  font-family:Arial,"Noto Sans Bengali",sans-serif;
+  font-family:
+    Arial,
+    "Noto Sans Bengali",
+    sans-serif;
   background:#f4f7fb;
   color:#172033;
 }
 
-button,
-input,
-select,
-textarea{
-  font-family:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-.header{
-  background:linear-gradient(135deg,#075e54,#0b8f72);
+header{
+  background:#075e54;
   color:white;
-  padding:18px 15px;
+  padding:16px;
   position:sticky;
   top:0;
   z-index:20;
-  box-shadow:0 3px 12px #0002;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
 
-.header-top{
+.header-row{
+  max-width:1100px;
+  margin:auto;
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:10px;
 }
 
-.header h1{
+.logo h1{
   margin:0;
-  font-size:20px;
+  font-size:21px;
 }
 
-.header p{
-  margin:5px 0 0;
-  font-size:12px;
+.logo small{
   opacity:.9;
 }
 
 .logout-btn{
-  border:1px solid #ffffff55;
-  background:#ffffff18;
-  color:white;
-  padding:9px 12px;
-  border-radius:9px;
+  background:white;
+  color:#075e54;
+  border:0;
+  padding:9px 13px;
+  border-radius:8px;
   font-weight:bold;
+  cursor:pointer;
 }
 
 .container{
   max-width:1100px;
   margin:auto;
   padding:15px;
-  padding-bottom:90px;
 }
+
+.dashboard{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.quick{
+  border:0;
+  border-radius:12px;
+  padding:14px;
+  text-align:left;
+  cursor:pointer;
+  background:white;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.quick b{
+  display:block;
+  font-size:15px;
+  margin-bottom:5px;
+}
+
+.quick small{
+  color:#687386;
+}
+
+.q1{border-left:5px solid #075e54;}
+.q2{border-left:5px solid #2563eb;}
+.q3{border-left:5px solid #d97706;}
+.q4{border-left:5px solid #7c3aed;}
 
 .card{
   background:white;
-  border-radius:15px;
-  padding:15px;
+  border-radius:14px;
+  padding:16px;
   margin-bottom:15px;
-  box-shadow:0 3px 14px #0000000d;
-  border:1px solid #e7ebf0;
+  box-shadow:0 2px 10px rgba(0,0,0,.07);
 }
 
 .card h2{
-  font-size:17px;
-  margin:0 0 12px;
+  margin:0 0 15px;
+  font-size:18px;
 }
 
-.grid{
+.form-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:10px;
+  gap:12px;
 }
 
 .field{
@@ -105,399 +128,714 @@ button{
   grid-column:1/-1;
 }
 
-.field label{
-  font-size:13px;
+label{
+  font-size:14px;
   font-weight:bold;
-  color:#536070;
 }
 
 input,
-select,
-textarea{
+textarea,
+select{
   width:100%;
-  border:1px solid #d7dde5;
-  border-radius:9px;
   padding:11px;
-  font-size:14px;
+  border:1px solid #ccd4df;
+  border-radius:8px;
+  font-size:15px;
   outline:none;
   background:white;
 }
 
 input:focus,
-select:focus,
-textarea:focus{
-  border-color:#0b8f72;
-  box-shadow:0 0 0 3px #0b8f7215;
+textarea:focus,
+select:focus{
+  border-color:#075e54;
+  box-shadow:0 0 0 2px rgba(7,94,84,.08);
 }
 
 textarea{
-  min-height:80px;
+  min-height:75px;
   resize:vertical;
+}
+
+.btn-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+button{
+  font-family:inherit;
 }
 
 .btn{
   border:0;
-  border-radius:9px;
-  padding:11px 14px;
+  border-radius:8px;
+  padding:11px 15px;
+  cursor:pointer;
   font-weight:bold;
-  font-size:14px;
 }
 
-.btn-primary{
-  background:#087f5b;
+.primary{
+  background:#075e54;
   color:white;
 }
 
-.btn-secondary{
-  background:#e8f5f1;
-  color:#087f5b;
-}
-
-.btn-danger{
-  background:#ffe7e7;
-  color:#c62828;
-}
-
-.btn-dark{
-  background:#263238;
+.blue{
+  background:#2563eb;
   color:white;
 }
 
-.btn-blue{
-  background:#e8f0ff;
-  color:#1759b5;
+.orange{
+  background:#d97706;
+  color:white;
 }
 
-.btn-orange{
-  background:#fff1dd;
-  color:#b86b00;
+.red{
+  background:#dc2626;
+  color:white;
 }
 
-.quick-grid{
+.gray{
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.search-box{
+  margin-bottom:12px;
+}
+
+.product-list{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
-
-.quick{
-  border:0;
-  border-radius:13px;
-  padding:16px;
-  text-align:left;
-  min-height:85px;
-}
-
-.quick b{
-  display:block;
-  font-size:16px;
-  margin-bottom:6px;
-}
-
-.quick small{
-  opacity:.75;
-}
-
-.q1{
-  background:#e8f5e9;
-  color:#176b2d;
-}
-
-.q2{
-  background:#e3f2fd;
-  color:#125b91;
-}
-
-.q3{
-  background:#fff3e0;
-  color:#9b5c00;
-}
-
-.q4{
-  background:#f3e5f5;
-  color:#6a1b75;
-}
-
-.product-search{
-  position:relative;
-}
-
-.search-result{
-  margin-top:8px;
-  max-height:300px;
+  gap:8px;
+  max-height:350px;
   overflow:auto;
-  border:1px solid #e1e5ea;
-  border-radius:10px;
-  display:none;
 }
 
 .product-item{
-  padding:11px;
-  border-bottom:1px solid #edf0f3;
+  border:1px solid #dce2ea;
+  border-radius:10px;
+  padding:10px;
+  background:#fafbfd;
+}
+
+.product-item b{
+  display:block;
+}
+
+.product-item small{
+  display:block;
+  color:#667085;
+  margin:3px 0;
+}
+
+.product-actions{
   display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  background:white;
+  gap:5px;
+  margin-top:7px;
 }
 
-.product-item:last-child{
-  border-bottom:0;
-}
-
-.product-info{
-  flex:1;
-}
-
-.product-name{
-  font-weight:bold;
-  font-size:14px;
-}
-
-.product-meta{
+.mini-btn{
+  border:0;
+  padding:6px 9px;
+  border-radius:6px;
+  cursor:pointer;
   font-size:12px;
-  color:#687482;
-  margin-top:3px;
+  font-weight:bold;
 }
 
-.order-table-wrap{
-  overflow-x:auto;
+.add-btn{
+  background:#075e54;
+  color:white;
+}
+
+.edit-btn{
+  background:#2563eb;
+  color:white;
+}
+
+.delete-btn{
+  background:#dc2626;
+  color:white;
+}
+
+.table-wrap{
+  overflow:auto;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:700px;
+  min-width:750px;
 }
 
 th,
 td{
-  border-bottom:1px solid #e8ecf0;
-  padding:9px 7px;
+  border-bottom:1px solid #e5e7eb;
+  padding:9px;
   text-align:left;
-  font-size:13px;
+  font-size:14px;
 }
 
 th{
-  background:#f7f9fb;
-  color:#46515d;
+  background:#f1f5f9;
 }
 
 .qty-input{
-  width:70px;
+  width:75px;
   padding:7px;
 }
 
 .bonus-input{
-  width:70px;
+  width:75px;
   padding:7px;
 }
 
 .total-box{
-  background:#f1f8f5;
-  border-radius:12px;
+  background:#ecfdf5;
+  border:1px solid #bbf7d0;
   padding:14px;
+  border-radius:10px;
   margin-top:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.total-box strong{
-  font-size:20px;
-  color:#087f5b;
-}
-
-.actions{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:9px;
-  margin-top:12px;
-}
-
-.status{
-  font-size:12px;
-  margin-top:8px;
-  color:#687482;
+  font-size:17px;
+  font-weight:bold;
 }
 
 .empty{
-  padding:25px 10px;
   text-align:center;
-  color:#7a8590;
-}
-
-.bottom-nav{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  background:white;
-  border-top:1px solid #ddd;
-  display:flex;
-  justify-content:space-around;
-  padding:8px 5px;
-  z-index:30;
-  box-shadow:0 -3px 12px #00000010;
-}
-
-.bottom-nav button{
-  background:none;
-  border:0;
-  color:#56616d;
-  font-size:11px;
-  padding:5px;
-}
-
-.bottom-nav b{
-  display:block;
-  font-size:18px;
-  margin-bottom:2px;
+  padding:25px;
+  color:#777;
 }
 
 .modal{
   display:none;
   position:fixed;
   inset:0;
-  background:#0008;
+  background:rgba(0,0,0,.55);
   z-index:100;
   padding:15px;
   overflow:auto;
 }
 
 .modal-box{
-  background:white;
   max-width:900px;
-  margin:20px auto;
-  border-radius:16px;
-  padding:17px;
-  box-shadow:0 10px 40px #0005;
+  margin:30px auto;
+  background:white;
+  border-radius:14px;
+  padding:18px;
 }
 
-.modal-head{
+.modal-header{
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:10px;
   margin-bottom:15px;
 }
 
-.modal-head h2{
+.modal-header h2{
   margin:0;
-  font-size:18px;
+  font-size:19px;
 }
 
 .close{
   border:0;
-  background:#f0f2f4;
+  background:#eee;
+  width:35px;
+  height:35px;
   border-radius:50%;
-  width:36px;
-  height:36px;
+  cursor:pointer;
   font-size:20px;
 }
 
-.modal-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-
-.product-list{
-  margin-top:15px;
-  border:1px solid #e2e6ea;
-  border-radius:10px;
-  overflow:hidden;
-}
-
-.manager-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  padding:11px;
-  border-bottom:1px solid #edf0f2;
-}
-
-.manager-row:last-child{
-  border-bottom:0;
-}
-
-.manager-info{
-  flex:1;
-}
-
-.manager-info strong{
-  display:block;
-  font-size:14px;
-}
-
-.manager-info span{
-  display:block;
-  color:#6d7883;
-  font-size:12px;
-  margin-top:3px;
-}
-
-.manager-buttons{
-  display:flex;
-  gap:5px;
-}
-
-.small-btn{
-  border:0;
-  border-radius:7px;
-  padding:7px 9px;
-  font-size:12px;
-  font-weight:bold;
-}
-
-.history-row{
-  padding:13px;
-  border-bottom:1px solid #e7eaee;
-}
-
-.history-row:last-child{
-  border-bottom:0;
-}
-
-.history-row strong{
-  display:block;
-  margin-bottom:4px;
-}
-
-.history-meta{
-  color:#68737e;
-  font-size:12px;
-}
-
-.setup-box{
-  background:#f7faf9;
-  border:1px dashed #b9d9ce;
+.history-item{
+  border:1px solid #ddd;
   border-radius:10px;
   padding:12px;
+  margin-bottom:9px;
+}
+
+.history-item b{
+  color:#075e54;
+}
+
+.bottom-nav{
+  position:sticky;
+  bottom:0;
+  background:white;
+  border-top:1px solid #ddd;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  padding:8px;
+  z-index:15;
+}
+
+.bottom-nav button{
+  flex:1;
+  max-width:180px;
+}
+
+.notice{
+  padding:10px;
+  border-radius:8px;
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
+  font-size:13px;
   margin-top:10px;
 }
 
-@media(max-width:600px){
-  .grid{
+.success{
+  background:#ecfdf5;
+  border:1px solid #bbf7d0;
+  color:#166534;
+}
+
+@media(max-width:800px){
+  .dashboard{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .form-grid{
     grid-template-columns:1fr;
   }
 
-  .quick-grid{
+  .field.full{
+    grid-column:auto;
+  }
+
+  .product-list{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:500px){
+  .dashboard{
     grid-template-columns:1fr 1fr;
   }
 
-  .actions{
-    grid-template-columns:1fr 1fr;
+  .quick{
+    padding:11px;
   }
 
-  .header h1{
+  .logo h1{
     font-size:17px;
+  }
+
+  .container{
+    padding:9px;
+  }
+
+  .card{
+    padding:12px;
+  }
+}
+
+@media print{
+  header,
+  .dashboard,
+  .bottom-nav,
+  .btn-row,
+  #productSearchCard,
+  .no-print{
+    display:none !important;
+  }
+
+  body{
+    background:white;
+  }
+
+  .card{
+    box-shadow:none;
+    border:1px solid #ddd;
   }
 }
 </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="logo">
+      <h1>কহিনুর কেমিক্যাল পিএলসি</h1>
+      <small>অর্ডার অটোমেশন</small>
+    </div>
+
+    <button class="logout-btn" onclick="adminLogout()">
+      Logout
+    </button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- DASHBOARD -->
+  <div class="dashboard">
+
+    <button class="quick q1" onclick="newOrder()">
+      <b>＋ নতুন অর্ডার</b>
+      <small>নতুন অর্ডার তৈরি করুন</small>
+    </button>
+
+    <button class="quick q2" onclick="openProductManager()">
+      <b>▣ পণ্য তালিকা</b>
+      <small>পণ্য যোগ / এডিট / ডিলেট</small>
+    </button>
+
+    <button class="quick q3" onclick="openHistory()">
+      <b>◷ অর্ডার হিস্টোরি</b>
+      <small>পুরোনো অর্ডার দেখুন</small>
+    </button>
+
+    <button class="quick q4" onclick="openOnlineSetup()">
+      <b>⚙ অনলাইন অর্ডার</b>
+      <small>অনলাইন সেটআপ</small>
+    </button>
+
+  </div>
+
+
+  <!-- CUSTOMER / ORDER INFORMATION -->
+  <div class="card" id="orderCard">
+
+    <h2>অর্ডারের তথ্য</h2>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>দোকানের নাম *</label>
+        <input
+          id="shop"
+          type="text"
+          placeholder="দোকানের নাম লিখুন">
+      </div>
+
+      <div class="field">
+        <label>ঠিকানা *</label>
+        <input
+          id="address"
+          type="text"
+          placeholder="দোকানের ঠিকানা">
+      </div>
+
+      <div class="field">
+        <label>মোবাইল নম্বর *</label>
+        <input
+          id="mobile"
+          type="tel"
+          placeholder="01XXXXXXXXX">
+      </div>
+
+      <div class="field">
+        <label>রিপ্রেজেনটেটিভের নাম *</label>
+        <input
+          id="representative"
+          type="text"
+          placeholder="রিপ্রেজেনটেটিভের নাম">
+      </div>
+
+      <div class="field">
+        <label>অর্ডার ডেট *</label>
+        <input
+          id="orderDate"
+          type="date">
+      </div>
+
+      <div class="field">
+        <label>ডেলিভারি ডেট *</label>
+        <input
+          id="deliveryDate"
+          type="date">
+      </div>
+
+      <div class="field full">
+        <label>নোট</label>
+        <textarea
+          id="note"
+          placeholder="প্রয়োজনীয় অতিরিক্ত তথ্য"></textarea>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PRODUCT SEARCH -->
+  <div class="card" id="productSearchCard">
+
+    <h2>পণ্য নির্বাচন</h2>
+
+    <div class="search-box">
+      <input
+        id="productSearch"
+        type="text"
+        placeholder="কোড বা পণ্যের নাম দিয়ে খুঁজুন..."
+        oninput="renderProducts()">
+    </div>
+
+    <div id="productList" class="product-list"></div>
+
+  </div>
+
+
+  <!-- ORDER -->
+  <div class="card">
+
+    <h2>অর্ডারের পণ্য</h2>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>কোড</th>
+            <th>পণ্যের নাম</th>
+            <th>প্যাক</th>
+            <th>দাম</th>
+            <th>Qty</th>
+            <th>Bonus</th>
+            <th>মোট</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody id="orderBody"></tbody>
+
+      </table>
+
+    </div>
+
+    <div class="total-box">
+      সর্বমোট: ৳ <span id="grandTotal">0.00</span>
+    </div>
+
+    <div class="btn-row">
+
+      <button class="btn primary" onclick="saveOrder()">
+        💾 অর্ডার সেভ
+      </button>
+
+      <button class="btn blue" onclick="shareOrder()">
+        📤 শেয়ার
+      </button>
+
+      <button class="btn orange" onclick="printOrder()">
+        🖨 প্রিন্ট
+      </button>
+
+      <button class="btn gray" onclick="newOrder()">
+        ＋ নতুন
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+    <h2>অনলাইন অর্ডার</h2>
+
+    <p>
+      অনলাইন অর্ডার ফর্ম:
+      <b id="onlineLinkText">সেটআপ করা হয়নি</b>
+    </p>
+
+    <button class="btn blue" onclick="openOnlineSetup()">
+      অনলাইন সেটআপ
+    </button>
+  </div>
+
+</div>
+
+
+<!-- PRODUCT MANAGER MODAL -->
+<div class="modal" id="productModal">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+      <h2>পণ্য তালিকা পরিচালনা</h2>
+
+      <button
+        class="close"
+        onclick="closeProductManager()">×</button>
+    </div>
+
+
+    <div class="notice success">
+      এখানে আপনি নিজের পণ্য যোগ করবেন।
+      এই কোডে পুরোনো/default পণ্য আর স্বয়ংক্রিয়ভাবে যোগ হবে না।
+    </div>
+
+
+    <div class="card" style="box-shadow:none;border:1px solid #ddd">
+
+      <h2 id="productFormTitle">নতুন পণ্য যোগ করুন</h2>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>পণ্য কোড *</label>
+          <input id="pCode" placeholder="যেমন P001">
+        </div>
+
+        <div class="field">
+          <label>পণ্যের নাম *</label>
+          <input id="pName" placeholder="পণ্যের নাম">
+        </div>
+
+        <div class="field">
+          <label>প্যাক</label>
+          <input id="pPack" placeholder="যেমন 24">
+        </div>
+
+        <div class="field">
+          <label>দাম</label>
+          <input id="pPrice" type="number" step="0.01" placeholder="0">
+        </div>
+
+        <div class="field">
+          <label>স্টক</label>
+          <input id="pStock" type="number" placeholder="0">
+        </div>
+
+      </div>
+
+      <div class="btn-row">
+
+        <button
+          class="btn primary"
+          onclick="saveProduct()">
+          💾 পণ্য সেভ
+        </button>
+
+        <button
+          class="btn gray"
+          onclick="clearProductForm()">
+          পরিষ্কার
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="card" style="box-shadow:none;border:1px solid #ddd">
+
+      <h2>আমার পণ্যসমূহ</h2>
+
+      <input
+        id="managerSearch"
+        placeholder="পণ্য খুঁজুন..."
+        oninput="renderManagerProducts()">
+
+      <div id="managerProductList"
+           class="product-list"
+           style="margin-top:12px">
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- HISTORY MODAL -->
+<div class="modal" id="historyModal">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>অর্ডার হিস্টোরি</h2>
+
+      <button
+        class="close"
+        onclick="closeHistory()">×</button>
+
+    </div>
+
+    <div id="historyList"></div>
+
+  </div>
+
+</div>
+
+
+<!-- ONLINE SETUP MODAL -->
+<div class="modal" id="onlineModal">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>অনলাইন অর্ডার সেটআপ</h2>
+
+      <button
+        class="close"
+        onclick="closeOnlineSetup()">×</button>
+
+    </div>
+
+    <div class="field">
+
+      <label>অনলাইন অর্ডার লিংক</label>
+
+      <input
+        id="onlineUrl"
+        type="url"
+        placeholder="https://forms.gle/...">
+
+    </div>
+
+    <div class="btn-row">
+
+      <button
+        class="btn primary"
+        onclick="saveOnlineSetup()">
+        💾 সেভ
+      </button>
+
+      <button
+        class="btn blue"
+        onclick="openOnlineForm()">
+        🔗 খুলুন
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="bottom-nav">
+
+  <button class="btn primary" onclick="newOrder()">
+    ＋ নতুন অর্ডার
+  </button>
+
+  <button class="btn blue" onclick="openProductManager()">
+    ▣ পণ্য
+  </button>
+
+  <button class="btn orange" onclick="openHistory()">
+    ◷ হিস্টোরি
+  </button>
+
+</div>
+
 
 <script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
 const SUPABASE_URL =
   "https://utzkpsohkoiawvuupgeb.supabase.co";
 
@@ -510,588 +848,162 @@ const supabaseClient =
     SUPABASE_PUBLISHABLE_KEY
   );
 
+
+/* =====================================================
+   AUTH
+===================================================== */
+
 async function checkAdmin(){
+
   try{
+
     const {data,error} =
       await supabaseClient.auth.getSession();
 
-    if(error || !data.session){
-      window.location.replace("signin.html");
+    if(error){
+
+      console.error(error);
+
+      window.location.href="signin.html";
+
       return;
     }
+
+    if(!data.session){
+
+      window.location.href="signin.html";
+
+      return;
+    }
+
   }catch(error){
+
     console.error(error);
-    window.location.replace("signin.html");
+
+    window.location.href="signin.html";
   }
 }
 
+
 async function adminLogout(){
-  if(!confirm("আপনি কি Logout করতে চান?")) return;
+
+  if(!confirm("আপনি কি Logout করতে চান?")){
+    return;
+  }
 
   try{
+
     const {error} =
       await supabaseClient.auth.signOut();
 
     if(error){
-      alert("Logout করা যায়নি:\n" + error.message);
+
+      alert(
+        "Logout করা যায়নি:\n"+
+        error.message
+      );
+
       return;
     }
 
     window.location.replace("signin.html");
 
   }catch(error){
-    console.error(error);
+
     alert("Logout করার সময় সমস্যা হয়েছে।");
   }
 }
 
 checkAdmin();
-</script>
-</head>
 
-<body>
 
-<header class="header">
-  <div class="header-top">
-    <div>
-      <h1>কহিনুর কেমিক্যাল পিএলসি</h1>
-      <p>অর্ডার অটোমেশন সিস্টেম</p>
-    </div>
+/* =====================================================
+   STORAGE
+===================================================== */
 
-    <button class="logout-btn" onclick="adminLogout()">
-      Logout
-    </button>
-  </div>
-</header>
+/*
+  গুরুত্বপূর্ণ:
 
-<main class="container">
+  এখানে আর কোনো default product নেই।
 
-  <!-- Dashboard -->
-  <section class="card">
-    <h2>ড্যাশবোর্ড</h2>
+  products = localStorage-এর পণ্য।
 
-    <div class="quick-grid">
+  ফলে আপনি নিজে যেগুলো যোগ করবেন
+  শুধু সেগুলোই থাকবে।
+*/
 
-      <button
-        class="quick q1"
-        onclick="newOrder()">
-        <b>＋ নতুন অর্ডার</b>
-        <small>নতুন অর্ডার তৈরি করুন</small>
-      </button>
+const PRODUCT_KEY =
+  "kohinoor_products_v3";
 
-      <!-- FIXED: এখন পণ্য তালিকা চাপলে Product Manager খুলবে -->
-      <button
-        class="quick q2"
-        onclick="openProductManager()">
-        <b>▣ পণ্য তালিকা</b>
-        <small>পণ্য যোগ / এডিট / ডিলিট</small>
-      </button>
+const ORDER_KEY =
+  "kohinoor_orders_v3";
 
-      <button
-        class="quick q3"
-        onclick="openHistory()">
-        <b>◷ অর্ডার ইতিহাস</b>
-        <small>আগের অর্ডার দেখুন</small>
-      </button>
+const ONLINE_KEY =
+  "kohinoor_online_url";
 
-      <button
-        class="quick q4"
-        onclick="openOnlineSetup()">
-        <b>⚙ অনলাইন অর্ডার</b>
-        <small>অনলাইন অর্ডার সেটআপ</small>
-      </button>
 
-    </div>
-  </section>
-
-
-  <!-- Order Form -->
-  <section class="card" id="orderSection">
-
-    <h2>নতুন অর্ডার</h2>
-
-    <div class="grid">
-
-      <div class="field">
-        <label>দোকানের নাম *</label>
-        <input
-          id="shop"
-          type="text"
-          placeholder="দোকানের নাম লিখুন">
-      </div>
-
-      <div class="field">
-        <label>মোবাইল নম্বর</label>
-        <input
-          id="mobile"
-          type="tel"
-          placeholder="01XXXXXXXXX">
-      </div>
-
-      <div class="field">
-        <label>রিপ্রেজেন্টেটিভ</label>
-        <input
-          id="rep"
-          type="text"
-          placeholder="রিপ্রেজেন্টেটিভের নাম">
-      </div>
-
-      <div class="field">
-        <label>তারিখ</label>
-        <input
-          id="orderDate"
-          type="date">
-      </div>
-
-      <div class="field full">
-        <label>নোট</label>
-        <textarea
-          id="note"
-          placeholder="প্রয়োজনীয় নোট লিখুন"></textarea>
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- Product Search -->
-  <section class="card">
-
-    <h2>পণ্য যোগ করুন</h2>
-
-    <div class="product-search">
-
-      <input
-        id="productSearch"
-        type="text"
-        autocomplete="off"
-        placeholder="পণ্যের নাম বা কোড লিখে খুঁজুন...">
-
-      <div
-        id="searchResult"
-        class="search-result">
-      </div>
-
-    </div>
-
-    <div class="status" id="productCount">
-      পণ্য লোড হচ্ছে...
-    </div>
-
-  </section>
-
-
-  <!-- Order Table -->
-  <section class="card">
-
-    <h2>অর্ডারের পণ্য</h2>
-
-    <div class="order-table-wrap">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>কোড</th>
-            <th>পণ্য</th>
-            <th>প্যাক</th>
-            <th>দাম</th>
-            <th>Qty</th>
-            <th>Bonus</th>
-            <th>মোট</th>
-            <th></th>
-          </tr>
-        </thead>
-
-        <tbody id="orderBody">
-        </tbody>
-
-      </table>
-
-    </div>
-
-    <div
-      id="orderEmpty"
-      class="empty">
-      এখনো কোনো পণ্য যোগ করা হয়নি।
-    </div>
-
-    <div class="total-box">
-      <span>সর্বমোট</span>
-      <strong id="grandTotal">৳ 0.00</strong>
-    </div>
-
-    <div class="actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="saveOrder()">
-        💾 অর্ডার সেভ
-      </button>
-
-      <button
-        class="btn btn-secondary"
-        onclick="shareOrder()">
-        📤 শেয়ার
-      </button>
-
-      <button
-        class="btn btn-blue"
-        onclick="printOrder()">
-        🖨 প্রিন্ট
-      </button>
-
-      <button
-        class="btn btn-danger"
-        onclick="newOrder()">
-        ✕ নতুন করে শুরু
-      </button>
-
-    </div>
-
-    <div
-      class="status"
-      id="saveStatus">
-    </div>
-
-  </section>
-
-
-  <!-- Online Order -->
-  <section class="card">
-
-    <h2>অনলাইন অর্ডার</h2>
-
-    <div class="setup-box">
-
-      <p style="margin-top:0">
-        অনলাইন অর্ডারের জন্য নিচের Google Form ব্যবহার করতে পারবেন।
-      </p>
-
-      <button
-        class="btn btn-primary"
-        onclick="openGoogleForm()">
-        🌐 Google Form খুলুন
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- Extra Info -->
-  <section class="card">
-
-    <h2>অতিরিক্ত তথ্য</h2>
-
-    <div class="grid">
-
-      <div class="field">
-        <label>রিপ্রেজেন্টেটিভ মোবাইল</label>
-        <input
-          id="repMobile"
-          type="tel"
-          placeholder="মোবাইল নম্বর">
-      </div>
-
-      <div class="field">
-        <label>অতিরিক্ত নোট</label>
-        <input
-          id="extraNote"
-          type="text"
-          placeholder="অতিরিক্ত তথ্য">
-      </div>
-
-    </div>
-
-  </section>
-
-</main>
-
-
-<!-- Bottom Navigation -->
-<nav class="bottom-nav">
-
-  <button onclick="newOrder()">
-    <b>＋</b>
-    নতুন
-  </button>
-
-  <button onclick="document.getElementById('productSearch').focus()">
-    <b>⌕</b>
-    খুঁজুন
-  </button>
-
-  <button onclick="openProductManager()">
-    <b>▣</b>
-    পণ্য
-  </button>
-
-  <button onclick="openHistory()">
-    <b>◷</b>
-    ইতিহাস
-  </button>
-
-</nav>
-
-
-<!-- PRODUCT MANAGER MODAL -->
-<div
-  id="productModal"
-  class="modal">
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <h2>পণ্য তালিকা ও ব্যবস্থাপনা</h2>
-
-      <button
-        class="close"
-        onclick="closeProductManager()">
-        ×
-      </button>
-
-    </div>
-
-    <div class="grid">
-
-      <div class="field">
-        <label>পণ্য কোড *</label>
-        <input
-          id="productCode"
-          type="text"
-          placeholder="যেমন P001">
-      </div>
-
-      <div class="field">
-        <label>পণ্যের নাম *</label>
-        <input
-          id="productName"
-          type="text"
-          placeholder="পণ্যের নাম">
-      </div>
-
-      <div class="field">
-        <label>প্যাক</label>
-        <input
-          id="productPack"
-          type="text"
-          placeholder="যেমন 60">
-      </div>
-
-      <div class="field">
-        <label>দাম</label>
-        <input
-          id="productPrice"
-          type="number"
-          step="0.01"
-          placeholder="0">
-      </div>
-
-      <div class="field">
-        <label>স্টক</label>
-        <input
-          id="productStock"
-          type="number"
-          placeholder="0">
-      </div>
-
-    </div>
-
-    <div class="modal-actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="saveProduct()">
-        💾 পণ্য সেভ
-      </button>
-
-      <button
-        class="btn btn-secondary"
-        onclick="clearProductForm()">
-        পরিষ্কার
-      </button>
-
-      <button
-        class="btn btn-blue"
-        onclick="loadProductsFromSupabase()">
-        🔄 Supabase থেকে লোড
-      </button>
-
-    </div>
-
-    <div
-      id="productSaveStatus"
-      class="status">
-    </div>
-
-
-    <div style="margin-top:18px">
-
-      <input
-        id="managerSearch"
-        type="text"
-        placeholder="পণ্যের নাম বা কোড দিয়ে তালিকায় খুঁজুন...">
-
-    </div>
-
-
-    <div
-      id="managerProductList"
-      class="product-list">
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- HISTORY MODAL -->
-<div
-  id="historyModal"
-  class="modal">
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <h2>অর্ডার ইতিহাস</h2>
-
-      <button
-        class="close"
-        onclick="closeHistory()">
-        ×
-      </button>
-
-    </div>
-
-    <div
-      id="historyList">
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ONLINE SETUP MODAL -->
-<div
-  id="onlineModal"
-  class="modal">
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <h2>অনলাইন অর্ডার সেটআপ</h2>
-
-      <button
-        class="close"
-        onclick="closeOnlineSetup()">
-        ×
-      </button>
-
-    </div>
-
-    <p>
-      আপনার Google Form লিংক:
-    </p>
-
-    <input
-      id="googleFormUrl"
-      type="text"
-      value="https://forms.gle/776PMNGr7WoujFxg8">
-
-    <div class="modal-actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="openGoogleForm()">
-        🌐 Form খুলুন
-      </button>
-
-      <button
-        class="btn btn-secondary"
-        onclick="copyGoogleForm()">
-        📋 লিংক কপি
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<script>
-
-const KEY = "kohinoor_products_v2";
-const ORD = "kohinoor_orders_v2";
-
-let products = [];
-
-try{
-
-  const saved =
-    JSON.parse(
-      localStorage.getItem(KEY) || "null"
-    );
-
-  if(Array.isArray(saved)){
-    products = saved;
-  }
-
-}catch(error){
-
-  console.error(
-    "Local products error:",
-    error
+let products =
+  JSON.parse(
+    localStorage.getItem(PRODUCT_KEY) || "[]"
   );
-
-}
-
-
-if(!products.length){
-
-  products = [
-
-    {
-      code:"03227",
-      name:"স্যাভলন সাবান 100 গ্রাম",
-      pack:"60",
-      price:88,
-      stock:100
-    },
-
-    {
-      code:"03228",
-      name:"স্যাভলন সাবান 75 গ্রাম",
-      pack:"48",
-      price:65,
-      stock:100
-    },
-
-    {
-      code:"03229",
-      name:"স্যাভলন লিকুইড",
-      pack:"24",
-      price:188,
-      stock:80
-    }
-
-  ];
-
-}
 
 
 let order = [];
+
 let editCode = null;
 
 
+/* =====================================================
+   HELPERS
+===================================================== */
+
 function $(id){
+
   return document.getElementById(id);
+}
+
+
+function saveProductsLocal(){
+
+  localStorage.setItem(
+    PRODUCT_KEY,
+    JSON.stringify(products)
+  );
+}
+
+
+function saveOrdersLocal(orders){
+
+  localStorage.setItem(
+    ORDER_KEY,
+    JSON.stringify(orders)
+  );
+}
+
+
+function getOrders(){
+
+  return JSON.parse(
+    localStorage.getItem(ORDER_KEY) || "[]"
+  );
+}
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+function money(value){
+
+  return Number(value || 0)
+    .toFixed(2);
 }
 
 
@@ -1100,162 +1012,157 @@ function today(){
   const d = new Date();
 
   const month =
-    String(d.getMonth()+1).padStart(2,"0");
+    String(d.getMonth()+1)
+      .padStart(2,"0");
 
   const day =
-    String(d.getDate()).padStart(2,"0");
+    String(d.getDate())
+      .padStart(2,"0");
 
   return (
-    d.getFullYear() +
-    "-" +
-    month +
-    "-" +
+    d.getFullYear()+
+    "-"+
+    month+
+    "-"+
     day
   );
-
 }
 
 
-$("orderDate").value = today();
+/* =====================================================
+   NEW ORDER
+===================================================== */
 
+function newOrder(){
 
-function money(value){
+  order=[];
 
-  return Number(value || 0)
-    .toLocaleString("en-BD",{
-      minimumFractionDigits:2,
-      maximumFractionDigits:2
-    });
+  $("shop").value="";
+  $("address").value="";
+  $("mobile").value="";
+  $("representative").value="";
+  $("orderDate").value=today();
+  $("deliveryDate").value="";
+  $("note").value="";
 
+  renderOrder();
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
 }
 
 
-function saveProductsLocal(){
-
-  localStorage.setItem(
-    KEY,
-    JSON.stringify(products)
-  );
-
-}
-
+/* =====================================================
+   PRODUCT SEARCH LIST
+===================================================== */
 
 function renderProducts(){
 
-  $("productCount").textContent =
-    "মোট পণ্য: " +
-    products.length +
-    " টি";
+  const box =
+    $("productList");
 
-}
-
-
-function searchProducts(){
-
-  const q =
+  const search =
     $("productSearch")
       .value
       .trim()
       .toLowerCase();
 
-  const box = $("searchResult");
 
-  if(!q){
+  const filtered =
+    products.filter(p => {
 
-    box.style.display = "none";
-    box.innerHTML = "";
-    return;
+      return (
+        String(p.code || "")
+          .toLowerCase()
+          .includes(search)
 
-  }
+        ||
 
+        String(p.name || "")
+          .toLowerCase()
+          .includes(search)
+      );
 
-  const result =
-    products.filter(p =>
-
-      String(p.code || "")
-        .toLowerCase()
-        .includes(q)
-
-      ||
-
-      String(p.name || "")
-        .toLowerCase()
-        .includes(q)
-
-    ).slice(0,30);
+    });
 
 
-  box.innerHTML = "";
+  if(!filtered.length){
 
-
-  if(!result.length){
-
-    box.innerHTML =
-      '<div class="empty">কোনো পণ্য পাওয়া যায়নি।</div>';
-
-    box.style.display = "block";
-    return;
-
-  }
-
-
-  result.forEach(p => {
-
-    const div =
-      document.createElement("div");
-
-    div.className = "product-item";
-
-    div.innerHTML = `
-
-      <div class="product-info">
-
-        <div class="product-name">
-          ${esc(p.name)}
-        </div>
-
-        <div class="product-meta">
-          কোড: ${esc(p.code)}
-          · প্যাক: ${esc(p.pack || "")}
-          · ৳ ${money(p.price)}
-          · স্টক: ${Number(p.stock || 0)}
-        </div>
-
+    box.innerHTML = `
+      <div class="empty">
+        কোনো পণ্য পাওয়া যায়নি।
+        <br><br>
+        <button
+          class="btn primary"
+          onclick="openProductManager()">
+          ＋ নতুন পণ্য যোগ করুন
+        </button>
       </div>
-
-      <button
-        class="btn btn-primary"
-        onclick="addToOrder('${escAttr(p.code)}')">
-        যোগ করুন
-      </button>
-
     `;
 
-    box.appendChild(div);
+    return;
+  }
 
-  });
 
+  box.innerHTML =
+    filtered.map(p => {
 
-  box.style.display = "block";
+      return `
+        <div class="product-item">
 
+          <b>
+            ${escapeHtml(p.name)}
+          </b>
+
+          <small>
+            কোড: ${escapeHtml(p.code)}
+            |
+            প্যাক: ${escapeHtml(p.pack || "-")}
+          </small>
+
+          <small>
+            দাম: ৳${money(p.price)}
+            |
+            স্টক: ${Number(p.stock || 0)}
+          </small>
+
+          <div class="product-actions">
+
+            <button
+              class="mini-btn add-btn"
+              onclick="addProductToOrder('${escapeHtml(p.code)}')">
+              + অর্ডারে যোগ
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
 }
 
 
-$("productSearch")
-  .addEventListener(
-    "input",
-    searchProducts
-  );
+/* =====================================================
+   ADD PRODUCT TO ORDER
+===================================================== */
 
-
-function addToOrder(code){
+function addProductToOrder(code){
 
   const product =
     products.find(
       p => String(p.code) === String(code)
     );
 
-  if(!product) return;
+
+  if(!product){
+
+    alert("পণ্য পাওয়া যায়নি।");
+
+    return;
+  }
 
 
   const existing =
@@ -1267,18 +1174,23 @@ function addToOrder(code){
   if(existing){
 
     existing.qty =
-      Number(existing.qty || 0) + 1;
+      Number(existing.qty || 0)+1;
 
   }else{
 
     order.push({
 
-      code: product.code,
-      name: product.name,
-      pack: product.pack || "",
-      price: Number(product.price || 0),
-      qty: 1,
-      bonus: 0
+      code:product.code,
+
+      name:product.name,
+
+      pack:product.pack || "",
+
+      price:Number(product.price || 0),
+
+      qty:1,
+
+      bonus:0
 
     });
 
@@ -1286,120 +1198,127 @@ function addToOrder(code){
 
 
   renderOrder();
-
-  $("productSearch").value = "";
-  $("searchResult").style.display = "none";
-
 }
 
+
+/* =====================================================
+   RENDER ORDER
+===================================================== */
 
 function renderOrder(){
 
-  const body = $("orderBody");
-
-  body.innerHTML = "";
-
-
-  $("orderEmpty").style.display =
-    order.length ? "none" : "block";
+  const body =
+    $("orderBody");
 
 
-  let total = 0;
+  if(!order.length){
 
-
-  order.forEach((item,index) => {
-
-    const line =
-      Number(item.price || 0) *
-      Number(item.qty || 0);
-
-    total += line;
-
-
-    const tr =
-      document.createElement("tr");
-
-
-    tr.innerHTML = `
-
-      <td>${esc(item.code)}</td>
-
-      <td>
-        <b>${esc(item.name)}</b>
-      </td>
-
-      <td>${esc(item.pack || "")}</td>
-
-      <td>৳ ${money(item.price)}</td>
-
-      <td>
-        <input
-          class="qty-input"
-          type="number"
-          min="1"
-          value="${Number(item.qty || 1)}"
-          onchange="setQty(${index},this.value)">
-      </td>
-
-      <td>
-        <input
-          class="bonus-input"
-          type="number"
-          min="0"
-          value="${Number(item.bonus || 0)}"
-          onchange="setBonus(${index},this.value)">
-      </td>
-
-      <td>
-        <b>৳ ${money(line)}</b>
-      </td>
-
-      <td>
-        <button
-          class="small-btn btn-danger"
-          onclick="removeLine(${index})">
-          ✕
-        </button>
-      </td>
-
+    body.innerHTML = `
+      <tr>
+        <td colspan="8" class="empty">
+          এখনো কোনো পণ্য যোগ করা হয়নি।
+        </td>
+      </tr>
     `;
 
-    body.appendChild(tr);
+    $("grandTotal").textContent="0.00";
 
-  });
+    return;
+  }
 
 
-  $("grandTotal").textContent =
-    "৳ " + money(total);
+  body.innerHTML =
+    order.map((item,index)=>{
 
+      const total =
+        Number(item.price || 0) *
+        Number(item.qty || 0);
+
+
+      return `
+        <tr>
+
+          <td>
+            ${escapeHtml(item.code)}
+          </td>
+
+          <td>
+            ${escapeHtml(item.name)}
+          </td>
+
+          <td>
+            ${escapeHtml(item.pack || "-")}
+          </td>
+
+          <td>
+            ৳${money(item.price)}
+          </td>
+
+          <td>
+
+            <input
+              class="qty-input"
+              type="number"
+              min="0"
+              value="${Number(item.qty || 0)}"
+              onchange="setQty(${index},this.value)">
+
+          </td>
+
+          <td>
+
+            <input
+              class="bonus-input"
+              type="number"
+              min="0"
+              value="${Number(item.bonus || 0)}"
+              onchange="setBonus(${index},this.value)">
+
+          </td>
+
+          <td>
+            ৳${money(total)}
+          </td>
+
+          <td>
+
+            <button
+              class="mini-btn delete-btn"
+              onclick="removeLine(${index})">
+              ডিলেট
+            </button>
+
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+
+  calc();
 }
 
 
+/* =====================================================
+   QTY / BONUS
+===================================================== */
+
 function setQty(index,value){
 
-  const qty =
-    Math.max(1,Number(value || 1));
-
-  if(order[index]){
-    order[index].qty = qty;
-  }
+  order[index].qty =
+    Math.max(0,Number(value || 0));
 
   renderOrder();
-
 }
 
 
 function setBonus(index,value){
 
-  const bonus =
+  order[index].bonus =
     Math.max(0,Number(value || 0));
 
-  if(order[index]){
-    order[index].bonus = bonus;
-  }
-
   renderOrder();
-
 }
 
 
@@ -1408,38 +1327,619 @@ function removeLine(index){
   order.splice(index,1);
 
   renderOrder();
-
 }
 
 
 function calc(){
 
-  return order.reduce(
-    (sum,item) =>
-      sum +
+  let total=0;
+
+
+  order.forEach(item=>{
+
+    total +=
       Number(item.price || 0) *
-      Number(item.qty || 0),
-    0
+      Number(item.qty || 0);
+
+  });
+
+
+  $("grandTotal").textContent =
+    money(total);
+
+  return total;
+}
+
+
+/* =====================================================
+   PRODUCT MANAGER
+===================================================== */
+
+function openProductManager(){
+
+  $("productModal").style.display="block";
+
+  renderManagerProducts();
+
+}
+
+
+function closeProductManager(){
+
+  $("productModal").style.display="none";
+
+}
+
+
+function clearProductForm(){
+
+  editCode=null;
+
+  $("productFormTitle")
+    .textContent="নতুন পণ্য যোগ করুন";
+
+  $("pCode").value="";
+  $("pName").value="";
+  $("pPack").value="";
+  $("pPrice").value="";
+  $("pStock").value="";
+
+}
+
+
+/* =====================================================
+   SAVE PRODUCT
+===================================================== */
+
+async function saveProduct(){
+
+  const code =
+    $("pCode")
+      .value
+      .trim();
+
+  const name =
+    $("pName")
+      .value
+      .trim();
+
+  const pack =
+    $("pPack")
+      .value
+      .trim();
+
+  const price =
+    Number(
+      $("pPrice").value || 0
+    );
+
+  const stock =
+    Number(
+      $("pStock").value || 0
+    );
+
+
+  if(!code){
+
+    alert("পণ্য কোড লিখুন।");
+
+    return;
+  }
+
+
+  if(!name){
+
+    alert("পণ্যের নাম লিখুন।");
+
+    return;
+  }
+
+
+  const duplicate =
+    products.find(
+      p =>
+        String(p.code).toLowerCase()
+        ===
+        code.toLowerCase()
+    );
+
+
+  /* EDIT */
+
+  if(editCode){
+
+    const index =
+      products.findIndex(
+        p =>
+          String(p.code) ===
+          String(editCode)
+      );
+
+
+    if(index === -1){
+
+      alert("পণ্য পাওয়া যায়নি।");
+
+      return;
+    }
+
+
+    products[index]={
+
+      code,
+
+      name,
+
+      pack,
+
+      price,
+
+      stock
+
+    };
+
+
+    saveProductsLocal();
+
+    /*
+      Supabase-এ update করার চেষ্টা।
+      RLS permission না থাকলে local save
+      তবুও কাজ করবে।
+    */
+
+    try{
+
+      await supabaseClient
+        .from("products")
+        .update({
+
+          code,
+          name,
+          pack,
+          price,
+          stock,
+          updated_at:new Date().toISOString()
+
+        })
+        .eq("code",editCode);
+
+    }catch(error){
+
+      console.log(
+        "Supabase update:",
+        error
+      );
+
+    }
+
+
+    alert("পণ্য আপডেট হয়েছে।");
+
+  }
+
+  /* NEW */
+
+  else{
+
+    if(duplicate){
+
+      alert(
+        "এই কোডের পণ্য আগে থেকেই আছে।"
+      );
+
+      return;
+    }
+
+
+    const newProduct={
+
+      code,
+
+      name,
+
+      pack,
+
+      price,
+
+      stock
+
+    };
+
+
+    products.push(newProduct);
+
+    saveProductsLocal();
+
+
+    /*
+      নতুন পণ্য Supabase-এ পাঠানো হবে।
+    */
+
+    try{
+
+      const {error} =
+        await supabaseClient
+          .from("products")
+          .insert([{
+
+            code,
+            name,
+            pack,
+            price,
+            stock
+
+          }]);
+
+
+      if(error){
+
+        console.log(
+          "Supabase insert:",
+          error
+        );
+
+      }
+
+    }catch(error){
+
+      console.log(
+        "Supabase insert exception:",
+        error
+      );
+
+    }
+
+
+    alert("নতুন পণ্য যোগ হয়েছে।");
+
+  }
+
+
+  clearProductForm();
+
+  renderManagerProducts();
+
+  renderProducts();
+
+}
+
+
+/* =====================================================
+   MANAGER PRODUCT LIST
+===================================================== */
+
+function renderManagerProducts(){
+
+  const box =
+    $("managerProductList");
+
+
+  const search =
+    $("managerSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filtered =
+    products.filter(p=>{
+
+      return (
+
+        String(p.code || "")
+          .toLowerCase()
+          .includes(search)
+
+        ||
+
+        String(p.name || "")
+          .toLowerCase()
+          .includes(search)
+
+      );
+
+    });
+
+
+  if(!filtered.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        কোনো পণ্য নেই।
+        <br>
+        উপরের ফর্ম দিয়ে নতুন পণ্য যোগ করুন।
+      </div>
+    `;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    filtered.map(p=>{
+
+      return `
+
+        <div class="product-item">
+
+          <b>
+            ${escapeHtml(p.name)}
+          </b>
+
+          <small>
+            কোড: ${escapeHtml(p.code)}
+          </small>
+
+          <small>
+            প্যাক: ${escapeHtml(p.pack || "-")}
+            |
+            দাম: ৳${money(p.price)}
+            |
+            স্টক: ${Number(p.stock || 0)}
+          </small>
+
+          <div class="product-actions">
+
+            <button
+              class="mini-btn edit-btn"
+              onclick="editProduct('${escapeHtml(p.code)}')">
+              এডিট
+            </button>
+
+            <button
+              class="mini-btn delete-btn"
+              onclick="deleteProduct('${escapeHtml(p.code)}')">
+              ডিলেট
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+}
+
+
+/* =====================================================
+   EDIT PRODUCT
+===================================================== */
+
+function editProduct(code){
+
+  const product =
+    products.find(
+      p =>
+        String(p.code) ===
+        String(code)
+    );
+
+
+  if(!product){
+
+    alert("পণ্য পাওয়া যায়নি।");
+
+    return;
+  }
+
+
+  editCode=product.code;
+
+
+  $("productFormTitle")
+    .textContent="পণ্য এডিট করুন";
+
+
+  $("pCode").value =
+    product.code || "";
+
+  $("pName").value =
+    product.name || "";
+
+  $("pPack").value =
+    product.pack || "";
+
+  $("pPrice").value =
+    product.price || 0;
+
+  $("pStock").value =
+    product.stock || 0;
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =====================================================
+   DELETE PRODUCT
+===================================================== */
+
+async function deleteProduct(code){
+
+  const product =
+    products.find(
+      p =>
+        String(p.code) ===
+        String(code)
+    );
+
+
+  if(!product){
+
+    alert("পণ্য পাওয়া যায়নি।");
+
+    return;
+  }
+
+
+  const yes =
+    confirm(
+      "আপনি কি এই পণ্যটি ডিলেট করতে চান?\n\n"+
+      product.name
+    );
+
+
+  if(!yes){
+
+    return;
+  }
+
+
+  /*
+    প্রথমে LOCAL তালিকা থেকে ডিলেট।
+    তাই ডিলেট করার পরে refresh করলেও
+    local তালিকা থেকে ফিরে আসবে না।
+  */
+
+  products =
+    products.filter(
+      p =>
+        String(p.code) !==
+        String(code)
+    );
+
+
+  saveProductsLocal();
+
+
+  /*
+    Supabase থেকেও ডিলেট করার চেষ্টা।
+  */
+
+  try{
+
+    const {error} =
+      await supabaseClient
+        .from("products")
+        .delete()
+        .eq("code",code);
+
+
+    if(error){
+
+      console.log(
+        "Supabase delete:",
+        error
+      );
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "Supabase delete exception:",
+      error
+    );
+
+  }
+
+
+  renderManagerProducts();
+
+  renderProducts();
+
+
+  alert(
+    "পণ্যটি ডিলেট করা হয়েছে।"
   );
 
 }
 
 
+/* =====================================================
+   SAVE ORDER
+===================================================== */
+
 async function saveOrder(){
 
   const shop =
-    $("shop").value.trim();
+    $("shop")
+      .value
+      .trim();
+
+  const address =
+    $("address")
+      .value
+      .trim();
+
+  const mobile =
+    $("mobile")
+      .value
+      .trim();
+
+  const representative =
+    $("representative")
+      .value
+      .trim();
+
+  const orderDate =
+    $("orderDate")
+      .value;
+
+  const deliveryDate =
+    $("deliveryDate")
+      .value;
+
+  const note =
+    $("note")
+      .value
+      .trim();
 
 
   if(!shop){
 
+    alert("দোকানের নাম লিখুন।");
+
+    return;
+  }
+
+
+  if(!address){
+
+    alert("ঠিকানা লিখুন।");
+
+    return;
+  }
+
+
+  if(!mobile){
+
+    alert("মোবাইল নম্বর লিখুন।");
+
+    return;
+  }
+
+
+  if(!representative){
+
     alert(
-      "দোকানের নাম লিখুন।"
+      "রিপ্রেজেনটেটিভের নাম লিখুন।"
     );
 
-    $("shop").focus();
     return;
+  }
 
+
+  if(!orderDate){
+
+    alert("অর্ডার ডেট নির্বাচন করুন।");
+
+    return;
+  }
+
+
+  if(!deliveryDate){
+
+    alert(
+      "ডেলিভারি ডেট নির্বাচন করুন।"
+    );
+
+    return;
   }
 
 
@@ -1450,138 +1950,96 @@ async function saveOrder(){
     );
 
     return;
-
   }
 
 
-  const total = calc();
+  const total=calc();
 
 
-  const orderData = {
+  const orderData={
 
     id:
       Date.now().toString(),
 
-    shop: shop,
+    shop,
 
-    mobile:
-      $("mobile").value.trim(),
+    address,
 
-    rep:
-      $("rep").value.trim(),
+    mobile,
 
-    repMobile:
-      $("repMobile").value.trim(),
+    representative,
 
-    note:
-      $("note").value.trim(),
+    order_date:orderDate,
 
-    extraNote:
-      $("extraNote").value.trim(),
+    delivery_date:deliveryDate,
 
-    date:
-      $("orderDate").value || today(),
+    note,
 
-    total: total,
-
-    items:
+    products:
       JSON.parse(
         JSON.stringify(order)
       ),
 
-    createdAt:
+    total,
+
+    created_at:
       new Date().toISOString()
 
   };
 
 
-  /* প্রথমে LocalStorage-এ সেভ */
+  /*
+    LOCAL SAVE
+  */
 
-  let orders = [];
-
-
-  try{
-
-    orders =
-      JSON.parse(
-        localStorage.getItem(ORD) || "[]"
-      );
-
-    if(!Array.isArray(orders)){
-      orders = [];
-    }
-
-  }catch(error){
-
-    orders = [];
-
-  }
+  const orders =
+    getOrders();
 
 
   orders.unshift(orderData);
 
-
-  localStorage.setItem(
-    ORD,
-    JSON.stringify(orders)
-  );
+  saveOrdersLocal(orders);
 
 
-  $("saveStatus").textContent =
-    "অর্ডার LocalStorage-এ সফলভাবে সেভ হয়েছে।";
-
-
-  /* Supabase-এ চেষ্টা */
+  /*
+    SUPABASE SAVE
+  */
 
   try{
 
     const {error} =
       await supabaseClient
         .from("orders")
-        .insert({
+        .insert([{
 
-          shop: shop,
+          shop,
+          address,
+          mobile,
+          representative,
+          order_date:orderDate,
+          delivery_date:deliveryDate,
+          note,
+          products:orderData.products,
+          total
 
-          mobile:
-            $("mobile").value.trim(),
-
-          rep:
-            $("rep").value.trim(),
-
-          note:
-            $("note").value.trim(),
-
-          total: total,
-
-          items: orderData.items
-
-        });
+        }]);
 
 
     if(error){
 
-      console.warn(
+      console.log(
         "Supabase order save:",
-        error.message
+        error
       );
-
-      $("saveStatus").textContent =
-        "অর্ডার সেভ হয়েছে। Supabase-এ পাঠানো যায়নি: " +
-        error.message;
-
-    }else{
-
-      $("saveStatus").textContent =
-        "অর্ডার LocalStorage ও Supabase-এ সফলভাবে সেভ হয়েছে।";
 
     }
 
   }catch(error){
 
-    console.warn(error);
-
-    $("saveStatus").textContent =
-      "অর্ডার LocalStorage-এ সেভ হয়েছে।";
+    console.log(
+      "Supabase order exception:",
+      error
+    );
 
   }
 
@@ -1593,85 +2051,229 @@ async function saveOrder(){
 }
 
 
+/* =====================================================
+   HISTORY
+===================================================== */
+
+function openHistory(){
+
+  $("historyModal")
+    .style.display="block";
+
+  renderHistory();
+
+}
+
+
+function closeHistory(){
+
+  $("historyModal")
+    .style.display="none";
+
+}
+
+
+function renderHistory(){
+
+  const box =
+    $("historyList");
+
+
+  const orders =
+    getOrders();
+
+
+  if(!orders.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        এখনো কোনো অর্ডার নেই।
+      </div>
+    `;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    orders.map((o,index)=>{
+
+      const items =
+        Array.isArray(o.products)
+          ? o.products
+          : [];
+
+
+      return `
+
+        <div class="history-item">
+
+          <b>
+            ${escapeHtml(o.shop)}
+          </b>
+
+          <div>
+            ঠিকানা:
+            ${escapeHtml(o.address)}
+          </div>
+
+          <div>
+            মোবাইল:
+            ${escapeHtml(o.mobile)}
+          </div>
+
+          <div>
+            রিপ্রেজেনটেটিভ:
+            ${escapeHtml(o.representative)}
+          </div>
+
+          <div>
+            অর্ডার:
+            ${escapeHtml(o.order_date)}
+          </div>
+
+          <div>
+            ডেলিভারি:
+            ${escapeHtml(o.delivery_date)}
+          </div>
+
+          <div>
+            মোট:
+            <b>৳${money(o.total)}</b>
+          </div>
+
+          <div style="margin-top:8px">
+
+            ${items.map(item=>`
+
+              <div>
+                •
+                ${escapeHtml(item.name)}
+                ×
+                ${Number(item.qty || 0)}
+              </div>
+
+            `).join("")}
+
+          </div>
+
+          <div class="btn-row">
+
+            <button
+              class="btn red"
+              onclick="deleteHistory(${index})">
+              ডিলেট
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+}
+
+
+function deleteHistory(index){
+
+  const orders =
+    getOrders();
+
+
+  if(!orders[index]){
+    return;
+  }
+
+
+  if(
+    !confirm(
+      "এই অর্ডারটি ডিলেট করবেন?"
+    )
+  ){
+
+    return;
+  }
+
+
+  orders.splice(index,1);
+
+  saveOrdersLocal(orders);
+
+  renderHistory();
+
+}
+
+
+/* =====================================================
+   SHARE ORDER
+===================================================== */
+
 function buildOrderText(){
 
+  const shop =
+    $("shop").value.trim();
+
+  const address =
+    $("address").value.trim();
+
+  const mobile =
+    $("mobile").value.trim();
+
+  const representative =
+    $("representative").value.trim();
+
+  const orderDate =
+    $("orderDate").value;
+
+  const deliveryDate =
+    $("deliveryDate").value;
+
+  const note =
+    $("note").value.trim();
+
+
   let text =
-    "কহিনুর কেমিক্যাল পিএলসি\n";
+`কহিনুর কেমিক্যাল পিএলসি
 
-  text +=
-    "অর্ডার\n\n";
+দোকানের নাম: ${shop}
+ঠিকানা: ${address}
+মোবাইল: ${mobile}
+রিপ্রেজেনটেটিভ: ${representative}
+অর্ডার ডেট: ${orderDate}
+ডেলিভারি ডেট: ${deliveryDate}
 
-
-  text +=
-    "দোকান: " +
-    $("shop").value.trim() +
-    "\n";
-
-
-  if($("mobile").value.trim()){
-
-    text +=
-      "মোবাইল: " +
-      $("mobile").value.trim() +
-      "\n";
-
-  }
+পণ্যের তালিকা:
+`;
 
 
-  if($("rep").value.trim()){
+  order.forEach((item,index)=>{
 
     text +=
-      "রিপ্রেজেন্টেটিভ: " +
-      $("rep").value.trim() +
-      "\n";
+`${index+1}. ${item.name}
+কোড: ${item.code}
+প্যাক: ${item.pack}
+দাম: ৳${money(item.price)}
+Qty: ${item.qty}
+Bonus: ${item.bonus || 0}
+মোট: ৳${money(
+  Number(item.price || 0) *
+  Number(item.qty || 0)
+)}
 
-  }
-
-
-  text +=
-    "তারিখ: " +
-    ($("orderDate").value || today()) +
-    "\n\n";
-
-
-  order.forEach((item,index) => {
-
-    text +=
-      (index+1) +
-      ". " +
-      item.name +
-      " (" +
-      item.code +
-      ")\n";
-
-    text +=
-      "Qty: " +
-      item.qty +
-      " | Bonus: " +
-      (item.bonus || 0) +
-      "\n";
-
-    text +=
-      "দাম: ৳ " +
-      money(
-        Number(item.price) *
-        Number(item.qty)
-      ) +
-      "\n\n";
+`;
 
   });
 
 
   text +=
-    "সর্বমোট: ৳ " +
-    money(calc());
+`\nসর্বমোট: ৳${money(calc())}`;
 
 
-  if($("note").value.trim()){
+  if(note){
 
     text +=
-      "\nনোট: " +
-      $("note").value.trim();
+`\n\nনোট: ${note}`;
 
   }
 
@@ -1690,7 +2292,6 @@ async function shareOrder(){
     );
 
     return;
-
   }
 
 
@@ -1705,11 +2306,13 @@ async function shareOrder(){
     try{
 
       await navigator.share({
-        title:"কহিনুর কেমিক্যাল অর্ডার",
-        text:text
-      });
 
-      return;
+        title:
+          "কহিনুর কেমিক্যাল অর্ডার",
+
+        text
+
+      });
 
     }catch(error){
 
@@ -1717,65 +2320,30 @@ async function shareOrder(){
 
     }
 
-  }
+  }else{
 
+    try{
 
-  try{
+      await navigator.clipboard.writeText(text);
 
-    await navigator.clipboard.writeText(text);
+      alert(
+        "অর্ডারের তথ্য কপি হয়েছে।"
+      );
 
-    alert(
-      "অর্ডারের তথ্য কপি হয়েছে।"
-    );
+    }catch(error){
 
-  }catch(error){
+      alert(text);
 
-    prompt(
-      "নিচের তথ্য কপি করুন:",
-      text
-    );
+    }
 
   }
 
 }
 
 
-function newOrder(){
-
-  if(
-    order.length &&
-    !confirm(
-      "বর্তমান অর্ডার মুছে নতুন অর্ডার শুরু করবেন?"
-    )
-  ){
-    return;
-  }
-
-
-  order = [];
-
-
-  $("shop").value = "";
-  $("mobile").value = "";
-  $("rep").value = "";
-  $("repMobile").value = "";
-  $("note").value = "";
-  $("extraNote").value = "";
-  $("orderDate").value = today();
-
-  $("saveStatus").textContent = "";
-
-
-  renderOrder();
-
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-
-}
-
+/* =====================================================
+   PRINT
+===================================================== */
 
 function printOrder(){
 
@@ -1786,929 +2354,150 @@ function printOrder(){
     );
 
     return;
-
   }
 
 
-  const text =
-    buildOrderText();
-
-
-  const win =
-    window.open(
-      "",
-      "_blank"
-    );
-
-
-  if(!win){
-
-    alert(
-      "Print window খোলা যায়নি। Browser popup অনুমতি দিন।"
-    );
-
-    return;
-
-  }
-
-
-  win.document.write(`
-
-    <html>
-
-      <head>
-
-        <title>
-          কহিনুর কেমিক্যাল অর্ডার
-        </title>
-
-        <style>
-
-          body{
-            font-family:Arial,sans-serif;
-            padding:30px;
-            line-height:1.7;
-          }
-
-          pre{
-            white-space:pre-wrap;
-            font-family:inherit;
-          }
-
-        </style>
-
-      </head>
-
-      <body>
-
-        <pre>${esc(text)}</pre>
-
-        <script>
-          window.onload=function(){
-            window.print();
-          };
-        <\/script>
-
-      </body>
-
-    </html>
-
-  `);
-
-  win.document.close();
+  window.print();
 
 }
 
 
-function openProductManager(){
-
-  $("productModal").style.display =
-    "block";
-
-  renderProductList();
-
-}
-
-
-function closeProductManager(){
-
-  $("productModal").style.display =
-    "none";
-
-}
-
-
-function clearProductForm(){
-
-  editCode = null;
-
-  $("productCode").value = "";
-  $("productName").value = "";
-  $("productPack").value = "";
-  $("productPrice").value = "";
-  $("productStock").value = "";
-
-  $("productSaveStatus").textContent = "";
-
-}
-
-
-async function saveProduct(){
-
-  const code =
-    $("productCode")
-      .value
-      .trim();
-
-  const name =
-    $("productName")
-      .value
-      .trim();
-
-  const pack =
-    $("productPack")
-      .value
-      .trim();
-
-  const price =
-    Number(
-      $("productPrice").value || 0
-    );
-
-  const stock =
-    Number(
-      $("productStock").value || 0
-    );
-
-
-  if(!code){
-
-    alert(
-      "পণ্যের কোড লিখুন।"
-    );
-
-    return;
-
-  }
-
-
-  if(!name){
-
-    alert(
-      "পণ্যের নাম লিখুন।"
-    );
-
-    return;
-
-  }
-
-
-  const product = {
-
-    code: code,
-
-    name: name,
-
-    pack: pack,
-
-    price: price,
-
-    stock: stock
-
-  };
-
-
-  try{
-
-    $("productSaveStatus").textContent =
-      "সেভ হচ্ছে...";
-
-
-    /* LocalStorage */
-
-    const existingIndex =
-      products.findIndex(
-        p =>
-          String(p.code).toLowerCase() ===
-          code.toLowerCase()
-      );
-
-
-    if(existingIndex >= 0){
-
-      products[existingIndex] =
-        product;
-
-    }else{
-
-      products.push(product);
-
-    }
-
-
-    saveProductsLocal();
-
-
-    /* Supabase */
-
-    if(existingIndex >= 0){
-
-      const old =
-        products[existingIndex];
-
-
-      const {data:found,error:findError} =
-        await supabaseClient
-          .from("products")
-          .select("id")
-          .eq("code",code)
-          .limit(1);
-
-
-      if(
-        !findError &&
-        found &&
-        found.length
-      ){
-
-        await supabaseClient
-          .from("products")
-          .update({
-
-            name:name,
-            pack:pack,
-            price:price,
-            stock:stock,
-            updated_at:
-              new Date().toISOString()
-
-          })
-          .eq("id",found[0].id);
-
-      }else{
-
-        await supabaseClient
-          .from("products")
-          .insert({
-
-            code:code,
-            name:name,
-            pack:pack,
-            price:price,
-            stock:stock
-
-          });
-
-      }
-
-    }else{
-
-      const {error} =
-        await supabaseClient
-          .from("products")
-          .insert({
-
-            code:code,
-            name:name,
-            pack:pack,
-            price:price,
-            stock:stock
-
-          });
-
-
-      if(error){
-
-        console.warn(
-          "Supabase insert:",
-          error.message
-        );
-
-      }
-
-    }
-
-
-    $("productSaveStatus").textContent =
-      "পণ্য সফলভাবে সেভ হয়েছে।";
-
-
-    clearProductForm();
-
-    renderProducts();
-    renderProductList();
-
-
-  }catch(error){
-
-    console.error(error);
-
-    $("productSaveStatus").textContent =
-      "LocalStorage-এ সেভ হয়েছে, কিন্তু Supabase-এ সমস্যা হয়েছে।";
-
-  }
-
-}
-
-
-function renderProductList(){
-
-  const box =
-    $("managerProductList");
-
-  const q =
-    $("managerSearch")
-      .value
-      .trim()
-      .toLowerCase();
-
-
-  let list =
-    products.filter(p => {
-
-      if(!q) return true;
-
-      return (
-
-        String(p.code || "")
-          .toLowerCase()
-          .includes(q)
-
-        ||
-
-        String(p.name || "")
-          .toLowerCase()
-          .includes(q)
-
-      );
-
-    });
-
-
-  box.innerHTML = "";
-
-
-  if(!list.length){
-
-    box.innerHTML =
-      '<div class="empty">কোনো পণ্য পাওয়া যায়নি।</div>';
-
-    return;
-
-  }
-
-
-  list.forEach(product => {
-
-    const row =
-      document.createElement("div");
-
-    row.className =
-      "manager-row";
-
-
-    row.innerHTML = `
-
-      <div class="manager-info">
-
-        <strong>
-          ${esc(product.name)}
-        </strong>
-
-        <span>
-          কোড: ${esc(product.code)}
-          · প্যাক: ${esc(product.pack || "")}
-          · দাম: ৳ ${money(product.price)}
-          · স্টক: ${Number(product.stock || 0)}
-        </span>
-
-      </div>
-
-      <div class="manager-buttons">
-
-        <button
-          class="small-btn btn-blue"
-          onclick="editProduct('${escAttr(product.code)}')">
-          এডিট
-        </button>
-
-        <button
-          class="small-btn btn-danger"
-          onclick="deleteProduct('${escAttr(product.code)}')">
-          ডিলিট
-        </button>
-
-      </div>
-
-    `;
-
-
-    box.appendChild(row);
-
-  });
-
-}
-
-
-$("managerSearch")
-  .addEventListener(
-    "input",
-    renderProductList
-  );
-
-
-function editProduct(code){
-
-  const product =
-    products.find(
-      p => String(p.code) === String(code)
-    );
-
-
-  if(!product) return;
-
-
-  editCode = code;
-
-
-  $("productCode").value =
-    product.code || "";
-
-  $("productName").value =
-    product.name || "";
-
-  $("productPack").value =
-    product.pack || "";
-
-  $("productPrice").value =
-    product.price || 0;
-
-  $("productStock").value =
-    product.stock || 0;
-
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-
-}
-
-
-async function deleteProduct(code){
-
-  const product =
-    products.find(
-      p => String(p.code) === String(code)
-    );
-
-
-  if(!product) return;
-
-
-  if(
-    !confirm(
-      "এই পণ্যটি মুছে ফেলবেন?\n\n" +
-      product.name
-    )
-  ){
-
-    return;
-
-  }
-
-
-  try{
-
-    products =
-      products.filter(
-        p =>
-          String(p.code) !==
-          String(code)
-      );
-
-
-    saveProductsLocal();
-
-
-    /* Supabase থেকে code দিয়ে delete */
-
-    const {error} =
-      await supabaseClient
-        .from("products")
-        .delete()
-        .eq("code",code);
-
-
-    if(error){
-
-      console.warn(
-        "Supabase delete:",
-        error.message
-      );
-
-    }
-
-
-    renderProducts();
-    renderProductList();
-
-  }catch(error){
-
-    console.error(error);
-
-    alert(
-      "পণ্য মুছতে সমস্যা হয়েছে।"
-    );
-
-  }
-
-}
-
-
-async function loadProductsFromSupabase(){
-
-  try{
-
-    $("productSaveStatus").textContent =
-      "Supabase থেকে পণ্য লোড হচ্ছে...";
-
-
-    const {data,error} =
-      await supabaseClient
-        .from("products")
-        .select(
-          "id,code,name,pack,price,stock"
-        )
-        .order(
-          "created_at",
-          {ascending:true}
-        );
-
-
-    if(error){
-
-      throw error;
-
-    }
-
-
-    if(!Array.isArray(data)){
-
-      return;
-
-    }
-
-
-    /*
-      গুরুত্বপূর্ণ:
-      Supabase-এর পণ্য LocalStorage-এর
-      পুরোনো পণ্যের সাথে MERGE হবে।
-      পুরোনো LocalStorage পণ্য সরিয়ে দেওয়া হবে না।
-    */
-
-    const map =
-      new Map();
-
-
-    products.forEach(p => {
-
-      if(p && p.code){
-
-        map.set(
-          String(p.code),
-          p
-        );
-
-      }
-
-    });
-
-
-    data.forEach(p => {
-
-      if(p && p.code){
-
-        map.set(
-          String(p.code),
-          {
-
-            code:p.code,
-            name:p.name || "",
-            pack:p.pack || "",
-            price:Number(p.price || 0),
-            stock:Number(p.stock || 0)
-
-          }
-        );
-
-      }
-
-    });
-
-
-    products =
-      Array.from(map.values());
-
-
-    saveProductsLocal();
-
-    renderProducts();
-    renderProductList();
-
-
-    $("productSaveStatus").textContent =
-      "Supabase থেকে পণ্য সফলভাবে লোড হয়েছে। মোট " +
-      products.length +
-      " টি।";
-
-
-  }catch(error){
-
-    console.error(error);
-
-    $("productSaveStatus").textContent =
-      "Supabase থেকে পণ্য লোড করা যায়নি: " +
-      error.message;
-
-  }
-
-}
-
-
-function openHistory(){
-
-  $("historyModal").style.display =
-    "block";
-
-  renderHistory();
-
-}
-
-
-function closeHistory(){
-
-  $("historyModal").style.display =
-    "none";
-
-}
-
-
-function renderHistory(){
-
-  const box =
-    $("historyList");
-
-
-  let orders = [];
-
-
-  try{
-
-    orders =
-      JSON.parse(
-        localStorage.getItem(ORD) || "[]"
-      );
-
-    if(!Array.isArray(orders)){
-      orders = [];
-    }
-
-  }catch(error){
-
-    orders = [];
-
-  }
-
-
-  box.innerHTML = "";
-
-
-  if(!orders.length){
-
-    box.innerHTML =
-      '<div class="empty">কোনো অর্ডার ইতিহাস নেই।</div>';
-
-    return;
-
-  }
-
-
-  orders.forEach((o,index) => {
-
-    const row =
-      document.createElement("div");
-
-    row.className =
-      "history-row";
-
-
-    row.innerHTML = `
-
-      <strong>
-        ${esc(o.shop || "দোকানের নাম নেই")}
-      </strong>
-
-      <div class="history-meta">
-        তারিখ: ${esc(o.date || "")}
-        · মোট: ৳ ${money(o.total)}
-      </div>
-
-      <div class="history-meta">
-        পণ্য: ${(o.items || []).length} টি
-      </div>
-
-      <div style="margin-top:8px">
-
-        <button
-          class="small-btn btn-blue"
-          onclick="viewHistoryOrder(${index})">
-          দেখুন
-        </button>
-
-        <button
-          class="small-btn btn-danger"
-          onclick="deleteHistoryOrder(${index})">
-          মুছুন
-        </button>
-
-      </div>
-
-    `;
-
-
-    box.appendChild(row);
-
-  });
-
-}
-
-
-function viewHistoryOrder(index){
-
-  let orders = [];
-
-
-  try{
-
-    orders =
-      JSON.parse(
-        localStorage.getItem(ORD) || "[]"
-      );
-
-  }catch(error){
-
-    return;
-
-  }
-
-
-  const o = orders[index];
-
-
-  if(!o) return;
-
-
-  let text =
-    "দোকান: " +
-    (o.shop || "") +
-    "\n";
-
-  text +=
-    "তারিখ: " +
-    (o.date || "") +
-    "\n\n";
-
-
-  (o.items || []).forEach(
-    (item,i) => {
-
-      text +=
-        (i+1) +
-        ". " +
-        item.name +
-        " | Qty: " +
-        item.qty +
-        " | Bonus: " +
-        (item.bonus || 0) +
-        "\n";
-
-    }
-  );
-
-
-  text +=
-    "\nসর্বমোট: ৳ " +
-    money(o.total);
-
-
-  alert(text);
-
-}
-
-
-function deleteHistoryOrder(index){
-
-  if(
-    !confirm(
-      "এই অর্ডার ইতিহাস থেকে মুছে ফেলবেন?"
-    )
-  ){
-
-    return;
-
-  }
-
-
-  let orders = [];
-
-
-  try{
-
-    orders =
-      JSON.parse(
-        localStorage.getItem(ORD) || "[]"
-      );
-
-  }catch(error){
-
-    return;
-
-  }
-
-
-  orders.splice(index,1);
-
-
-  localStorage.setItem(
-    ORD,
-    JSON.stringify(orders)
-  );
-
-
-  renderHistory();
-
-}
-
+/* =====================================================
+   ONLINE SETUP
+===================================================== */
 
 function openOnlineSetup(){
 
-  $("onlineModal").style.display =
-    "block";
+  $("onlineModal")
+    .style.display="block";
+
+
+  $("onlineUrl").value =
+    localStorage.getItem(
+      ONLINE_KEY
+    ) ||
+    "https://forms.gle/776PMNGr7WoujFxg8";
 
 }
 
 
 function closeOnlineSetup(){
 
-  $("onlineModal").style.display =
-    "none";
+  $("onlineModal")
+    .style.display="none";
 
 }
 
 
-function openGoogleForm(){
+function saveOnlineSetup(){
+
+  const url =
+    $("onlineUrl")
+      .value
+      .trim();
+
+
+  if(!url){
+
+    alert(
+      "অনলাইন অর্ডার লিংক দিন।"
+    );
+
+    return;
+  }
+
+
+  localStorage.setItem(
+    ONLINE_KEY,
+    url
+  );
+
+
+  updateOnlineLink();
+
+
+  alert(
+    "অনলাইন অর্ডার লিংক সেভ হয়েছে।"
+  );
+
+}
+
+
+function openOnlineForm(){
+
+  const url =
+    localStorage.getItem(
+      ONLINE_KEY
+    );
+
+
+  if(!url){
+
+    alert(
+      "আগে অনলাইন অর্ডার লিংক সেট করুন।"
+    );
+
+    return;
+  }
+
 
   window.open(
-    "https://forms.gle/776PMNGr7WoujFxg8",
+    url,
     "_blank"
   );
 
 }
 
 
-async function copyGoogleForm(){
+function updateOnlineLink(){
 
   const url =
-    $("googleFormUrl").value.trim();
-
-
-  try{
-
-    await navigator.clipboard.writeText(url);
-
-    alert(
-      "Google Form লিংক কপি হয়েছে।"
+    localStorage.getItem(
+      ONLINE_KEY
     );
 
-  }catch(error){
 
-    prompt(
-      "লিংক কপি করুন:",
-      url
-    );
-
-  }
+  $("onlineLinkText")
+    .textContent =
+      url || "সেটআপ করা হয়নি";
 
 }
 
 
-function esc(value){
+/* =====================================================
+   STARTUP
+===================================================== */
 
-  return String(
-    value == null ? "" : value
-  )
-  .replace(/&/g,"&amp;")
-  .replace(/</g,"&lt;")
-  .replace(/>/g,"&gt;")
-  .replace(/"/g,"&quot;")
-  .replace(/'/g,"&#039;");
+function init(){
+
+  /*
+    গুরুত্বপূর্ণ:
+    এখানে Supabase থেকে কোনো পুরোনো
+    product load করা হচ্ছে না।
+
+    তাই পুরোনো ৯টি পণ্য আর
+    স্বয়ংক্রিয়ভাবে ফিরে আসবে না।
+  */
+
+  $("orderDate").value =
+    today();
+
+
+  renderProducts();
+
+  renderOrder();
+
+  updateOnlineLink();
 
 }
 
 
-function escAttr(value){
-
-  return String(
-    value == null ? "" : value
-  )
-  .replace(/\\/g,"\\\\")
-  .replace(/'/g,"\\'");
-
-}
+init();
 
 
-/* Modal-এর বাইরে চাপ দিলে বন্ধ হবে */
+/* =====================================================
+   MODAL OUTSIDE CLICK
+===================================================== */
 
 window.addEventListener(
   "click",
@@ -2723,6 +2512,7 @@ window.addEventListener(
 
     }
 
+
     if(
       event.target ===
       $("historyModal")
@@ -2731,6 +2521,7 @@ window.addEventListener(
       closeHistory();
 
     }
+
 
     if(
       event.target ===
@@ -2743,22 +2534,6 @@ window.addEventListener(
 
   }
 );
-
-
-/* প্রথমবার render */
-
-renderProducts();
-
-renderOrder();
-
-
-/*
-  Supabase থেকে পণ্য লোড:
-  LocalStorage-এর পুরোনো পণ্য আগে থাকবে,
-  Supabase-এর পণ্য থাকলে merge হবে।
-*/
-
-loadProductsFromSupabase();
 
 </script>
 

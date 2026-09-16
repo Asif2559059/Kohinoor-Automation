@@ -1887,23 +1887,882 @@ function calc(){
    SAVE ORDER
 ========================= */
 
+<script>
+
+/* =========================
+   SAVE ORDER
+========================= */
+
 async function saveOrder(){
 
+  if(!$('shop').value.trim()){
+
+    alert('দোকানের নাম লিখুন।');
+
+    return;
+  }
+
+  if(!order.length){
+
+    alert('কমপক্ষে একটি পণ্য যোগ করুন।');
+
+    return;
+  }
+
+  const orderData = {
+
+    shop: $('shop').value.trim(),
+
+    order_date: $('orderDate').value,
+
+    delivery_date: $('deliveryDate').value,
+
+    customer: $('customer').value.trim(),
+
+    rep: $('rep').value.trim(),
+
+    mobile: $('mobile').value.trim(),
+
+    note: $('note').value.trim(),
+
+    total: order.reduce(
+      (s,p) => s + (Number(p.qty)||0) * (Number(p.price)||0),
+      0
+    ),
+
+    items: order.map(p => ({
+      code:p.code,
+      name:p.name,
+      pack:p.pack,
+      price:Number(p.price)||0,
+      stock:Number(p.stock)||0,
+      qty:Number(p.qty)||0,
+      bonus:Number(p.bonus)||0
+    })),
+
+    created_at:new Date().toISOString()
+
+  };
+
+
+  /* LOCAL SAVE */
+
+  let orders =
+    JSON.parse(
+      localStorage.getItem(ORD) || '[]'
+    );
+
+  orders.unshift(orderData);
+
+  localStorage.setItem(
+    ORD,
+    JSON.stringify(orders)
+  );
+
+
+  /* SUPABASE SAVE */
+
+  try{
+
+    const {error} =
+      await supabaseClient
+        .from('orders')
+        .insert({
+          shop_name:orderData.shop,
+          order_date:orderData.order_date,
+          delivery_date:orderData.delivery_date,
+          customer:orderData.customer,
+          representative:orderData.rep,
+          mobile:orderData.mobile,
+          note:orderData.note,
+          total:orderData.total,
+          items:orderData.items
+        });
+
+    if(error){
+
+      console.warn(
+        'Supabase order save:',
+        error.message
+      );
+
+    }
+
+  }catch(e){
+
+    console.warn(
+      'Supabase order error:',
+      e
+    );
+
+  }
+
+
+  alert('অর্ডার সফলভাবে সেভ হয়েছে।');
+
+  updateDashboard();
+
+}
+
+
+/* =========================
+   SHARE ORDER
+========================= */
+
+function shareOrder(){
+
+  if(!order.length){
+
+    alert('আগে পণ্য যোগ করুন।');
+
+    return;
+  }
+
+  const shop =
+    $('shop').value.trim() || 'দোকান';
+
+  let text =
+    'কহিনুর কেমিক্যাল পিএলসি\n' +
+    'অর্ডার\n\n';
+
+  text +=
+    'দোকান: ' + shop + '\n\n';
+
+
+  order.forEach((p,i)=>{
+
+    text +=
+      (i+1) + '. ' +
+      p.name +
+      ' × ' +
+      p.qty +
+      ' = ৳' +
+      (p.qty*p.price).toFixed(2) +
+      '\n';
+
+  });
+
+
+  text +=
+    '\nমোট: ৳' +
+    Number(
+      $('grandTotal').textContent
+    ).toFixed(2);
+
+
   if(
-    !$('shop')
-      .value
-      .trim()
+    navigator.share
   ){
 
+    navigator.share({
+
+      title:'কহিনুর কেমিক্যাল অর্ডার',
+
+      text:text
+
+    }).catch(()=>{});
+
+  }else{
+
+    navigator.clipboard
+      .writeText(text)
+      .then(()=>{
+
+        alert(
+          'অর্ডারের তথ্য কপি হয়েছে।'
+        );
+
+      });
+
+  }
+
+}
+
+
+/* =========================
+   NEW ORDER
+========================= */
+
+function newOrder(){
+
+  if(
+    order.length &&
+    !confirm(
+      'বর্তমান অর্ডার মুছে নতুন অর্ডার শুরু করবেন?'
+    )
+  ){
+
+    return;
+  }
+
+
+  order=[];
+
+  $('shop').value='';
+  $('customer').value='';
+  $('deliveryDate').value='';
+  $('rep').value='';
+  $('mobile').value='';
+  $('note').value='';
+
+  renderOrder();
+
+}
+
+
+/* =========================
+   PRODUCT MANAGER
+========================= */
+
+function openProductManager(){
+
+  $('productModal')
+    .classList
+    .add('show');
+
+  renderProductList();
+
+}
+
+
+function closeProductManager(){
+
+  $('productModal')
+    .classList
+    .remove('show');
+
+}
+
+
+/* =========================
+   SAVE PRODUCT
+========================= */
+
+async function saveProduct(){
+
+  const code =
+    $('pCode').value.trim();
+
+  const name =
+    $('pName').value.trim();
+
+  const pack =
+    $('pPack').value.trim();
+
+  const price =
+    Number($('pPrice').value)||0;
+
+  const stock =
+    Number($('pStock').value)||0;
+
+
+  if(!code || !name){
+
     alert(
-      'দোকানের নাম লিখুন।'
+      'কোড এবং পণ্যের নাম দিন।'
     );
 
     return;
   }
 
 
-  if(!order.length){
+  const product = {
 
-    alert(
-      'কমপক্ষে একটি পণ্য যোগ করুন
+    code,
+    name,
+    pack,
+    price,
+    stock
+
+  };
+
+
+  const index =
+    products.findIndex(
+      p => p.code===code
+    );
+
+
+  if(index>=0){
+
+    products[index]=product;
+
+  }else{
+
+    products.push(product);
+
+  }
+
+
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(products)
+  );
+
+
+  /* Supabase */
+
+  try{
+
+    const {error} =
+      await supabaseClient
+        .from('products')
+        .upsert(
+          product,
+          {onConflict:'code'}
+        );
+
+    if(error){
+
+      console.warn(
+        'Product Supabase:',
+        error.message
+      );
+
+    }
+
+  }catch(e){
+
+    console.warn(e);
+
+  }
+
+
+  $('pCode').value='';
+  $('pName').value='';
+  $('pPack').value='';
+  $('pPrice').value='';
+  $('pStock').value='';
+
+
+  renderProducts();
+
+  renderProductList();
+
+  updateDashboard();
+
+
+  alert(
+    'পণ্য সফলভাবে সেভ হয়েছে।'
+  );
+
+}
+
+
+/* =========================
+   PRODUCT LIST
+========================= */
+
+function renderProductList(){
+
+  if(!products.length){
+
+    $('productList').innerHTML =
+      '<div class="empty">কোনো পণ্য নেই।</div>';
+
+    return;
+  }
+
+
+  $('productList').innerHTML =
+
+    products.map((p,i)=>`
+
+      <div class="prod">
+
+        <div class="prod-main">
+
+          <b>
+            ${esc(p.code)} —
+            ${esc(p.name)}
+          </b>
+
+          <small>
+            প্যাক: ${esc(p.pack)}
+            • মূল্য: ৳${Number(p.price).toFixed(2)}
+            • স্টক: ${Number(p.stock)}
+          </small>
+
+        </div>
+
+        <button
+          class="danger"
+          onclick="deleteProduct(${i})">
+
+          মুছুন
+
+        </button>
+
+      </div>
+
+    `).join('');
+
+}
+
+
+/* =========================
+   DELETE PRODUCT
+========================= */
+
+async function deleteProduct(i){
+
+  const p=products[i];
+
+  if(!p)return;
+
+
+  if(
+    !confirm(
+      p.name +
+      ' মুছে ফেলবেন?'
+    )
+  ){
+
+    return;
+  }
+
+
+  products.splice(i,1);
+
+
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(products)
+  );
+
+
+  try{
+
+    await supabaseClient
+      .from('products')
+      .delete()
+      .eq('code',p.code);
+
+  }catch(e){
+
+    console.warn(e);
+
+  }
+
+
+  renderProducts();
+
+  renderProductList();
+
+  updateDashboard();
+
+}
+
+
+/* =========================
+   HISTORY
+========================= */
+
+function openHistory(){
+
+  $('historyModal')
+    .classList
+    .add('show');
+
+  renderHistory();
+
+}
+
+
+function closeHistory(){
+
+  $('historyModal')
+    .classList
+    .remove('show');
+
+}
+
+
+function renderHistory(){
+
+  const orders =
+    JSON.parse(
+      localStorage.getItem(ORD) || '[]'
+    );
+
+
+  if(!orders.length){
+
+    $('historyList').innerHTML =
+      '<div class="empty">এখনও কোনো অর্ডার নেই।</div>';
+
+    return;
+  }
+
+
+  $('historyList').innerHTML =
+
+    orders.map((o,i)=>`
+
+      <div class="history-item">
+
+        <b>
+          ${esc(o.shop || 'দোকানের নাম নেই')}
+        </b>
+
+        <div style="margin-top:5px">
+
+          ${esc(o.order_date || '')}
+
+          <span class="badge">
+            ৳${Number(o.total||0).toFixed(2)}
+          </span>
+
+        </div>
+
+        <small style="display:block;margin-top:6px;color:#71807a">
+
+          পণ্য:
+          ${(o.items||[]).length}
+
+        </small>
+
+      </div>
+
+    `).join('');
+
+}
+
+
+/* =========================
+   ONLINE SETUP
+========================= */
+
+function openOnlineSetup(){
+
+  $('onlineModal')
+    .classList
+    .add('show');
+
+  const url =
+    localStorage.getItem('kohinoor_api_url') || '';
+
+  $('apiUrl').value=url;
+
+  $('apiTest').textContent =
+    url
+    ? 'URL সেট করা আছে।'
+    : 'URL সেট করা নেই।';
+
+}
+
+
+function closeOnlineSetup(){
+
+  $('onlineModal')
+    .classList
+    .remove('show');
+
+}
+
+
+function saveApiUrl(){
+
+  const url =
+    $('apiUrl').value.trim();
+
+  if(!url){
+
+    alert('Web App URL দিন।');
+
+    return;
+  }
+
+
+  localStorage.setItem(
+    'kohinoor_api_url',
+    url
+  );
+
+
+  $('apiTest').textContent =
+    'URL সফলভাবে সেভ হয়েছে।';
+
+  alert(
+    'Web App URL সেভ হয়েছে।'
+  );
+
+}
+
+
+function clearApiUrl(){
+
+  localStorage.removeItem(
+    'kohinoor_api_url'
+  );
+
+  $('apiUrl').value='';
+
+  $('apiTest').textContent =
+    'URL সেট করা নেই।';
+
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function updateDashboard(){
+
+  $('dashItems').textContent =
+    order.reduce(
+      (s,p)=>s+(Number(p.qty)||0),
+      0
+    );
+
+
+  const orders =
+    JSON.parse(
+      localStorage.getItem(ORD) || '[]'
+    );
+
+
+  $('dashOrders').textContent =
+    orders.length;
+
+
+  $('dashProducts').textContent =
+    products.length;
+
+
+  const total =
+    order.reduce(
+      (s,p)=>
+        s+
+        (Number(p.qty)||0)*
+        (Number(p.price)||0),
+      0
+    );
+
+
+  $('dashTotal').textContent =
+    '৳' + total.toFixed(2);
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function esc(value){
+
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+
+}
+
+
+function js(value){
+
+  return String(value ?? '')
+    .replace(/\\/g,'\\\\')
+    .replace(/'/g,"\\'")
+    .replace(/"/g,'\\"');
+
+}
+
+
+/* =========================
+   NUMBER TO BANGLA WORDS
+========================= */
+
+function moneyBn(num){
+
+  num =
+    Math.round(
+      Number(num)||0
+    );
+
+
+  if(num===0){
+
+    return 'শূন্য টাকা মাত্র';
+
+  }
+
+
+  const ones=[
+    '',
+    'এক',
+    'দুই',
+    'তিন',
+    'চার',
+    'পাঁচ',
+    'ছয়',
+    'সাত',
+    'আট',
+    'নয়'
+  ];
+
+
+  const tens=[
+    '',
+    'দশ',
+    'বিশ',
+    'ত্রিশ',
+    'চল্লিশ',
+    'পঞ্চাশ',
+    'ষাট',
+    'সত্তর',
+    'আশি',
+    'নব্বই'
+  ];
+
+
+  if(num<10){
+
+    return ones[num]+' টাকা মাত্র';
+
+  }
+
+
+  if(num<100){
+
+    return tens[
+      Math.floor(num/10)
+    ] +
+    (
+      num%10
+      ? ' '+ones[num%10]
+      : ''
+    ) +
+    ' টাকা মাত্র';
+
+  }
+
+
+  if(num<1000){
+
+    return ones[
+      Math.floor(num/100)
+    ] +
+    'শ ' +
+    (
+      num%100
+      ? moneyBn(num%100)
+        .replace(' টাকা মাত্র','')
+      : ''
+    ) +
+    ' টাকা মাত্র';
+
+  }
+
+
+  return num.toLocaleString(
+    'bn-BD'
+  )+' টাকা মাত্র';
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+$('productSearch')
+  .addEventListener(
+    'input',
+    renderProducts
+  );
+
+
+/* =========================
+   INITIAL RENDER
+========================= */
+
+renderProducts();
+
+renderOrder();
+
+updateDashboard();
+
+
+/* =========================
+   SUPABASE PRODUCTS LOAD
+========================= */
+
+async function loadProductsFromSupabase(){
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from('products')
+        .select(
+          'code,name,pack,price,stock'
+        )
+        .order('id');
+
+
+    if(error){
+
+      console.warn(
+        'Products load error:',
+        error.message
+      );
+
+      return;
+    }
+
+
+    if(data && data.length){
+
+      products =
+        data.map(p=>({
+
+          code:String(p.code || ''),
+
+          name:String(p.name || ''),
+
+          pack:String(p.pack || ''),
+
+          price:Number(p.price)||0,
+
+          stock:Number(p.stock)||0
+
+        }));
+
+
+      localStorage.setItem(
+        KEY,
+        JSON.stringify(products)
+      );
+
+
+      renderProducts();
+
+      renderProductList();
+
+      updateDashboard();
+
+    }
+
+  }catch(e){
+
+    console.warn(
+      'Supabase load exception:',
+      e
+    );
+
+  }
+
+}
+
+
+loadProductsFromSupabase();
+
+</script>

@@ -1,310 +1,126 @@
-async function saveOrder(){
+async function saveOrder() {
 
-  // =========================
-  // FORM DATA
-  // =========================
+  try {
 
-  const shop =
-    $("shop").value.trim();
+    const shop = $("shop").value.trim();
+    const address = $("address").value.trim();
+    const mobile = $("mobile").value.trim();
+    const representative = $("representative").value.trim();
+    const orderDate = $("orderDate").value;
+    const deliveryDate = $("deliveryDate").value;
+    const note = $("note").value.trim();
 
-  const address =
-    $("address").value.trim();
+    // =========================
+    // VALIDATION
+    // =========================
 
-  const mobile =
-    $("mobile").value.trim();
+    if (!shop) {
+      alert("দোকানের নাম লিখুন।");
+      return;
+    }
 
-  const representative =
-    $("representative").value.trim();
+    if (!address) {
+      alert("ঠিকানা লিখুন।");
+      return;
+    }
 
-  const orderDate =
-    $("orderDate").value;
+    if (!mobile) {
+      alert("মোবাইল নম্বর লিখুন।");
+      return;
+    }
 
-  const deliveryDate =
-    $("deliveryDate").value;
+    if (!representative) {
+      alert("রিপ্রেজেনটেটিভের নাম লিখুন।");
+      return;
+    }
 
-  const note =
-    $("note").value.trim();
+    if (!orderDate) {
+      alert("অর্ডার ডেট নির্বাচন করুন।");
+      return;
+    }
 
+    if (!deliveryDate) {
+      alert("ডেলিভারি ডেট নির্বাচন করুন।");
+      return;
+    }
 
-  // =========================
-  // VALIDATION
-  // =========================
-
-  if(!shop){
-    alert("দোকানের নাম লিখুন।");
-    return;
-  }
-
-  if(!address){
-    alert("ঠিকানা লিখুন।");
-    return;
-  }
-
-  if(!mobile){
-    alert("মোবাইল নম্বর লিখুন।");
-    return;
-  }
-
-  if(!representative){
-    alert("রিপ্রেজেনটেটিভের নাম লিখুন।");
-    return;
-  }
-
-  if(!orderDate){
-    alert("অর্ডার ডেট নির্বাচন করুন।");
-    return;
-  }
-
-  if(!deliveryDate){
-    alert("ডেলিভারি ডেট নির্বাচন করুন।");
-    return;
-  }
-
-  if(!order || !order.length){
-    alert("কমপক্ষে একটি পণ্য যোগ করুন।");
-    return;
-  }
+    if (!order || order.length === 0) {
+      alert("কমপক্ষে একটি পণ্য যোগ করুন।");
+      return;
+    }
 
 
-  // =========================
-  // CHECK LOGIN
-  // =========================
+    // =========================
+    // LOGIN CHECK
+    // =========================
 
-  const {
-    data: sessionData,
-    error: sessionError
-  } = await supabaseClient.auth.getSession();
+    const {
+      data,
+      error: sessionError
+    } = await supabaseClient.auth.getSession();
 
+    if (sessionError) {
+      alert(
+        "Login তথ্য পাওয়া যায়নি:\n\n" +
+        sessionError.message
+      );
+      return;
+    }
 
-  if(sessionError){
+    const session = data.session;
 
-    console.error(
-      "SESSION ERROR:",
-      sessionError
-    );
+    if (!session || !session.user) {
+      alert("আগে Login করুন।");
+      return;
+    }
 
-    alert(
-      "Login তথ্য পাওয়া যায়নি।\n\n" +
-      sessionError.message
-    );
-
-    return;
-  }
-
-
-  const session =
-    sessionData.session;
+    const userId = session.user.id;
 
 
-  if(!session || !session.user){
+    // =========================
+    // ORDER DATA
+    // =========================
 
-    alert(
-      "আপনি Login করা নেই।\n\n" +
-      "অর্ডার করার আগে Login করুন।"
-    );
+    const total = calc();
 
-    return;
-  }
-
-
-  // Logged-in user's UUID
-  const userId =
-    session.user.id;
+    const productsData =
+      JSON.parse(JSON.stringify(order));
 
 
-  // =========================
-  // CALCULATE TOTAL
-  // =========================
+    // =========================
+    // SAVE TO SUPABASE
+    // =========================
 
-  const total =
-    calc();
-
-
-  // Copy product list
-  const productsData =
-    JSON.parse(
-      JSON.stringify(order)
-    );
-
-
-  // =========================
-  // SUPABASE ORDER DATA
-  // =========================
-
-  const supabaseOrder = {
-
-    user_id: userId,
-
-    shop: shop,
-
-    address: address,
-
-    mobile: mobile,
-
-    representative: representative,
-
-    order_date: orderDate,
-
-    delivery_date: deliveryDate,
-
-    note: note,
-
-    products: productsData,
-
-    total: total,
-
-    status: "pending"
-
-  };
-
-
-  console.log(
-    "ORDER SENDING TO SUPABASE:",
-    supabaseOrder
-  );
-
-
-  // =========================
-  // INSERT ORDER
-  // =========================
-
-  const {
-    data: insertedOrder,
-    error: insertError
-  } =
-    await supabaseClient
+    const {
+      error: insertError
+    } = await supabaseClient
       .from("orders")
-      .insert([supabaseOrder])
-      .select()
-      .single();
+      .insert([{
+        user_id: userId,
+        shop: shop,
+        address: address,
+        mobile: mobile,
+        representative: representative,
+        order_date: orderDate,
+        delivery_date: deliveryDate,
+        note: note,
+        products: productsData,
+        total: total,
+        status: "pending"
+      }]);
 
 
-  // =========================
-  // INSERT ERROR
-  // =========================
+    // =========================
+    // ERROR
+    // =========================
 
-  if(insertError){
+    if (insertError) {
 
-    console.error(
-      "SUPABASE ORDER ERROR:",
-      insertError
-    );
+      console.error(
+        "ORDER INSERT ERROR:",
+        insertError
+      );
 
-    alert(
-      "❌ অর্ডার Supabase-এ সেভ হয়নি!\n\n" +
-      "Error:\n" +
-      insertError.message
-    );
-
-    return;
-  }
-
-
-  console.log(
-    "ORDER SAVED SUCCESSFULLY:",
-    insertedOrder
-  );
-
-
-  // =========================
-  // SAVE LOCAL COPY
-  // =========================
-
-  const localOrder = {
-
-    id:
-      insertedOrder?.id ||
-      Date.now().toString(),
-
-    user_id:
-      userId,
-
-    shop:
-      shop,
-
-    address:
-      address,
-
-    mobile:
-      mobile,
-
-    representative:
-      representative,
-
-    order_date:
-      orderDate,
-
-    delivery_date:
-      deliveryDate,
-
-    note:
-      note,
-
-    products:
-      productsData,
-
-    total:
-      total,
-
-    status:
-      insertedOrder?.status ||
-      "pending",
-
-    created_at:
-      insertedOrder?.created_at ||
-      new Date().toISOString()
-
-  };
-
-
-  const localOrders =
-    getOrders();
-
-  localOrders.unshift(
-    localOrder
-  );
-
-  saveOrdersLocal(
-    localOrders
-  );
-
-
-  // =========================
-  // SUCCESS MESSAGE
-  // =========================
-
-  alert(
-    "✅ অর্ডার সফলভাবে পাঠানো হয়েছে।"
-  );
-
-
-  // =========================
-  // CLEAR FORM
-  // =========================
-
-  order = [];
-
-
-  $("shop").value = "";
-
-  $("address").value = "";
-
-  $("mobile").value = "";
-
-  $("representative").value = "";
-
-  $("orderDate").value =
-    today();
-
-  $("deliveryDate").value = "";
-
-  $("note").value = "";
-
-
-  // =========================
-  // REFRESH ORDER DISPLAY
-  // =========================
-
-  renderOrder();
-
-}
+      alert(
+        "❌ অর্ডার পাঠানো যায়নি!\n\n" +
+       

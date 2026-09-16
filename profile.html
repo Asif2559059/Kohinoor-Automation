@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>আমার প্রোফাইল</title>
+<title>আমার প্রোফাইল - Kohinoor Automation</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -23,46 +23,42 @@ body{
 
 .container{
   max-width:500px;
-  margin:25px auto;
+  margin:20px auto;
 }
 
 .card{
-  background:#fff;
+  background:white;
   border-radius:20px;
   padding:25px;
-  box-shadow:0 10px 30px rgba(0,0,0,.20);
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
 }
 
-.top{
+h2{
   text-align:center;
   color:#0b6b45;
-  margin-bottom:20px;
+  margin:0 0 20px;
 }
 
-.top h2{
-  margin:0;
-}
-
-.avatar-box{
+.avatar-area{
   text-align:center;
-  margin:20px 0;
+  margin-bottom:25px;
 }
 
 .avatar{
-  width:120px;
-  height:120px;
+  width:130px;
+  height:130px;
   border-radius:50%;
   object-fit:cover;
   border:4px solid #0b6b45;
   background:#eee;
 }
 
-.camera{
+.photo-btn{
   display:inline-block;
-  margin-top:10px;
+  margin-top:12px;
+  padding:10px 18px;
   background:#0b6b45;
   color:white;
-  padding:10px 18px;
   border-radius:8px;
   cursor:pointer;
   font-weight:bold;
@@ -74,7 +70,7 @@ body{
 
 label{
   display:block;
-  margin-top:18px;
+  margin-top:16px;
   margin-bottom:6px;
   font-weight:bold;
 }
@@ -87,14 +83,18 @@ input{
   font-size:16px;
 }
 
-.email-box{
-  background:#f3f3f3;
-  color:#555;
+input:focus{
+  outline:none;
+  border-color:#0b6b45;
+}
+
+.email{
+  background:#f2f2f2;
 }
 
 .status{
   display:inline-block;
-  padding:7px 15px;
+  padding:8px 16px;
   border-radius:20px;
   font-weight:bold;
 }
@@ -117,12 +117,12 @@ input{
 button{
   width:100%;
   border:0;
-  padding:13px;
   border-radius:9px;
+  padding:13px;
+  margin-top:15px;
   font-size:16px;
   font-weight:bold;
   cursor:pointer;
-  margin-top:15px;
 }
 
 .save{
@@ -130,13 +130,13 @@ button{
   color:white;
 }
 
-.back{
-  background:#e8e8e8;
-  color:#333;
+.dashboard{
+  background:#eeeeee;
+  color:#222;
 }
 
 .logout{
-  background:#ffe2e2;
+  background:#ffe1e1;
   color:#b00020;
 }
 
@@ -146,16 +146,15 @@ button{
   padding:12px;
   border-radius:9px;
   text-align:center;
+  font-weight:bold;
 }
 
 .success{
-  display:block;
   background:#dff5e8;
   color:#087443;
 }
 
 .error{
-  display:block;
   background:#ffe0e0;
   color:#b00020;
 }
@@ -163,6 +162,7 @@ button{
 .loading{
   text-align:center;
   padding:30px;
+  color:#666;
 }
 </style>
 </head>
@@ -177,13 +177,13 @@ button{
   প্রোফাইল লোড হচ্ছে...
 </div>
 
-<div id="profile" style="display:none;">
 
-<div class="top">
-  <h2>👤 আমার প্রোফাইল</h2>
-</div>
+<div id="profileArea" style="display:none;">
 
-<div class="avatar-box">
+<h2>👤 আমার প্রোফাইল</h2>
+
+
+<div class="avatar-area">
 
   <img
     id="avatar"
@@ -194,7 +194,10 @@ button{
 
   <br>
 
-  <label for="photoInput" class="camera">
+  <label
+    for="photoInput"
+    class="photo-btn"
+  >
     📷 ছবি পরিবর্তন
   </label>
 
@@ -214,7 +217,7 @@ button{
 <input
   type="text"
   id="username"
-  placeholder="আপনার Username"
+  placeholder="Username লিখুন"
 >
 
 
@@ -225,7 +228,7 @@ button{
 <input
   type="email"
   id="email"
-  class="email-box"
+  class="email"
   readonly
 >
 
@@ -244,6 +247,7 @@ button{
 
 <button
   class="save"
+  id="saveBtn"
   onclick="saveProfile()"
 >
   💾 Profile Save
@@ -251,7 +255,7 @@ button{
 
 
 <button
-  class="back"
+  class="dashboard"
   onclick="goDashboard()"
 >
   🏠 Dashboard
@@ -266,7 +270,10 @@ button{
 </button>
 
 
-<div id="message" class="message"></div>
+<div
+  id="message"
+  class="message"
+></div>
 
 </div>
 
@@ -289,124 +296,208 @@ supabase.createClient(
   SUPABASE_KEY
 );
 
+
 let currentUser = null;
 let currentProfile = null;
 let selectedFile = null;
 
 
 /* =========================
-   LOAD PROFILE
+   PROFILE LOAD
 ========================= */
 
 async function loadProfile(){
 
-  const {
-    data:{user},
-    error
-  } =
-  await supabaseClient.auth.getUser();
+  try{
 
-  if(error || !user){
+    const {
+      data,
+      error
+    } =
+    await supabaseClient.auth.getUser();
 
-    window.location.replace("signin.html");
 
-    return;
+    if(error || !data.user){
+
+      window.location.replace(
+        "signin.html"
+      );
+
+      return;
+    }
+
+
+    currentUser =
+      data.user;
+
+
+    const {
+      data:profile,
+      error:profileError
+    } =
+    await supabaseClient
+      .from("user_profiles")
+      .select("*")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .single();
+
+
+    console.log(
+      "PROFILE:",
+      profile
+    );
+
+
+    console.log(
+      "PROFILE ERROR:",
+      profileError
+    );
+
+
+    if(profileError){
+
+      document.getElementById(
+        "loading"
+      ).textContent =
+      "Profile Load Error: " +
+      profileError.message;
+
+      return;
+    }
+
+
+    if(!profile){
+
+      document.getElementById(
+        "loading"
+      ).textContent =
+      "User Profile পাওয়া যায়নি।";
+
+      return;
+    }
+
+
+    currentProfile =
+      profile;
+
+
+    /* Username */
+
+    document.getElementById(
+      "username"
+    ).value =
+      profile.username || "";
+
+
+    /* Email */
+
+    document.getElementById(
+      "email"
+    ).value =
+      profile.email ||
+      currentUser.email ||
+      "";
+
+
+    /* Status */
+
+    const statusElement =
+      document.getElementById(
+        "status"
+      );
+
+
+    statusElement.textContent =
+      profile.status ||
+      "unknown";
+
+
+    statusElement.className =
+      "status " +
+      (profile.status || "");
+
+
+    /* Profile Picture */
+
+    const avatar =
+      document.getElementById(
+        "avatar"
+      );
+
+
+    if(profile.avatar_url){
+
+      avatar.src =
+        profile.avatar_url;
+
+    }else{
+
+      avatar.src =
+        "https://ui-avatars.com/api/?name=" +
+        encodeURIComponent(
+          profile.username || "User"
+        ) +
+        "&size=300";
+
+    }
+
+
+    /* Local Storage */
+
+    localStorage.setItem(
+      "kohinoor_user_profile",
+      JSON.stringify(profile)
+    );
+
+
+    /* Show Profile */
+
+    document.getElementById(
+      "loading"
+    ).style.display =
+      "none";
+
+
+    document.getElementById(
+      "profileArea"
+    ).style.display =
+      "block";
+
+
+  }catch(error){
+
+    console.error(
+      "PROFILE ERROR:",
+      error
+    );
+
+
+    document.getElementById(
+      "loading"
+    ).textContent =
+      "Error: " +
+      error.message;
   }
 
-  currentUser = user;
-
-
-  const {
-    data:profile,
-    error:profileError
-  } =
-  await supabaseClient
-    .from("user_profiles")
-    .select(
-      "id, username, email, status, avatar_url, created_at"
-    )
-    .eq("id",user.id)
-    .maybeSingle();
-
-
-  if(profileError || !profile){
-
-    document.getElementById("loading")
-      .textContent =
-      "Profile পাওয়া যায়নি।";
-
-    return;
-  }
-
-
-  currentProfile = profile;
-
-
-  document.getElementById("username")
-    .value =
-    profile.username || "";
-
-
-  document.getElementById("email")
-    .value =
-    profile.email || user.email || "";
-
-
-  const status =
-    document.getElementById("status");
-
-
-  status.textContent =
-    profile.status;
-
-
-  status.className =
-    "status " + profile.status;
-
-
-  /* Profile Picture */
-
-  if(profile.avatar_url){
-
-    document.getElementById("avatar")
-      .src =
-      profile.avatar_url;
-
-  }else{
-
-    document.getElementById("avatar")
-      .src =
-      "https://ui-avatars.com/api/?name=" +
-      encodeURIComponent(
-        profile.username || "User"
-      ) +
-      "&size=240";
-
-  }
-
-
-  document.getElementById("loading")
-    .style.display =
-    "none";
-
-
-  document.getElementById("profile")
-    .style.display =
-    "block";
 }
 
 
 /* =========================
-   SELECT PHOTO
+   PHOTO SELECT
 ========================= */
 
-document.getElementById("photoInput")
-.addEventListener(
+document.getElementById(
+  "photoInput"
+).addEventListener(
   "change",
-  function(event){
+  function(){
 
     const file =
-      event.target.files[0];
+      this.files[0];
+
 
     if(!file){
       return;
@@ -416,9 +507,11 @@ document.getElementById("photoInput")
     if(!file.type.startsWith("image/")){
 
       showMessage(
-        "শুধু Image File নির্বাচন করুন।",
+        "শুধু ছবি নির্বাচন করুন।",
         "error"
       );
+
+      this.value = "";
 
       return;
     }
@@ -427,30 +520,36 @@ document.getElementById("photoInput")
     if(file.size > 5 * 1024 * 1024){
 
       showMessage(
-        "ছবির Size সর্বোচ্চ 5 MB হতে হবে।",
+        "ছবির সর্বোচ্চ Size 5 MB।",
         "error"
       );
+
+      this.value = "";
 
       return;
     }
 
 
-    selectedFile = file;
+    selectedFile =
+      file;
 
 
-    /* আগে Preview দেখাবে */
+    /* Preview */
 
     const reader =
       new FileReader();
 
-    reader.onload =
-      function(e){
 
-        document.getElementById("avatar")
-          .src =
-          e.target.result;
+    reader.onload =
+      function(event){
+
+        document.getElementById(
+          "avatar"
+        ).src =
+          event.target.result;
 
       };
+
 
     reader.readAsDataURL(file);
 
@@ -465,14 +564,15 @@ document.getElementById("photoInput")
 async function saveProfile(){
 
   if(!currentUser){
+
     return;
   }
 
 
   const username =
-    document.getElementById("username")
-      .value
-      .trim();
+    document.getElementById(
+      "username"
+    ).value.trim();
 
 
   if(!username){
@@ -486,23 +586,28 @@ async function saveProfile(){
   }
 
 
-  const saveButton =
-    document.querySelector(".save");
+  const saveBtn =
+    document.getElementById(
+      "saveBtn"
+    );
 
-  saveButton.disabled = true;
 
-  saveButton.textContent =
-    "Saving...";
+  saveBtn.disabled =
+    true;
+
+  saveBtn.textContent =
+    "⏳ Saving...";
 
 
   try{
 
     let avatarUrl =
-      currentProfile.avatar_url || null;
+      currentProfile.avatar_url ||
+      null;
 
 
     /* =====================
-       UPLOAD NEW PHOTO
+       PHOTO UPLOAD
     ===================== */
 
     if(selectedFile){
@@ -530,7 +635,8 @@ async function saveProfile(){
           selectedFile,
           {
             upsert:true,
-            contentType:selectedFile.type
+            contentType:
+              selectedFile.type
           }
         );
 
@@ -559,7 +665,7 @@ async function saveProfile(){
 
 
     /* =====================
-       UPDATE PROFILE
+       DATABASE UPDATE
     ===================== */
 
     const {
@@ -570,16 +676,21 @@ async function saveProfile(){
       .from("user_profiles")
       .update({
 
-        username:username,
+        username:
+          username,
 
-        avatar_url:avatarUrl,
+        avatar_url:
+          avatarUrl,
 
-        updated_at:new Date()
-          .toISOString()
+        updated_at:
+          new Date().toISOString()
 
       })
-      .eq("id",currentUser.id)
-      .select()
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .select("*")
       .single();
 
 
@@ -593,6 +704,8 @@ async function saveProfile(){
       updatedProfile;
 
 
+    /* Local Storage Update */
+
     localStorage.setItem(
       "kohinoor_user_profile",
       JSON.stringify(
@@ -601,7 +714,8 @@ async function saveProfile(){
     );
 
 
-    selectedFile = null;
+    selectedFile =
+      null;
 
 
     showMessage(
@@ -612,10 +726,14 @@ async function saveProfile(){
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      "SAVE ERROR:",
+      error
+    );
+
 
     showMessage(
-      "Profile Update হয়নি: " +
+      "❌ Update হয়নি: " +
       error.message,
       "error"
     );
@@ -623,9 +741,10 @@ async function saveProfile(){
   }
 
 
-  saveButton.disabled = false;
+  saveBtn.disabled =
+    false;
 
-  saveButton.textContent =
+  saveBtn.textContent =
     "💾 Profile Save";
 }
 
@@ -639,16 +758,21 @@ function showMessage(
   type
 ){
 
-  const box =
-    document.getElementById("message");
+  const message =
+    document.getElementById(
+      "message"
+    );
 
-  box.textContent =
+
+  message.textContent =
     text;
 
-  box.className =
+
+  message.className =
     "message " + type;
 
-  box.style.display =
+
+  message.style.display =
     "block";
 }
 
@@ -674,9 +798,11 @@ async function logout(){
     .auth
     .signOut();
 
+
   localStorage.removeItem(
     "kohinoor_user_profile"
   );
+
 
   window.location.replace(
     "signin.html"
@@ -684,7 +810,9 @@ async function logout(){
 }
 
 
-/* START */
+/* =========================
+   START
+========================= */
 
 loadProfile();
 

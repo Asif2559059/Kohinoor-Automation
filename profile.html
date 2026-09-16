@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>আমার প্রোফাইল</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#0b6b45,#16a085);
+  min-height:100vh;
+  padding:20px;
+}
+
+.container{
+  max-width:500px;
+  margin:25px auto;
+}
+
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 10px 30px rgba(0,0,0,.20);
+}
+
+.top{
+  text-align:center;
+  color:#0b6b45;
+  margin-bottom:20px;
+}
+
+.top h2{
+  margin:0;
+}
+
+.avatar-box{
+  text-align:center;
+  margin:20px 0;
+}
+
+.avatar{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  border:4px solid #0b6b45;
+  background:#eee;
+}
+
+.camera{
+  display:inline-block;
+  margin-top:10px;
+  background:#0b6b45;
+  color:white;
+  padding:10px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+#photoInput{
+  display:none;
+}
+
+label{
+  display:block;
+  margin-top:18px;
+  margin-bottom:6px;
+  font-weight:bold;
+}
+
+input{
+  width:100%;
+  padding:13px;
+  border:1px solid #ccc;
+  border-radius:9px;
+  font-size:16px;
+}
+
+.email-box{
+  background:#f3f3f3;
+  color:#555;
+}
+
+.status{
+  display:inline-block;
+  padding:7px 15px;
+  border-radius:20px;
+  font-weight:bold;
+}
+
+.approved{
+  background:#dff5e8;
+  color:#087443;
+}
+
+.pending{
+  background:#fff1c7;
+  color:#8a6200;
+}
+
+.rejected{
+  background:#ffe0e0;
+  color:#b00020;
+}
+
+button{
+  width:100%;
+  border:0;
+  padding:13px;
+  border-radius:9px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:15px;
+}
+
+.save{
+  background:#0b6b45;
+  color:white;
+}
+
+.back{
+  background:#e8e8e8;
+  color:#333;
+}
+
+.logout{
+  background:#ffe2e2;
+  color:#b00020;
+}
+
+.message{
+  display:none;
+  margin-top:15px;
+  padding:12px;
+  border-radius:9px;
+  text-align:center;
+}
+
+.success{
+  display:block;
+  background:#dff5e8;
+  color:#087443;
+}
+
+.error{
+  display:block;
+  background:#ffe0e0;
+  color:#b00020;
+}
+
+.loading{
+  text-align:center;
+  padding:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div id="loading" class="loading">
+  প্রোফাইল লোড হচ্ছে...
+</div>
+
+<div id="profile" style="display:none;">
+
+<div class="top">
+  <h2>👤 আমার প্রোফাইল</h2>
+</div>
+
+<div class="avatar-box">
+
+  <img
+    id="avatar"
+    class="avatar"
+    src=""
+    alt="Profile Picture"
+  >
+
+  <br>
+
+  <label for="photoInput" class="camera">
+    📷 ছবি পরিবর্তন
+  </label>
+
+  <input
+    type="file"
+    id="photoInput"
+    accept="image/*"
+  >
+
+</div>
+
+
+<label>
+  Username
+</label>
+
+<input
+  type="text"
+  id="username"
+  placeholder="আপনার Username"
+>
+
+
+<label>
+  Email
+</label>
+
+<input
+  type="email"
+  id="email"
+  class="email-box"
+  readonly
+>
+
+
+<label>
+  Account Status
+</label>
+
+<div>
+  <span
+    id="status"
+    class="status"
+  ></span>
+</div>
+
+
+<button
+  class="save"
+  onclick="saveProfile()"
+>
+  💾 Profile Save
+</button>
+
+
+<button
+  class="back"
+  onclick="goDashboard()"
+>
+  🏠 Dashboard
+</button>
+
+
+<button
+  class="logout"
+  onclick="logout()"
+>
+  🚪 Logout
+</button>
+
+
+<div id="message" class="message"></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+"https://utzkpsohkoiawvuupgeb.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_PJj7uWb3pd3VQvSI0jNyA_xY3CFKAt";
+
+const supabaseClient =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
+let currentProfile = null;
+let selectedFile = null;
+
+
+/* =========================
+   LOAD PROFILE
+========================= */
+
+async function loadProfile(){
+
+  const {
+    data:{user},
+    error
+  } =
+  await supabaseClient.auth.getUser();
+
+  if(error || !user){
+
+    window.location.replace("signin.html");
+
+    return;
+  }
+
+  currentUser = user;
+
+
+  const {
+    data:profile,
+    error:profileError
+  } =
+  await supabaseClient
+    .from("user_profiles")
+    .select(
+      "id, username, email, status, avatar_url, created_at"
+    )
+    .eq("id",user.id)
+    .maybeSingle();
+
+
+  if(profileError || !profile){
+
+    document.getElementById("loading")
+      .textContent =
+      "Profile পাওয়া যায়নি।";
+
+    return;
+  }
+
+
+  currentProfile = profile;
+
+
+  document.getElementById("username")
+    .value =
+    profile.username || "";
+
+
+  document.getElementById("email")
+    .value =
+    profile.email || user.email || "";
+
+
+  const status =
+    document.getElementById("status");
+
+
+  status.textContent =
+    profile.status;
+
+
+  status.className =
+    "status " + profile.status;
+
+
+  /* Profile Picture */
+
+  if(profile.avatar_url){
+
+    document.getElementById("avatar")
+      .src =
+      profile.avatar_url;
+
+  }else{
+
+    document.getElementById("avatar")
+      .src =
+      "https://ui-avatars.com/api/?name=" +
+      encodeURIComponent(
+        profile.username || "User"
+      ) +
+      "&size=240";
+
+  }
+
+
+  document.getElementById("loading")
+    .style.display =
+    "none";
+
+
+  document.getElementById("profile")
+    .style.display =
+    "block";
+}
+
+
+/* =========================
+   SELECT PHOTO
+========================= */
+
+document.getElementById("photoInput")
+.addEventListener(
+  "change",
+  function(event){
+
+    const file =
+      event.target.files[0];
+
+    if(!file){
+      return;
+    }
+
+
+    if(!file.type.startsWith("image/")){
+
+      showMessage(
+        "শুধু Image File নির্বাচন করুন।",
+        "error"
+      );
+
+      return;
+    }
+
+
+    if(file.size > 5 * 1024 * 1024){
+
+      showMessage(
+        "ছবির Size সর্বোচ্চ 5 MB হতে হবে।",
+        "error"
+      );
+
+      return;
+    }
+
+
+    selectedFile = file;
+
+
+    /* আগে Preview দেখাবে */
+
+    const reader =
+      new FileReader();
+
+    reader.onload =
+      function(e){
+
+        document.getElementById("avatar")
+          .src =
+          e.target.result;
+
+      };
+
+    reader.readAsDataURL(file);
+
+  }
+);
+
+
+/* =========================
+   SAVE PROFILE
+========================= */
+
+async function saveProfile(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  const username =
+    document.getElementById("username")
+      .value
+      .trim();
+
+
+  if(!username){
+
+    showMessage(
+      "Username লিখুন।",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const saveButton =
+    document.querySelector(".save");
+
+  saveButton.disabled = true;
+
+  saveButton.textContent =
+    "Saving...";
+
+
+  try{
+
+    let avatarUrl =
+      currentProfile.avatar_url || null;
+
+
+    /* =====================
+       UPLOAD NEW PHOTO
+    ===================== */
+
+    if(selectedFile){
+
+      const extension =
+        selectedFile.name
+          .split(".")
+          .pop()
+          .toLowerCase();
+
+
+      const filePath =
+        currentUser.id +
+        "/profile." +
+        extension;
+
+
+      const {
+        error:uploadError
+      } =
+      await supabaseClient.storage
+        .from("avatars")
+        .upload(
+          filePath,
+          selectedFile,
+          {
+            upsert:true,
+            contentType:selectedFile.type
+          }
+        );
+
+
+      if(uploadError){
+
+        throw uploadError;
+      }
+
+
+      const {
+        data:publicData
+      } =
+      supabaseClient.storage
+        .from("avatars")
+        .getPublicUrl(
+          filePath
+        );
+
+
+      avatarUrl =
+        publicData.publicUrl +
+        "?v=" +
+        Date.now();
+    }
+
+
+    /* =====================
+       UPDATE PROFILE
+    ===================== */
+
+    const {
+      data:updatedProfile,
+      error:updateError
+    } =
+    await supabaseClient
+      .from("user_profiles")
+      .update({
+
+        username:username,
+
+        avatar_url:avatarUrl,
+
+        updated_at:new Date()
+          .toISOString()
+
+      })
+      .eq("id",currentUser.id)
+      .select()
+      .single();
+
+
+    if(updateError){
+
+      throw updateError;
+    }
+
+
+    currentProfile =
+      updatedProfile;
+
+
+    localStorage.setItem(
+      "kohinoor_user_profile",
+      JSON.stringify(
+        updatedProfile
+      )
+    );
+
+
+    selectedFile = null;
+
+
+    showMessage(
+      "✅ Profile সফলভাবে Update হয়েছে।",
+      "success"
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    showMessage(
+      "Profile Update হয়নি: " +
+      error.message,
+      "error"
+    );
+
+  }
+
+
+  saveButton.disabled = false;
+
+  saveButton.textContent =
+    "💾 Profile Save";
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function showMessage(
+  text,
+  type
+){
+
+  const box =
+    document.getElementById("message");
+
+  box.textContent =
+    text;
+
+  box.className =
+    "message " + type;
+
+  box.style.display =
+    "block";
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function goDashboard(){
+
+  window.location.href =
+    "index.html";
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+  await supabaseClient
+    .auth
+    .signOut();
+
+  localStorage.removeItem(
+    "kohinoor_user_profile"
+  );
+
+  window.location.replace(
+    "signin.html"
+  );
+}
+
+
+/* START */
+
+loadProfile();
+
+</script>
+
+</body>
+</html>

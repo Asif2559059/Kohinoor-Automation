@@ -26,6 +26,11 @@ button{
   cursor:pointer;
 }
 
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
 .header{
   height:64px;
   background:#075e54;
@@ -408,6 +413,12 @@ th{
   object-fit:cover;
 }
 
+.product-count{
+  margin-top:8px;
+  font-size:12px;
+  color:#666;
+}
+
 @media(max-width:700px){
 
   .dashboard{
@@ -468,6 +479,7 @@ th{
             class="secondary"
             style="padding:5px 8px;font-size:11px"
             id="clearNotificationsBtn"
+            type="button"
           >
             সব মুছুন
           </button>
@@ -491,6 +503,7 @@ th{
       class="icon-btn"
       id="logoutBtn"
       title="Logout"
+      type="button"
     >
       ↪
     </button>
@@ -543,6 +556,7 @@ th{
     <button
       class="dash-btn"
       onclick="openOrderForm()"
+      type="button"
     >
       <span>📝</span>
       নতুন অর্ডার
@@ -551,6 +565,7 @@ th{
     <button
       class="dash-btn"
       onclick="openProductManager()"
+      type="button"
     >
       <span>📦</span>
       পণ্য
@@ -559,6 +574,7 @@ th{
     <button
       class="dash-btn"
       onclick="openHistory()"
+      type="button"
     >
       <span>📋</span>
       অর্ডার হিস্টোরি
@@ -567,6 +583,7 @@ th{
     <button
       class="dash-btn"
       onclick="openOnlineSetup()"
+      type="button"
     >
       <span>🌐</span>
       অনলাইন অর্ডার
@@ -594,6 +611,7 @@ th{
       <button
         class="primary"
         onclick="openOrderForm()"
+        type="button"
       >
         + নতুন অর্ডার
       </button>
@@ -601,6 +619,7 @@ th{
       <button
         class="secondary"
         onclick="openHistory()"
+        type="button"
       >
         অর্ডার দেখুন
       </button>
@@ -617,18 +636,21 @@ th{
   <button
     class="active"
     onclick="openOrderForm()"
+    type="button"
   >
     📝<br>অর্ডার
   </button>
 
   <button
     onclick="openProductManager()"
+    type="button"
   >
     📦<br>পণ্য
   </button>
 
   <button
     onclick="openHistory()"
+    type="button"
   >
     📋<br>হিস্টোরি
   </button>
@@ -654,6 +676,7 @@ th{
       <button
         class="close"
         onclick="closeModal('orderModal')"
+        type="button"
       >
         ×
       </button>
@@ -768,6 +791,7 @@ th{
     <button
       class="secondary"
       onclick="addOrderProductRow()"
+      type="button"
     >
       + পণ্য যোগ করুন
     </button>
@@ -791,6 +815,7 @@ th{
         class="primary"
         id="saveOrderBtn"
         onclick="saveOrder()"
+        type="button"
       >
         অর্ডার পাঠান
       </button>
@@ -798,6 +823,7 @@ th{
       <button
         class="secondary"
         onclick="closeModal('orderModal')"
+        type="button"
       >
         বাতিল
       </button>
@@ -820,13 +846,25 @@ th{
 
     <div class="modal-head">
 
-      <h2>
-        পণ্য ম্যানেজমেন্ট
-      </h2>
+      <div>
+
+        <h2>
+          পণ্য ম্যানেজমেন্ট
+        </h2>
+
+        <div
+          class="product-count"
+          id="productCount"
+        >
+          পণ্য লোড হচ্ছে...
+        </div>
+
+      </div>
 
       <button
         class="close"
         onclick="closeModal('productModal')"
+        type="button"
       >
         ×
       </button>
@@ -917,6 +955,7 @@ th{
       <button
         class="primary"
         onclick="saveProduct()"
+        type="button"
       >
         সংরক্ষণ
       </button>
@@ -924,8 +963,17 @@ th{
       <button
         class="secondary"
         onclick="resetProductForm()"
+        type="button"
       >
         নতুন
+      </button>
+
+      <button
+        class="secondary"
+        onclick="refreshProducts()"
+        type="button"
+      >
+        ↻ Refresh
       </button>
 
     </div>
@@ -991,6 +1039,7 @@ th{
       <button
         class="close"
         onclick="closeModal('historyModal')"
+        type="button"
       >
         ×
       </button>
@@ -1020,6 +1069,7 @@ th{
       <button
         class="secondary"
         onclick="loadOrdersFromSupabase()"
+        type="button"
       >
         ↻ Supabase থেকে Refresh
       </button>
@@ -1027,6 +1077,7 @@ th{
       <button
         class="danger"
         onclick="clearLocalHistory()"
+        type="button"
       >
         লোকাল হিস্টোরি মুছুন
       </button>
@@ -1083,6 +1134,7 @@ th{
       <button
         class="close"
         onclick="closeModal('detailModal')"
+        type="button"
       >
         ×
       </button>
@@ -1114,6 +1166,7 @@ th{
       <button
         class="close"
         onclick="closeModal('onlineModal')"
+        type="button"
       >
         ×
       </button>
@@ -1136,6 +1189,7 @@ th{
       <button
         class="primary"
         onclick="saveOnlineUrl()"
+        type="button"
       >
         সংরক্ষণ
       </button>
@@ -1143,6 +1197,7 @@ th{
       <button
         class="secondary"
         onclick="openOnlineUrl()"
+        type="button"
       >
         ওপেন
       </button>
@@ -1249,6 +1304,39 @@ function esc(value){
 
 
 /* =========================================================
+   NORMALIZE PRODUCT
+========================================================= */
+
+function normalizeProduct(row){
+
+  if(!row) return null;
+
+  return {
+
+    code:
+    String(row.code ?? "")
+      .trim(),
+
+    name:
+    String(row.name ?? "")
+      .trim(),
+
+    pack:
+    String(row.pack ?? "")
+      .trim(),
+
+    price:
+    Number(row.price ?? 0),
+
+    stock:
+    Number(row.stock ?? 0)
+
+  };
+
+}
+
+
+/* =========================================================
    MONEY
 ========================================================= */
 
@@ -1333,7 +1421,10 @@ async function checkAdmin(){
       result.error
     );
 
-    return;
+    location.href =
+    "signin.html";
+
+    return false;
 
   }
 
@@ -1342,11 +1433,13 @@ async function checkAdmin(){
     location.href =
     "signin.html";
 
-    return;
+    return false;
 
   }
 
   await loadUserProfile();
+
+  return true;
 
 }
 
@@ -1429,7 +1522,19 @@ async function loadUserProfile(){
 
 async function logout(){
 
+  const result =
   await supabaseClient.auth.signOut();
+
+  if(result.error){
+
+    alert(
+      "Logout করা যায়নি:\n\n" +
+      result.error.message
+    );
+
+    return;
+
+  }
 
   location.href =
   "signin.html";
@@ -1455,6 +1560,15 @@ function loadLocalProducts(){
       products=[];
     }
 
+    products =
+    products
+      .map(normalizeProduct)
+      .filter(function(product){
+        return product &&
+               product.code &&
+               product.name;
+      });
+
   }catch(error){
 
     products=[];
@@ -1470,6 +1584,143 @@ function saveLocalProducts(){
     PRODUCTS_KEY,
     JSON.stringify(products)
   );
+
+}
+
+
+/* =========================================================
+   LOAD PRODUCTS FROM SUPABASE
+   IMPORTANT FIX
+========================================================= */
+
+async function loadProductsFromSupabase(){
+
+  const result =
+  await supabaseClient
+    .from("products")
+    .select(
+      "code,name,pack,price,stock,created_at"
+    )
+    .order(
+      "created_at",
+      {
+        ascending:true
+      }
+    );
+
+
+  if(result.error){
+
+    console.error(
+      "PRODUCT LOAD ERROR:",
+      result.error
+    );
+
+    updateProductCount();
+
+    return false;
+
+  }
+
+
+  if(!Array.isArray(result.data)){
+
+    console.warn(
+      "Supabase products data is not an array."
+    );
+
+    return false;
+
+  }
+
+
+  const remoteProducts =
+  result.data
+    .map(normalizeProduct)
+    .filter(function(product){
+
+      return product &&
+             product.code &&
+             product.name;
+
+    });
+
+
+  /*
+    Supabase-ই হবে মূল Product source।
+    তাই পুরোনো LocalStorage-এর ৬টি Product
+    দিয়ে আর তালিকা overwrite হবে না।
+  */
+
+  products =
+  remoteProducts;
+
+
+  saveLocalProducts();
+
+  updateProductCount();
+
+  renderManagerProducts();
+
+  return true;
+
+}
+
+
+/* =========================================================
+   PRODUCT COUNT
+========================================================= */
+
+function updateProductCount(){
+
+  const element =
+  $("productCount");
+
+  if(!element) return;
+
+  element.textContent =
+  "মোট পণ্য: " +
+  products.length;
+
+}
+
+
+/* =========================================================
+   REFRESH PRODUCTS
+========================================================= */
+
+async function refreshProducts(){
+
+  const element =
+  $("productCount");
+
+  if(element){
+
+    element.textContent =
+    "Supabase থেকে পণ্য লোড হচ্ছে...";
+
+  }
+
+
+  const success =
+  await loadProductsFromSupabase();
+
+
+  if(success){
+
+    alert(
+      "Supabase থেকে " +
+      products.length +
+      "টি পণ্য লোড হয়েছে।"
+    );
+
+  }else{
+
+    alert(
+      "Supabase থেকে পণ্য লোড করা যায়নি।"
+    );
+
+  }
 
 }
 
@@ -1742,10 +1993,6 @@ async function openNotificationOrder(index){
     .classList.remove("show");
 
 
-  /*
-    Supabase ID থাকলে সরাসরি অর্ডার আনার চেষ্টা।
-  */
-
   if(
     notification.id &&
     !String(
@@ -1910,13 +2157,33 @@ async function requestNotificationPermission(){
    PRODUCT MANAGER
 ========================================================= */
 
-function openProductManager(){
+async function openProductManager(){
+
+  /*
+    আগে Local list দেখাবে,
+    তারপর Supabase থেকে fresh list আনবে।
+  */
 
   renderManagerProducts();
+
+  updateProductCount();
 
   openModal(
     "productModal"
   );
+
+
+  const loaded =
+  await loadProductsFromSupabase();
+
+
+  if(!loaded){
+
+    console.warn(
+      "Supabase product refresh failed. Local products remain."
+    );
+
+  }
 
 }
 
@@ -1934,11 +2201,15 @@ function resetProductForm(){
 }
 
 
+/* =========================================================
+   RENDER PRODUCT MANAGER
+========================================================= */
+
 function renderManagerProducts(){
 
   const search =
   (
-    $("managerSearch").value ||
+    $("managerSearch")?.value ||
     ""
   )
   .trim()
@@ -1949,18 +2220,25 @@ function renderManagerProducts(){
   products.filter(
     function(product){
 
+      const code =
+      String(product.code || "")
+        .toLowerCase();
+
+      const name =
+      String(product.name || "")
+        .toLowerCase();
+
       return (
         !search ||
-        String(product.code || "")
-          .toLowerCase()
-          .includes(search) ||
-        String(product.name || "")
-          .toLowerCase()
-          .includes(search)
+        code.includes(search) ||
+        name.includes(search)
       );
 
     }
   );
+
+
+  updateProductCount();
 
 
   if(!list.length){
@@ -1985,6 +2263,12 @@ function renderManagerProducts(){
   $("managerProductsBody").innerHTML =
   list.map(
     function(product){
+
+      const safeCode =
+      JSON.stringify(
+        String(product.code || "")
+      );
+
 
       return `
 
@@ -2014,14 +2298,16 @@ function renderManagerProducts(){
 
             <button
               class="secondary"
-              onclick="editProductByCode(${JSON.stringify(product.code)})"
+              type="button"
+              onclick="editProductByCode(${safeCode})"
             >
               Edit
             </button>
 
             <button
               class="danger"
-              onclick="deleteProductByCode(${JSON.stringify(product.code)})"
+              type="button"
+              onclick="deleteProductByCode(${safeCode})"
             >
               ×
             </button>
@@ -2040,6 +2326,7 @@ function renderManagerProducts(){
 
 /* =========================================================
    SAVE PRODUCT
+   FIXED
 ========================================================= */
 
 async function saveProduct(){
@@ -2075,73 +2362,156 @@ async function saveProduct(){
   }
 
 
+  if(!Number.isFinite(price)){
+
+    alert(
+      "সঠিক মূল্য দিন।"
+    );
+
+    return;
+
+  }
+
+
+  if(!Number.isFinite(stock)){
+
+    alert(
+      "সঠিক স্টক দিন।"
+    );
+
+    return;
+
+  }
+
+
   const item = {
+
     code,
     name,
     pack,
     price,
     stock
+
   };
 
 
-  if(editingProductCode){
+  /* =====================================================
+     EDIT EXISTING PRODUCT
+  ===================================================== */
 
-    const index =
-    products.findIndex(
-      function(product){
-        return product.code ===
-        editingProductCode;
+  if(editingProductCode !== null){
+
+    const oldCode =
+    String(editingProductCode)
+      .trim();
+
+
+    /*
+      যদি code পরিবর্তন করা হয়,
+      নতুন code আগে থেকেই আছে কি না check।
+    */
+
+    if(code !== oldCode){
+
+      const localDuplicate =
+      products.some(
+        function(product){
+
+          return (
+            String(product.code || "")
+              .trim() === code
+            &&
+            String(product.code || "")
+              .trim() !== oldCode
+          );
+
+        }
+      );
+
+
+      if(localDuplicate){
+
+        alert(
+          "এই নতুন কোডের পণ্য ইতিমধ্যে আছে।"
+        );
+
+        return;
+
       }
-    );
 
 
-    if(index >= 0){
+      const duplicateResult =
+      await supabaseClient
+        .from("products")
+        .select("code")
+        .eq("code",code)
+        .maybeSingle();
 
-      products[index]=item;
+
+      if(
+        duplicateResult.error
+      ){
+
+        console.error(
+          "Duplicate code check error:",
+          duplicateResult.error
+        );
+
+        alert(
+          "Product code যাচাই করা যায়নি:\n\n" +
+          duplicateResult.error.message
+        );
+
+        return;
+
+      }
+
+
+      if(duplicateResult.data){
+
+        alert(
+          "এই কোডের পণ্য Supabase-এ ইতিমধ্যে আছে।"
+        );
+
+        return;
+
+      }
 
     }
 
+
+    /*
+      প্রথমে Supabase update।
+      সফল হলে Local update।
+    */
 
     const result =
     await supabaseClient
       .from("products")
       .update({
-        code,
-        name,
-        pack,
-        price,
-        stock
+        code:code,
+        name:name,
+        pack:pack,
+        price:price,
+        stock:stock
       })
       .eq(
         "code",
-        editingProductCode
+        oldCode
       );
 
 
     if(result.error){
 
-      console.warn(
-        "Product update:",
-        result.error.message
+      console.error(
+        "PRODUCT UPDATE ERROR:",
+        result.error
       );
 
-    }
-
-  }else{
-
-    const exists =
-    products.some(
-      function(product){
-        return product.code ===
-        code;
-      }
-    );
-
-
-    if(exists){
 
       alert(
-        "এই কোডের পণ্য আগে থেকেই আছে।"
+        "পণ্য Edit করা যায়নি।\n\n" +
+        result.error.message
       );
 
       return;
@@ -2149,27 +2519,117 @@ async function saveProduct(){
     }
 
 
-    products.push(item);
+    /*
+      Supabase সফল হয়েছে।
+      এখন Local list update।
+    */
+
+    const index =
+    products.findIndex(
+      function(product){
+
+        return String(product.code || "")
+          .trim() === oldCode;
+
+      }
+    );
 
 
-    const result =
-    await supabaseClient
-      .from("products")
-      .insert([
-        item
-      ]);
+    if(index >= 0){
 
+      products[index] =
+      normalizeProduct(item);
 
-    if(result.error){
+    }else{
 
-      console.warn(
-        "Product insert:",
-        result.error.message
+      products.push(
+        normalizeProduct(item)
       );
 
     }
 
+
+    saveLocalProducts();
+
+    resetProductForm();
+
+    renderManagerProducts();
+
+    updateProductCount();
+
+
+    alert(
+      "পণ্য সফলভাবে Edit হয়েছে।"
+    );
+
+    return;
+
   }
+
+
+  /* =====================================================
+     NEW PRODUCT
+  ===================================================== */
+
+  const existsLocal =
+  products.some(
+    function(product){
+
+      return String(product.code || "")
+        .trim() === code;
+
+    }
+  );
+
+
+  if(existsLocal){
+
+    alert(
+      "এই কোডের পণ্য আগে থেকেই আছে।"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Supabase-এ আগে Insert।
+  */
+
+  const result =
+  await supabaseClient
+    .from("products")
+    .insert([
+      item
+    ]);
+
+
+  if(result.error){
+
+    console.error(
+      "PRODUCT INSERT ERROR:",
+      result.error
+    );
+
+
+    alert(
+      "পণ্য সংরক্ষণ করা যায়নি।\n\n" +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Supabase সফল হলে Local-এ যোগ।
+  */
+
+  products.push(
+    normalizeProduct(item)
+  );
 
 
   saveLocalProducts();
@@ -2178,8 +2638,11 @@ async function saveProduct(){
 
   renderManagerProducts();
 
+  updateProductCount();
+
+
   alert(
-    "পণ্য সংরক্ষণ হয়েছে।"
+    "পণ্য সফলভাবে সংরক্ষণ হয়েছে।"
   );
 
 }
@@ -2187,23 +2650,42 @@ async function saveProduct(){
 
 /* =========================================================
    EDIT PRODUCT
+   FIXED
 ========================================================= */
 
 function editProductByCode(code){
 
+  const wantedCode =
+  String(code ?? "")
+    .trim();
+
+
   const product =
   products.find(
     function(item){
-      return item.code === code;
+
+      return String(item.code ?? "")
+        .trim() === wantedCode;
+
     }
   );
 
 
-  if(!product) return;
+  if(!product){
+
+    alert(
+      "এই Product পাওয়া যায়নি।\n\n" +
+      "Supabase থেকে Product list Refresh করুন।"
+    );
+
+    return;
+
+  }
 
 
   editingProductCode =
-  product.code;
+  String(product.code ?? "")
+    .trim();
 
 
   $("productCode").value =
@@ -2216,23 +2698,72 @@ function editProductByCode(code){
   product.pack || "";
 
   $("productPrice").value =
-  product.price || 0;
+  product.price ?? 0;
 
   $("productStock").value =
-  product.stock || 0;
+  product.stock ?? 0;
+
+
+  /*
+    Form-এর কাছে নিয়ে যাবে।
+  */
+
+  $("productCode").focus();
 
 }
 
 
 /* =========================================================
    DELETE PRODUCT
+   FIXED
 ========================================================= */
 
 async function deleteProductByCode(code){
 
+  const wantedCode =
+  String(code ?? "")
+    .trim();
+
+
+  if(!wantedCode){
+
+    alert(
+      "Product code পাওয়া যায়নি।"
+    );
+
+    return;
+
+  }
+
+
+  const product =
+  products.find(
+    function(item){
+
+      return String(item.code ?? "")
+        .trim() === wantedCode;
+
+    }
+  );
+
+
+  if(!product){
+
+    alert(
+      "এই Product পাওয়া যায়নি।"
+    );
+
+    return;
+
+  }
+
+
   if(
     !confirm(
-      "এই পণ্যটি মুছে ফেলবেন?"
+      "এই পণ্যটি মুছে ফেলবেন?\n\n" +
+      product.name +
+      "\nকোড: " +
+      wantedCode
     )
   ){
 
@@ -2241,16 +2772,11 @@ async function deleteProductByCode(code){
   }
 
 
-  products =
-  products.filter(
-    function(product){
-      return product.code !== code;
-    }
-  );
-
-
-  saveLocalProducts();
-
+  /*
+    IMPORTANT:
+    আগে Supabase থেকে Delete।
+    Supabase সফল হলে Local থেকে Delete।
+  */
 
   const result =
   await supabaseClient
@@ -2258,21 +2784,63 @@ async function deleteProductByCode(code){
     .delete()
     .eq(
       "code",
-      code
+      wantedCode
     );
 
 
   if(result.error){
 
-    console.warn(
-      "Product delete:",
+    console.error(
+      "PRODUCT DELETE ERROR:",
+      result.error
+    );
+
+
+    alert(
+      "পণ্য Delete করা যায়নি।\n\n" +
       result.error.message
     );
+
+    return;
 
   }
 
 
+  /*
+    Supabase সফল।
+    এখন Local থেকে Delete।
+  */
+
+  products =
+  products.filter(
+    function(product){
+
+      return String(product.code ?? "")
+        .trim() !== wantedCode;
+
+    }
+  );
+
+
+  saveLocalProducts();
+
   renderManagerProducts();
+
+  updateProductCount();
+
+
+  if(
+    editingProductCode === wantedCode
+  ){
+
+    resetProductForm();
+
+  }
+
+
+  alert(
+    "পণ্য সফলভাবে Delete হয়েছে।"
+  );
 
 }
 
@@ -2301,6 +2869,18 @@ function openOrderForm(){
   $("orderProducts").innerHTML="";
 
 
+  if(!products.length){
+
+    alert(
+      "কোনো Product পাওয়া যায়নি।\n\n" +
+      "প্রথমে Product section খুলে Supabase থেকে Product load করুন।"
+    );
+
+    return;
+
+  }
+
+
   addOrderProductRow();
 
   calculateOrderTotal();
@@ -2317,6 +2897,17 @@ function openOrderForm(){
 ========================================================= */
 
 function addOrderProductRow(){
+
+  if(!products.length){
+
+    alert(
+      "কোনো Product নেই।"
+    );
+
+    return;
+
+  }
+
 
   const row =
   document.createElement("div");
@@ -2398,6 +2989,7 @@ function addOrderProductRow(){
 
     <button
       class="danger"
+      type="button"
       onclick="
         this.parentElement.remove();
         calculateOrderTotal();
@@ -2430,8 +3022,10 @@ function orderProductChanged(select){
   const product =
   products.find(
     function(item){
-      return item.code ===
-      select.value;
+
+      return String(item.code) ===
+      String(select.value);
+
     }
   );
 
@@ -2533,7 +3127,10 @@ function collectOrderProducts(){
         const product =
         products.find(
           function(item){
-            return item.code === code;
+
+            return String(item.code) ===
+            String(code);
+
           }
         );
 
@@ -2691,16 +3288,6 @@ async function saveOrder(){
   };
 
 
-  /*
-    এখানে ইচ্ছাকৃতভাবে
-    .select().single()
-    ব্যবহার করা হয়নি।
-
-    কারণ INSERT-এর পরে SELECT
-    permission না থাকলেও অর্ডার
-    যেন সফলভাবে INSERT হয়।
-  */
-
   const result =
   await supabaseClient
     .from("orders")
@@ -2732,10 +3319,6 @@ async function saveOrder(){
 
   }
 
-
-  /*
-    Local copy.
-  */
 
   const localOrder = {
 
@@ -2803,11 +3386,6 @@ async function loadOrdersFromSupabase(){
       result.error
     );
 
-    /*
-      Local orders থাকলে
-      সেগুলোই দেখানো হবে।
-    */
-
     renderHistory();
 
     return;
@@ -2826,11 +3404,6 @@ async function loadOrdersFromSupabase(){
 
     saveLocalOrders();
 
-
-    /*
-      প্রথমবার load হওয়া existing orders
-      notification হবে না।
-    */
 
     if(!initialRemoteLoadDone){
 
@@ -2877,11 +3450,6 @@ function handleRealtimeOrder(order){
   String(order.id);
 
 
-  /*
-    Existing order হলে
-    আবার notification নয়।
-  */
-
   if(
     lastKnownRemoteOrderIds.has(id)
   ){
@@ -2910,10 +3478,6 @@ function handleRealtimeOrder(order){
 
   saveLocalOrders();
 
-
-  /*
-    নতুন notification
-  */
 
   addNotification(
     order
@@ -3045,11 +3609,6 @@ function startOrderPolling(){
       }
 
 
-      /*
-        First poll শুধু existing orders
-        mark করবে।
-      */
-
       if(!initialRemoteLoadDone){
 
         result.data.forEach(
@@ -3075,10 +3634,6 @@ function startOrderPolling(){
       }
 
 
-      /*
-        নতুন orders detect
-      */
-
       result.data.forEach(
         function(order){
 
@@ -3098,18 +3653,10 @@ function startOrderPolling(){
             );
 
 
-            /*
-              Local list update
-            */
-
             orders.unshift(
               order
             );
 
-
-            /*
-              Notification
-            */
 
             addNotification(
               order
@@ -3310,6 +3857,7 @@ function renderHistory(){
 
             <button
               class="secondary"
+              type="button"
               onclick="showOrderDetailByIndex(${index})"
             >
               দেখুন
@@ -3682,11 +4230,6 @@ $("notificationBtn")
 );
 
 
-/*
-  Notification panel-এর বাইরে click করলে
-  panel বন্ধ হবে।
-*/
-
 document.addEventListener(
   "click",
   function(event){
@@ -3774,7 +4317,7 @@ document
 async function init(){
 
   /*
-    Local data
+    Local data প্রথমে load
   */
 
   loadLocalProducts();
@@ -3785,12 +4328,33 @@ async function init(){
 
   resetProductForm();
 
+  updateProductCount();
+
 
   /*
     Login check
   */
 
+  const loggedIn =
   await checkAdmin();
+
+
+  if(!loggedIn){
+    return;
+  }
+
+
+  /*
+    IMPORTANT:
+    Login হওয়ার পর Supabase থেকে
+    সব Product load হবে।
+
+    এতে LocalStorage-এ ৬টি থাকলেও
+    Supabase-এর আসল Product list
+    ব্যবহার হবে।
+  */
+
+  await loadProductsFromSupabase();
 
 
   /*

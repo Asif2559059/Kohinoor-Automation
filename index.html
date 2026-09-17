@@ -9,13 +9,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   font-family:Arial,"Noto Sans Bengali",sans-serif;
-  background:#f4f7f7;
-  color:#222;
+  background:#f4f7f6;
+  color:#18352a;
 }
 
 button,input,select,textarea{
@@ -26,365 +28,55 @@ button{
   cursor:pointer;
 }
 
-button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
-
 .header{
-  height:64px;
-  background:#075e54;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 14px;
   position:sticky;
   top:0;
-  z-index:50;
+  z-index:100;
+  background:#087f50;
+  color:white;
+  padding:14px;
   box-shadow:0 2px 8px #0002;
 }
 
-.brand{
+.header-inner{
+  max-width:720px;
+  margin:auto;
   display:flex;
   align-items:center;
+  justify-content:space-between;
   gap:10px;
-  font-weight:700;
 }
 
-.brand-logo{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  background:#fff;
-  color:#075e54;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
+.logo{
+  font-size:18px;
+  font-weight:bold;
 }
 
-.header-right{
+.header-actions{
   display:flex;
-  align-items:center;
-  gap:8px;
+  gap:6px;
 }
 
 .icon-btn{
   border:0;
-  background:#ffffff20;
-  color:#fff;
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  font-size:21px;
-  position:relative;
-}
-
-.badge{
-  position:absolute;
-  right:-2px;
-  top:-2px;
-  background:#e53935;
-  color:#fff;
-  border-radius:20px;
-  min-width:19px;
-  height:19px;
-  font-size:11px;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:0 4px;
-  border:2px solid #075e54;
+  background:#ffffff22;
+  color:white;
+  border-radius:10px;
+  padding:9px 11px;
 }
 
 .container{
-  max-width:1100px;
+  max-width:720px;
   margin:auto;
-  padding:16px;
+  padding:14px 14px 90px;
 }
 
 .card{
-  background:#fff;
-  border-radius:14px;
+  background:white;
+  border-radius:16px;
   padding:16px;
   margin-bottom:14px;
-  box-shadow:0 2px 10px #0000000d;
-}
-
-.dashboard{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-}
-
-.dash-btn{
-  border:0;
-  border-radius:14px;
-  padding:18px 10px;
-  background:#fff;
-  box-shadow:0 2px 10px #0001;
-  color:#075e54;
-  font-weight:700;
-}
-
-.dash-btn span{
-  display:block;
-  font-size:28px;
-  margin-bottom:8px;
-}
-
-h2,h3{
-  margin:4px 0 14px;
-}
-
-label{
-  display:block;
-  font-weight:700;
-  margin:10px 0 5px;
-}
-
-input,select,textarea{
-  width:100%;
-  border:1px solid #ccd5d5;
-  border-radius:9px;
-  padding:11px;
-  background:#fff;
-  outline:none;
-}
-
-input:focus,select:focus,textarea:focus{
-  border-color:#075e54;
-}
-
-textarea{
-  min-height:80px;
-  resize:vertical;
-}
-
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.primary{
-  background:#075e54;
-  color:#fff;
-  border:0;
-  border-radius:9px;
-  padding:12px 16px;
-  font-weight:700;
-}
-
-.secondary{
-  background:#e8f1ef;
-  color:#075e54;
-  border:0;
-  border-radius:9px;
-  padding:12px 16px;
-  font-weight:700;
-}
-
-.danger{
-  background:#d32f2f;
-  color:#fff;
-  border:0;
-  border-radius:9px;
-  padding:10px 14px;
-  font-weight:700;
-}
-
-.actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:14px;
-}
-
-.table-wrap{
-  overflow:auto;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:650px;
-}
-
-th,td{
-  padding:10px;
-  border-bottom:1px solid #e7eeee;
-  text-align:left;
-  vertical-align:top;
-}
-
-th{
-  background:#f1f6f5;
-  color:#075e54;
-}
-
-.empty{
-  text-align:center;
-  color:#777;
-  padding:25px;
-}
-
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#0008;
-  z-index:100;
-  align-items:center;
-  justify-content:center;
-  padding:12px;
-}
-
-.modal.show{
-  display:flex;
-}
-
-.modal-box{
-  background:#fff;
-  border-radius:15px;
-  width:min(900px,100%);
-  max-height:92vh;
-  overflow:auto;
-  padding:18px;
-}
-
-.modal-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-
-.close{
-  border:0;
-  background:#eee;
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  font-size:20px;
-}
-
-.product-row{
-  display:grid;
-  grid-template-columns:2fr 90px 100px 80px 80px 40px;
-  gap:7px;
-  align-items:center;
-  margin-bottom:8px;
-}
-
-.product-row input{
-  padding:9px;
-}
-
-.small{
-  font-size:12px;
-  color:#666;
-}
-
-.notification-wrap{
-  position:relative;
-}
-
-.notification-panel{
-  display:none;
-  position:absolute;
-  right:0;
-  top:50px;
-  width:min(360px,92vw);
-  background:#fff;
-  color:#222;
-  border-radius:12px;
-  box-shadow:0 5px 25px #0003;
-  overflow:hidden;
-  z-index:70;
-}
-
-.notification-panel.show{
-  display:block;
-}
-
-.notification-head{
-  padding:12px 14px;
-  background:#f1f6f5;
-  font-weight:700;
-  display:flex;
-  justify-content:space-between;
-}
-
-.notification-list{
-  max-height:360px;
-  overflow:auto;
-}
-
-.notification-item{
-  padding:12px 14px;
-  border-bottom:1px solid #eee;
-  cursor:pointer;
-}
-
-.notification-item:hover{
-  background:#f7faf9;
-}
-
-.notification-item.unread{
-  background:#eef8f5;
-}
-
-.notification-time{
-  font-size:11px;
-  color:#777;
-  margin-top:4px;
-}
-
-.status{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:700;
-  background:#e8f5e9;
-  color:#2e7d32;
-}
-
-.order-total{
-  font-size:18px;
-  font-weight:700;
-  color:#075e54;
-  text-align:right;
-}
-
-.bottom-nav{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  height:62px;
-  background:#fff;
-  border-top:1px solid #ddd;
-  display:flex;
-  z-index:40;
-}
-
-.bottom-nav button{
-  flex:1;
-  border:0;
-  background:#fff;
-  color:#555;
-  font-weight:700;
-}
-
-.bottom-nav button.active{
-  color:#075e54;
-}
-
-.page{
-  padding-bottom:78px;
+  box-shadow:0 2px 12px #0000000c;
 }
 
 .profile{
@@ -394,49 +86,343 @@ th{
 }
 
 .avatar{
-  width:52px;
-  height:52px;
+  width:48px;
+  height:48px;
   border-radius:50%;
-  background:#e5efed;
-  color:#075e54;
+  background:#087f50;
+  color:white;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:22px;
-  font-weight:700;
-  overflow:hidden;
+  font-weight:bold;
 }
 
-.avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
+.small{
+  color:#6a7a73;
+  font-size:13px;
 }
 
-.product-count{
-  margin-top:8px;
+h2,h3{
+  margin-top:0;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.stat{
+  background:#f0faf5;
+  border-radius:14px;
+  padding:14px;
+}
+
+.stat strong{
+  display:block;
+  font-size:25px;
+  color:#087f50;
+}
+
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.btn{
+  border:0;
+  border-radius:11px;
+  padding:11px 14px;
+  font-weight:bold;
+}
+
+.btn-primary{
+  background:#087f50;
+  color:white;
+}
+
+.btn-green{
+  background:#0aa568;
+  color:white;
+}
+
+.btn-danger{
+  background:#d93025;
+  color:white;
+}
+
+.btn-warning{
+  background:#f3a000;
+  color:white;
+}
+
+.btn-light{
+  background:#edf3f0;
+  color:#17372a;
+}
+
+.btn-small{
+  padding:7px 9px;
   font-size:12px;
-  color:#666;
 }
 
-@media(max-width:700px){
+.form-group{
+  margin-bottom:12px;
+}
 
-  .dashboard{
-    grid-template-columns:repeat(2,1fr);
-  }
+label{
+  display:block;
+  margin-bottom:5px;
+  font-weight:bold;
+  font-size:14px;
+}
 
-  .grid2{
+input,select,textarea{
+  width:100%;
+  border:1px solid #d4dfda;
+  border-radius:10px;
+  padding:11px;
+  background:white;
+  outline:none;
+}
+
+input:focus,select:focus,textarea:focus{
+  border-color:#087f50;
+  box-shadow:0 0 0 2px #087f5015;
+}
+
+textarea{
+  min-height:75px;
+  resize:vertical;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.row3{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.actions > *{
+  flex:1;
+}
+
+.search-box{
+  margin-bottom:12px;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,td{
+  padding:9px 7px;
+  border-bottom:1px solid #e7eeeb;
+  text-align:left;
+  font-size:13px;
+}
+
+th{
+  background:#f1f7f4;
+}
+
+.product-result{
+  border:1px solid #e2eae6;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:7px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:20px;
+  background:#e9f7f0;
+  color:#087f50;
+  font-size:12px;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:#0008;
+  padding:12px;
+  overflow:auto;
+}
+
+.modal-box{
+  max-width:720px;
+  margin:30px auto;
+  background:white;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 10px 40px #0004;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.close{
+  border:0;
+  background:#edf2ef;
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  font-size:20px;
+}
+
+.order-item{
+  border:1px solid #dfe9e4;
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:8px;
+}
+
+.order-item-head{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:white;
+  border-top:1px solid #ddd;
+  z-index:150;
+  padding:8px;
+}
+
+.bottom-nav-inner{
+  max-width:720px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px;
+}
+
+.nav-btn{
+  border:0;
+  background:white;
+  padding:7px 2px;
+  font-size:12px;
+  color:#53645c;
+}
+
+.nav-btn.active{
+  color:#087f50;
+  font-weight:bold;
+}
+
+.notification-panel{
+  display:none;
+  position:fixed;
+  top:65px;
+  right:10px;
+  width:min(360px,calc(100% - 20px));
+  max-height:70vh;
+  overflow:auto;
+  background:white;
+  z-index:180;
+  border-radius:15px;
+  box-shadow:0 5px 30px #0003;
+  padding:12px;
+}
+
+.notification{
+  padding:10px;
+  border-bottom:1px solid #eee;
+}
+
+.notification.unread{
+  background:#eefaf4;
+}
+
+#notificationBadge{
+  background:#e53935;
+  color:white;
+  font-size:10px;
+  border-radius:20px;
+  padding:2px 5px;
+  position:absolute;
+  margin-left:-8px;
+  margin-top:-6px;
+}
+
+.empty{
+  text-align:center;
+  padding:25px;
+  color:#718078;
+}
+
+@media(max-width:520px){
+  .row,.row3{
     grid-template-columns:1fr;
   }
 
-  .product-row{
-    grid-template-columns:1fr 80px 90px 60px 35px;
+  .quick-grid{
+    grid-template-columns:1fr 1fr;
   }
 
-  .product-row .pack{
-    display:none;
+  .header{
+    padding:10px;
   }
 
+  .logo{
+    font-size:15px;
+  }
+}
+
+@media print{
+  .header,
+  .bottom-nav,
+  .no-print,
+  button{
+    display:none!important;
+  }
+
+  body{
+    background:white;
+  }
+
+  .container{
+    padding:0;
+  }
+
+  .card{
+    box-shadow:none;
+  }
 }
 </style>
 </head>
@@ -444,1712 +430,728 @@ th{
 <body>
 
 <header class="header">
+  <div class="header-inner">
+    <div class="logo">কহিনুর কেমিক্যাল পিএলসি</div>
 
-  <div class="brand">
-    <div class="brand-logo">ক</div>
-    <div>কহিনুর কেমিক্যাল পিএলসি</div>
-  </div>
-
-  <div class="header-right">
-
-    <div class="notification-wrap">
-
-      <button
-        class="icon-btn"
-        id="notificationBtn"
-        title="নোটিফিকেশন"
-      >
-        🔔
-        <span
-          class="badge"
-          id="notificationBadge"
-        >0</span>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="toggleNotifications()">
+        🔔 <span id="notificationBadge">0</span>
       </button>
 
-      <div
-        class="notification-panel"
-        id="notificationPanel"
-      >
-
-        <div class="notification-head">
-
-          <span>নোটিফিকেশন</span>
-
-          <button
-            class="secondary"
-            style="padding:5px 8px;font-size:11px"
-            id="clearNotificationsBtn"
-            type="button"
-          >
-            সব মুছুন
-          </button>
-
-        </div>
-
-        <div
-          class="notification-list"
-          id="notificationList"
-        >
-          <div class="empty">
-            কোনো নতুন নোটিফিকেশন নেই
-          </div>
-        </div>
-
-      </div>
-
+      <button class="icon-btn" onclick="adminLogout()">
+        🚪
+      </button>
     </div>
-
-    <button
-      class="icon-btn"
-      id="logoutBtn"
-      title="Logout"
-      type="button"
-    >
-      ↪
-    </button>
-
   </div>
-
 </header>
 
+<div id="notificationPanel" class="notification-panel">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <strong>🔔 নোটিফিকেশন</strong>
+    <button class="btn btn-small btn-light" onclick="clearNotifications()">Clear</button>
+  </div>
 
-<main class="container page">
+  <div id="notificationList"></div>
+</div>
 
+<main class="container">
+
+  <!-- PROFILE -->
   <section class="card">
-
     <div class="profile">
-
-      <div
-        class="avatar"
-        id="avatarBox"
-      >
-        ক
-      </div>
+      <div class="avatar" id="profileAvatar">A</div>
 
       <div>
+        <strong id="profileName">লোড হচ্ছে...</strong>
+        <div class="small" id="profileEmail"></div>
+      </div>
+    </div>
+  </section>
 
-        <h3 id="profileName">
-          Admin
-        </h3>
+  <!-- DASHBOARD -->
+  <section class="card">
+    <h3>📊 ড্যাশবোর্ড</h3>
 
-        <div
-          class="small"
-          id="profileEmail"
-        ></div>
-
-        <span
-          class="status"
-          id="profileStatus"
-        >
-          অনলাইন
-        </span>
-
+    <div class="stats">
+      <div class="stat">
+        <span class="small">মোট পণ্য</span>
+        <strong id="dashProducts">0</strong>
       </div>
 
-    </div>
+      <div class="stat">
+        <span class="small">মোট অর্ডার</span>
+        <strong id="dashOrders">0</strong>
+      </div>
 
+      <div class="stat">
+        <span class="small">মোট আইটেম</span>
+        <strong id="dashItems">0</strong>
+      </div>
+
+      <div class="stat">
+        <span class="small">মোট মূল্য</span>
+        <strong id="dashTotal">৳0</strong>
+      </div>
+    </div>
   </section>
 
+  <!-- QUICK ACTION -->
+  <section class="card">
+    <h3>⚡ দ্রুত কাজ</h3>
 
-  <section class="dashboard">
+    <div class="quick-grid">
+      <button class="btn btn-primary" onclick="openOrderModal()">
+        ➕ নতুন অর্ডার
+      </button>
 
-    <button
-      class="dash-btn"
-      onclick="openOrderForm()"
-      type="button"
-    >
-      <span>📝</span>
-      নতুন অর্ডার
-    </button>
+      <button class="btn btn-green" onclick="openProductManager()">
+        📦 পণ্য
+      </button>
 
-    <button
-      class="dash-btn"
-      onclick="openProductManager()"
-      type="button"
-    >
-      <span>📦</span>
-      পণ্য
-    </button>
+      <button class="btn btn-light" onclick="openHistory()">
+        📋 অর্ডার হিস্ট্রি
+      </button>
 
-    <button
-      class="dash-btn"
-      onclick="openHistory()"
-      type="button"
-    >
-      <span>📋</span>
-      অর্ডার হিস্টোরি
-    </button>
-
-    <button
-      class="dash-btn"
-      onclick="openOnlineSetup()"
-      type="button"
-    >
-      <span>🌐</span>
-      অনলাইন অর্ডার
-    </button>
-
+      <button class="btn btn-warning" onclick="openOnlineSetup()">
+        ☁️ অনলাইন
+      </button>
+    </div>
   </section>
 
+  <!-- PRODUCT SEARCH -->
+  <section class="card">
+    <h3>🔎 পণ্য খুঁজুন</h3>
 
-  <section
-    class="card"
-    style="margin-top:14px"
-  >
+    <input
+      id="productSearch"
+      placeholder="পণ্যের নাম/কোড লিখে খুঁজুন"
+      oninput="searchProducts()"
+    >
 
-    <h2>
-      অর্ডার অটোমেশন
-    </h2>
+    <div id="productResults"></div>
+  </section>
 
-    <p class="small">
-      নতুন অর্ডার Supabase-এ সংরক্ষণ হবে এবং নতুন অর্ডার এলে
-      এই Admin Panel-এ নোটিফিকেশন দেখাবে।
-    </p>
+  <!-- ONLINE STATUS -->
+  <section class="card">
+    <strong>অনলাইন অর্ডার: </strong>
+    <span id="onlineStatus" class="badge">লোকাল</span>
 
-    <div class="actions">
-
-      <button
-        class="primary"
-        onclick="openOrderForm()"
-        type="button"
-      >
-        + নতুন অর্ডার
-      </button>
-
-      <button
-        class="secondary"
-        onclick="openHistory()"
-        type="button"
-      >
-        অর্ডার দেখুন
-      </button>
-
+    <div class="small" style="margin-top:8px">
+      Google Apps Script Web App URL সেট করলে অনলাইন অর্ডারও পাঠানো যাবে।
     </div>
-
   </section>
 
 </main>
 
-
-<nav class="bottom-nav">
-
-  <button
-    class="active"
-    onclick="openOrderForm()"
-    type="button"
-  >
-    📝<br>অর্ডার
-  </button>
-
-  <button
-    onclick="openProductManager()"
-    type="button"
-  >
-    📦<br>পণ্য
-  </button>
-
-  <button
-    onclick="openHistory()"
-    type="button"
-  >
-    📋<br>হিস্টোরি
-  </button>
-
-</nav>
-
-
-<!-- ================= ORDER MODAL ================= -->
-
-<div
-  class="modal"
-  id="orderModal"
->
-
+<!-- PRODUCT MODAL -->
+<div id="productModal" class="modal">
   <div class="modal-box">
 
     <div class="modal-head">
-
-      <h2>
-        নতুন অর্ডার
-      </h2>
-
-      <button
-        class="close"
-        onclick="closeModal('orderModal')"
-        type="button"
-      >
-        ×
-      </button>
-
+      <h3>📦 Product Manager</h3>
+      <button class="close" onclick="closeModal('productModal')">×</button>
     </div>
 
+    <div class="card" style="background:#f8fbf9">
 
-    <div class="grid2">
+      <input type="hidden" id="editingProductCode">
 
-      <div>
-
-        <label>
-          দোকানের নাম
-        </label>
-
-        <input
-          id="shop"
-          placeholder="দোকানের নাম"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          মোবাইল
-        </label>
-
-        <input
-          id="mobile"
-          placeholder="01XXXXXXXXX"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          ঠিকানা
-        </label>
-
-        <input
-          id="address"
-          placeholder="দোকানের ঠিকানা"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          রিপ্রেজেন্টেটিভ
-        </label>
-
-        <input
-          id="representative"
-          placeholder="নাম"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          অর্ডার তারিখ
-        </label>
-
-        <input
-          id="orderDate"
-          type="date"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          ডেলিভারি তারিখ
-        </label>
-
-        <input
-          id="deliveryDate"
-          type="date"
-        >
-
-      </div>
-
-    </div>
-
-
-    <label>
-      নোট
-    </label>
-
-    <textarea
-      id="orderNote"
-      placeholder="প্রয়োজনীয় নোট"
-    ></textarea>
-
-
-    <h3 style="margin-top:18px">
-      পণ্য
-    </h3>
-
-    <div id="orderProducts"></div>
-
-    <button
-      class="secondary"
-      onclick="addOrderProductRow()"
-      type="button"
-    >
-      + পণ্য যোগ করুন
-    </button>
-
-
-    <div
-      class="order-total"
-      style="margin-top:15px"
-    >
-      মোট:
-      ৳
-      <span id="orderTotal">
-        0.00
-      </span>
-    </div>
-
-
-    <div class="actions">
-
-      <button
-        class="primary"
-        id="saveOrderBtn"
-        onclick="saveOrder()"
-        type="button"
-      >
-        অর্ডার পাঠান
-      </button>
-
-      <button
-        class="secondary"
-        onclick="closeModal('orderModal')"
-        type="button"
-      >
-        বাতিল
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ================= PRODUCT MODAL ================= -->
-
-<div
-  class="modal"
-  id="productModal"
->
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <div>
-
-        <h2>
-          পণ্য ম্যানেজমেন্ট
-        </h2>
-
-        <div
-          class="product-count"
-          id="productCount"
-        >
-          পণ্য লোড হচ্ছে...
+      <div class="row">
+        <div class="form-group">
+          <label>পণ্য কোড</label>
+          <input id="productCode" placeholder="03227">
         </div>
 
+        <div class="form-group">
+          <label>পণ্যের নাম</label>
+          <input id="productName">
+        </div>
       </div>
 
-      <button
-        class="close"
-        onclick="closeModal('productModal')"
-        type="button"
-      >
-        ×
-      </button>
+      <div class="row3">
+        <div class="form-group">
+          <label>Pack</label>
+          <input id="productPack" placeholder="60">
+        </div>
 
-    </div>
+        <div class="form-group">
+          <label>Price</label>
+          <input id="productPrice" type="number" step="0.01" placeholder="88">
+        </div>
 
-
-    <div class="grid2">
-
-      <div>
-
-        <label>
-          কোড
-        </label>
-
-        <input
-          id="productCode"
-          placeholder="Product code"
-        >
-
+        <div class="form-group">
+          <label>Stock</label>
+          <input id="productStock" type="number" placeholder="100">
+        </div>
       </div>
 
+      <div class="actions">
+        <button class="btn btn-primary" onclick="saveProduct()">
+          💾 Save Product
+        </button>
 
-      <div>
+        <button class="btn btn-light" onclick="resetProductForm()">
+          নতুন
+        </button>
 
-        <label>
-          নাম
-        </label>
-
-        <input
-          id="productName"
-          placeholder="Product name"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          প্যাক
-        </label>
-
-        <input
-          id="productPack"
-          placeholder="যেমন 500ml"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          মূল্য
-        </label>
-
-        <input
-          id="productPrice"
-          type="number"
-          step="0.01"
-          placeholder="0"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          স্টক
-        </label>
-
-        <input
-          id="productStock"
-          type="number"
-          step="1"
-          placeholder="0"
-        >
-
+        <button class="btn btn-green" onclick="refreshProducts()">
+          🔄 Refresh
+        </button>
       </div>
 
     </div>
 
-
-    <div class="actions">
-
-      <button
-        class="primary"
-        onclick="saveProduct()"
-        type="button"
+    <div class="search-box">
+      <input
+        id="managerSearch"
+        placeholder="পণ্য খুঁজুন..."
+        oninput="renderManagerProducts()"
       >
-        সংরক্ষণ
-      </button>
-
-      <button
-        class="secondary"
-        onclick="resetProductForm()"
-        type="button"
-      >
-        নতুন
-      </button>
-
-      <button
-        class="secondary"
-        onclick="refreshProducts()"
-        type="button"
-      >
-        ↻ Refresh
-      </button>
-
     </div>
 
-
-    <label>
-      পণ্য খুঁজুন
-    </label>
-
-    <input
-      id="managerSearch"
-      oninput="renderManagerProducts()"
-      placeholder="কোড বা নাম দিয়ে খুঁজুন"
-    >
-
-
-    <div
-      class="table-wrap"
-      style="margin-top:12px"
-    >
-
+    <div class="table-wrap">
       <table>
-
         <thead>
-
           <tr>
-            <th>কোড</th>
-            <th>নাম</th>
-            <th>প্যাক</th>
-            <th>মূল্য</th>
-            <th>স্টক</th>
-            <th>অ্যাকশন</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Pack</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Action</th>
           </tr>
-
         </thead>
 
         <tbody id="managerProductsBody"></tbody>
-
       </table>
-
     </div>
 
   </div>
-
 </div>
 
-
-<!-- ================= HISTORY MODAL ================= -->
-
-<div
-  class="modal"
-  id="historyModal"
->
-
+<!-- ORDER MODAL -->
+<div id="orderModal" class="modal">
   <div class="modal-box">
 
     <div class="modal-head">
+      <h3>📝 নতুন অর্ডার</h3>
+      <button class="close" onclick="closeModal('orderModal')">×</button>
+    </div>
 
-      <h2>
-        অর্ডার হিস্টোরি
-      </h2>
+    <div class="row">
 
-      <button
-        class="close"
-        onclick="closeModal('historyModal')"
-        type="button"
-      >
-        ×
-      </button>
+      <div class="form-group">
+        <label>Shop Name</label>
+        <input id="shop">
+      </div>
+
+      <div class="form-group">
+        <label>Mobile</label>
+        <input id="mobile">
+      </div>
 
     </div>
 
+    <div class="form-group">
+      <label>Address</label>
+      <textarea id="address"></textarea>
+    </div>
 
-    <div class="grid2">
+    <div class="row">
 
-      <input
-        id="historySearch"
-        placeholder="দোকান/মোবাইল খুঁজুন"
-        oninput="renderHistory()"
-      >
+      <div class="form-group">
+        <label>Representative</label>
+        <input id="representative" id="rep">
+      </div>
 
-      <input
-        id="historyDate"
-        type="date"
-        onchange="renderHistory()"
-      >
+      <div class="form-group">
+        <label>Note</label>
+        <input id="note">
+      </div>
 
     </div>
 
+    <div class="row">
+
+      <div class="form-group">
+        <label>Order Date</label>
+        <input id="orderDate" type="date">
+      </div>
+
+      <div class="form-group">
+        <label>Delivery Date</label>
+        <input id="deliveryDate" type="date">
+      </div>
+
+    </div>
+
+    <hr>
+
+    <h3>পণ্য যোগ করুন</h3>
+
+    <div class="row">
+
+      <div class="form-group">
+        <label>পণ্য</label>
+        <select id="orderProductSelect"></select>
+      </div>
+
+      <div class="form-group">
+        <label>Quantity</label>
+        <input id="orderQty" type="number" min="1" value="1">
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="form-group">
+        <label>Bonus</label>
+        <input id="orderBonus" type="number" min="0" value="0">
+      </div>
+
+      <div class="form-group" style="display:flex;align-items:end">
+        <button class="btn btn-green" style="width:100%" onclick="addOrderProduct()">
+          ➕ পণ্য যোগ করুন
+        </button>
+      </div>
+
+    </div>
+
+    <div id="orderItems"></div>
+
+    <div class="card" style="background:#f0faf5">
+      <strong>মোট: <span id="orderTotal">৳0</span></strong>
+    </div>
 
     <div class="actions">
-
-      <button
-        class="secondary"
-        onclick="loadOrdersFromSupabase()"
-        type="button"
-      >
-        ↻ Supabase থেকে Refresh
+      <button class="btn btn-primary" onclick="saveOrder()">
+        💾 অর্ডার Save
       </button>
 
-      <button
-        class="danger"
-        onclick="clearLocalHistory()"
-        type="button"
-      >
-        লোকাল হিস্টোরি মুছুন
+      <button class="btn btn-light" onclick="closeModal('orderModal')">
+        Cancel
       </button>
-
-    </div>
-
-
-    <div
-      class="table-wrap"
-      style="margin-top:12px"
-    >
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>তারিখ</th>
-            <th>দোকান</th>
-            <th>মোবাইল</th>
-            <th>মোট</th>
-            <th>পণ্য</th>
-            <th>অ্যাকশন</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="historyBody"></tbody>
-
-      </table>
-
     </div>
 
   </div>
-
 </div>
 
-
-<!-- ================= ORDER DETAIL ================= -->
-
-<div
-  class="modal"
-  id="detailModal"
->
-
+<!-- HISTORY MODAL -->
+<div id="historyModal" class="modal">
   <div class="modal-box">
 
     <div class="modal-head">
-
-      <h2>
-        অর্ডার বিস্তারিত
-      </h2>
-
-      <button
-        class="close"
-        onclick="closeModal('detailModal')"
-        type="button"
-      >
-        ×
-      </button>
-
+      <h3>📋 অর্ডার হিস্ট্রি</h3>
+      <button class="close" onclick="closeModal('historyModal')">×</button>
     </div>
 
-    <div id="orderDetail"></div>
+    <div class="row">
+      <input id="historySearch" placeholder="Shop / Mobile খুঁজুন..." oninput="renderHistory()">
 
-  </div>
-
-</div>
-
-
-<!-- ================= ONLINE ORDER ================= -->
-
-<div
-  class="modal"
-  id="onlineModal"
->
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <h2>
-        অনলাইন অর্ডার
-      </h2>
-
-      <button
-        class="close"
-        onclick="closeModal('onlineModal')"
-        type="button"
-      >
-        ×
-      </button>
-
+      <input id="historyDate" type="date" onchange="renderHistory()">
     </div>
 
-
-    <label>
-      অনলাইন অর্ডার URL
-    </label>
-
-    <input
-      id="onlineUrl"
-      placeholder="https://..."
-    >
-
+    <br>
 
     <div class="actions">
-
-      <button
-        class="primary"
-        onclick="saveOnlineUrl()"
-        type="button"
-      >
-        সংরক্ষণ
+      <button class="btn btn-green" onclick="loadOrdersFromSupabase(true)">
+        🔄 Refresh
       </button>
 
-      <button
-        class="secondary"
-        onclick="openOnlineUrl()"
-        type="button"
-      >
-        ওপেন
+      <button class="btn btn-light" onclick="clearLocalHistory()">
+        Local Clear
       </button>
-
     </div>
 
-  </div>
+    <div id="historyList"></div>
 
+  </div>
 </div>
 
+<!-- DETAIL MODAL -->
+<div id="detailModal" class="modal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>📄 Order Details</h3>
+      <button class="close" onclick="closeModal('detailModal')">×</button>
+    </div>
+
+    <div id="detailContent"></div>
+
+  </div>
+</div>
+
+<!-- ONLINE MODAL -->
+<div id="onlineModal" class="modal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>☁️ Online Order Setup</h3>
+      <button class="close" onclick="closeModal('onlineModal')">×</button>
+    </div>
+
+    <div class="form-group">
+      <label>Google Apps Script Web App URL</label>
+      <input id="onlineUrl">
+    </div>
+
+    <button class="btn btn-primary" onclick="saveOnlineSetup()">
+      💾 Save
+    </button>
+
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+
+    <button class="nav-btn active" onclick="scrollToTop()">
+      🏠<br>Home
+    </button>
+
+    <button class="nav-btn" onclick="openOrderModal()">
+      ➕<br>Order
+    </button>
+
+    <button class="nav-btn" onclick="openProductManager()">
+      📦<br>Products
+    </button>
+
+    <button class="nav-btn" onclick="openHistory()">
+      📋<br>History
+    </button>
+
+  </div>
+</nav>
 
 <script>
-
 /* =========================================================
    SUPABASE
 ========================================================= */
 
 const SUPABASE_URL =
-"https://utzkpsohkoiawvuupgeb.supabase.co";
+  "https://utzkpsohkoiawvuupgeb.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
-"sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
+  "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
 const supabaseClient =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
 
 
 /* =========================================================
-   STORAGE KEYS
+   STORAGE
 ========================================================= */
 
-const PRODUCTS_KEY =
-"kohinoor_products_v3";
-
-const ORDERS_KEY =
-"kohinoor_orders_v3";
-
-const ONLINE_URL_KEY =
-"kohinoor_online_url";
-
-const NOTIFICATIONS_KEY =
-"kohinoor_order_notifications_v1";
-
-const DEFAULT_ONLINE_URL =
-"https://forms.gle/776PMNGr7WoujFxg8";
+const PRODUCTS_KEY = "kohinoor_products_v3";
+const ORDERS_KEY = "kohinoor_orders_v3";
+const ONLINE_KEY = "kohinoor_online_url";
+const NOTIFICATION_KEY = "kohinoor_order_notifications_v1";
 
 
 /* =========================================================
-   VARIABLES
+   GLOBAL VARIABLES
 ========================================================= */
 
 let products = [];
-
 let orders = [];
-
 let notifications = [];
 
 let realtimeChannel = null;
-
 let pollingTimer = null;
 
 let editingProductCode = null;
 
-let lastKnownRemoteOrderIds =
-new Set();
-
+let lastKnownRemoteOrderIds = new Set();
 let initialRemoteLoadDone = false;
 
 let historyFilteredOrders = [];
+let currentOrderItems = [];
 
 
 /* =========================================================
-   SHORTCUT
+   BASIC HELPERS
 ========================================================= */
 
 function $(id){
   return document.getElementById(id);
 }
 
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function esc(value){
-
-  return String(value ?? "")
-    .replace(/[&<>"']/g,function(c){
-
-      return {
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-      }[c];
-
-    });
-
-}
-
-
-/* =========================================================
-   NORMALIZE PRODUCT
-========================================================= */
-
-function normalizeProduct(row){
-
-  if(!row) return null;
-
-  return {
-
-    code:
-    String(row.code ?? "")
-      .trim(),
-
-    name:
-    String(row.name ?? "")
-      .trim(),
-
-    pack:
-    String(row.pack ?? "")
-      .trim(),
-
-    price:
-    Number(row.price ?? 0),
-
-    stock:
-    Number(row.stock ?? 0)
-
-  };
-
-}
-
-
-/* =========================================================
-   MONEY
-========================================================= */
-
-function money(value){
-
-  return Number(value || 0)
-    .toLocaleString(
-      "en-BD",
-      {
-        minimumFractionDigits:2,
-        maximumFractionDigits:2
-      }
-    );
-
-}
-
-
-/* =========================================================
-   TODAY
-========================================================= */
-
-function today(){
-
-  const d = new Date();
-
-  const month =
-  String(d.getMonth()+1).padStart(2,"0");
-
-  const day =
-  String(d.getDate()).padStart(2,"0");
-
-  return (
-    d.getFullYear() +
-    "-" +
-    month +
-    "-" +
-    day
-  );
-
-}
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
 function openModal(id){
-
-  const element = $(id);
-
-  if(element){
-    element.classList.add("show");
-  }
-
+  const el = $(id);
+  if(el) el.style.display = "block";
 }
-
 
 function closeModal(id){
+  const el = $(id);
+  if(el) el.style.display = "none";
+}
 
-  const element = $(id);
+function money(value){
+  return "৳" + Number(value || 0).toLocaleString("en-BD",{
+    minimumFractionDigits:0,
+    maximumFractionDigits:2
+  });
+}
 
-  if(element){
-    element.classList.remove("show");
-  }
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
 
+function today(){
+  return new Date().toISOString().slice(0,10);
 }
 
 
 /* =========================================================
-   ADMIN CHECK
+   LOCAL STORAGE
+========================================================= */
+
+function saveLocalProducts(){
+  localStorage.setItem(
+    PRODUCTS_KEY,
+    JSON.stringify(products)
+  );
+}
+
+function loadLocalProducts(){
+  try{
+    const data =
+      JSON.parse(localStorage.getItem(PRODUCTS_KEY) || "[]");
+
+    products =
+      Array.isArray(data) ? data : [];
+
+  }catch(e){
+    products = [];
+  }
+}
+
+function saveLocalOrders(){
+  localStorage.setItem(
+    ORDERS_KEY,
+    JSON.stringify(orders)
+  );
+}
+
+function loadLocalOrders(){
+  try{
+    const data =
+      JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+
+    orders =
+      Array.isArray(data) ? data : [];
+
+  }catch(e){
+    orders = [];
+  }
+}
+
+function loadNotifications(){
+  try{
+    const data =
+      JSON.parse(localStorage.getItem(NOTIFICATION_KEY) || "[]");
+
+    notifications =
+      Array.isArray(data) ? data : [];
+
+  }catch(e){
+    notifications = [];
+  }
+
+  renderNotifications();
+}
+
+
+/* =========================================================
+   AUTH
 ========================================================= */
 
 async function checkAdmin(){
 
   const result =
-  await supabaseClient.auth.getSession();
+    await supabaseClient.auth.getSession();
 
   if(result.error){
-
-    console.error(
-      "Session error:",
-      result.error
-    );
-
-    location.href =
-    "signin.html";
-
+    console.error(result.error);
+    window.location.replace("signin.html");
     return false;
-
   }
 
   if(!result.data.session){
-
-    location.href =
-    "signin.html";
-
+    window.location.replace("signin.html");
     return false;
-
   }
 
-  await loadUserProfile();
+  await loadUserProfile(
+    result.data.session.user
+  );
 
   return true;
-
 }
 
 
-/* =========================================================
-   PROFILE
-========================================================= */
-
-async function loadUserProfile(){
-
-  const userResult =
-  await supabaseClient.auth.getUser();
-
-  const user =
-  userResult.data.user;
+async function loadUserProfile(user){
 
   if(!user) return;
 
   $("profileEmail").textContent =
-  user.email || "";
+    user.email || "";
 
+  const avatar =
+    (user.email || "A").charAt(0).toUpperCase();
 
-  const result =
-  await supabaseClient
-    .from("user_profiles")
-    .select(
-      "username,email,status,avatar_url"
-    )
-    .eq("id",user.id)
-    .maybeSingle();
-
-
-  if(result.error){
-
-    console.warn(
-      "Profile error:",
-      result.error.message
-    );
-
-    $("profileName").textContent =
-    user.email || "Admin";
-
-    return;
-
-  }
-
-
-  if(result.data){
-
-    $("profileName").textContent =
-    result.data.username ||
-    user.email ||
-    "Admin";
-
-    $("profileEmail").textContent =
-    result.data.email ||
-    user.email ||
-    "";
-
-    $("profileStatus").textContent =
-    result.data.status ||
-    "অনলাইন";
-
-
-    if(result.data.avatar_url){
-
-      $("avatarBox").innerHTML =
-      `<img src="${esc(result.data.avatar_url)}" alt="avatar">`;
-
-    }
-
-  }
-
-}
-
-
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-async function logout(){
-
-  const result =
-  await supabaseClient.auth.signOut();
-
-  if(result.error){
-
-    alert(
-      "Logout করা যায়নি:\n\n" +
-      result.error.message
-    );
-
-    return;
-
-  }
-
-  location.href =
-  "signin.html";
-
-}
-
-
-/* =========================================================
-   LOCAL PRODUCTS
-========================================================= */
-
-function loadLocalProducts(){
+  $("profileAvatar").textContent =
+    avatar;
 
   try{
 
-    products =
-    JSON.parse(
-      localStorage.getItem(PRODUCTS_KEY) ||
-      "[]"
-    );
+    const result =
+      await supabaseClient
+        .from("user_profiles")
+        .select("username,email,status,avatar_url")
+        .eq("id",user.id)
+        .maybeSingle();
 
-    if(!Array.isArray(products)){
-      products=[];
+    if(result.error){
+      console.log("Profile load:",result.error.message);
+      return;
     }
 
-    products =
-    products
-      .map(normalizeProduct)
-      .filter(function(product){
-        return product &&
-               product.code &&
-               product.name;
-      });
+    if(result.data){
+
+      $("profileName").textContent =
+        result.data.username ||
+        result.data.email ||
+        user.email;
+
+      if(result.data.email){
+        $("profileEmail").textContent =
+          result.data.email;
+      }
+
+      if(result.data.avatar_url){
+        $("profileAvatar").innerHTML =
+          `<img src="${escapeHtml(result.data.avatar_url)}"
+                style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+      }
+    }
 
   }catch(error){
-
-    products=[];
-
+    console.error(error);
   }
-
 }
 
 
-function saveLocalProducts(){
+async function adminLogout(){
 
-  localStorage.setItem(
-    PRODUCTS_KEY,
-    JSON.stringify(products)
-  );
+  try{
 
+    await supabaseClient.auth.signOut();
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+  localStorage.removeItem("supabase.auth.token");
+
+  window.location.replace("signin.html");
 }
 
 
 /* =========================================================
-   LOAD PRODUCTS FROM SUPABASE
-   IMPORTANT FIX
+   PRODUCTS - SUPABASE LOAD
 ========================================================= */
 
 async function loadProductsFromSupabase(){
 
-  const result =
-  await supabaseClient
-    .from("products")
-    .select(
-      "code,name,pack,price,stock,created_at"
-    )
-    .order(
-      "created_at",
-      {
-        ascending:true
-      }
-    );
+  try{
 
+    const result =
+      await supabaseClient
+        .from("products")
+        .select("code,name,pack,price,stock,created_at")
+        .order("created_at",{ascending:true});
 
-  if(result.error){
+    if(result.error){
+
+      console.error(
+        "PRODUCT LOAD ERROR:",
+        result.error
+      );
+
+      return false;
+    }
+
+    if(Array.isArray(result.data)){
+
+      products =
+        result.data
+          .map(row => ({
+            code:String(row.code ?? "").trim(),
+            name:String(row.name ?? "").trim(),
+            pack:String(row.pack ?? "").trim(),
+            price:Number(row.price ?? 0),
+            stock:Number(row.stock ?? 0)
+          }))
+          .filter(p => p.code || p.name);
+
+      saveLocalProducts();
+
+      updateDashboard();
+
+      populateOrderProductSelect();
+
+      searchProducts();
+
+      return true;
+    }
+
+  }catch(error){
 
     console.error(
-      "PRODUCT LOAD ERROR:",
-      result.error
+      "PRODUCT LOAD EXCEPTION:",
+      error
     );
-
-    updateProductCount();
-
-    return false;
 
   }
 
-
-  if(!Array.isArray(result.data)){
-
-    console.warn(
-      "Supabase products data is not an array."
-    );
-
-    return false;
-
-  }
-
-
-  const remoteProducts =
-  result.data
-    .map(normalizeProduct)
-    .filter(function(product){
-
-      return product &&
-             product.code &&
-             product.name;
-
-    });
-
-
-  /*
-    Supabase-ই হবে মূল Product source।
-    তাই পুরোনো LocalStorage-এর ৬টি Product
-    দিয়ে আর তালিকা overwrite হবে না।
-  */
-
-  products =
-  remoteProducts;
-
-
-  saveLocalProducts();
-
-  updateProductCount();
-
-  renderManagerProducts();
-
-  return true;
-
+  return false;
 }
 
-
-/* =========================================================
-   PRODUCT COUNT
-========================================================= */
-
-function updateProductCount(){
-
-  const element =
-  $("productCount");
-
-  if(!element) return;
-
-  element.textContent =
-  "মোট পণ্য: " +
-  products.length;
-
-}
-
-
-/* =========================================================
-   REFRESH PRODUCTS
-========================================================= */
 
 async function refreshProducts(){
 
-  const element =
-  $("productCount");
+  const ok =
+    await loadProductsFromSupabase();
 
-  if(element){
+  if(ok){
 
-    element.textContent =
-    "Supabase থেকে পণ্য লোড হচ্ছে...";
-
-  }
-
-
-  const success =
-  await loadProductsFromSupabase();
-
-
-  if(success){
+    renderManagerProducts();
 
     alert(
-      "Supabase থেকে " +
-      products.length +
-      "টি পণ্য লোড হয়েছে।"
+      "Supabase থেকে Product list সফলভাবে Refresh হয়েছে।"
     );
 
   }else{
 
     alert(
-      "Supabase থেকে পণ্য লোড করা যায়নি।"
+      "Product Refresh করা যায়নি।"
     );
-
   }
-
-}
-
-
-/* =========================================================
-   LOCAL ORDERS
-========================================================= */
-
-function loadLocalOrders(){
-
-  try{
-
-    orders =
-    JSON.parse(
-      localStorage.getItem(ORDERS_KEY) ||
-      "[]"
-    );
-
-    if(!Array.isArray(orders)){
-      orders=[];
-    }
-
-  }catch(error){
-
-    orders=[];
-
-  }
-
-}
-
-
-function saveLocalOrders(){
-
-  localStorage.setItem(
-    ORDERS_KEY,
-    JSON.stringify(orders)
-  );
-
-}
-
-
-/* =========================================================
-   NOTIFICATIONS
-========================================================= */
-
-function loadNotifications(){
-
-  try{
-
-    notifications =
-    JSON.parse(
-      localStorage.getItem(
-        NOTIFICATIONS_KEY
-      ) ||
-      "[]"
-    );
-
-    if(!Array.isArray(notifications)){
-      notifications=[];
-    }
-
-  }catch(error){
-
-    notifications=[];
-
-  }
-
-  renderNotifications();
-
-}
-
-
-function saveNotifications(){
-
-  notifications =
-  notifications.slice(0,50);
-
-  localStorage.setItem(
-    NOTIFICATIONS_KEY,
-    JSON.stringify(notifications)
-  );
-
-  renderNotifications();
-
-}
-
-
-/* =========================================================
-   ADD NOTIFICATION
-========================================================= */
-
-function addNotification(order){
-
-  if(!order) return;
-
-  const id =
-  order.id ||
-  (
-    "local-" +
-    Date.now()
-  );
-
-
-  const alreadyExists =
-  notifications.some(
-    function(item){
-      return String(item.id) === String(id);
-    }
-  );
-
-
-  if(alreadyExists){
-    return;
-  }
-
-
-  const notification = {
-
-    id:id,
-
-    shop:
-    order.shop ||
-    "নতুন অর্ডার",
-
-    mobile:
-    order.mobile ||
-    "",
-
-    total:
-    order.total ||
-    0,
-
-    created_at:
-    order.created_at ||
-    new Date().toISOString(),
-
-    read:false
-
-  };
-
-
-  notifications.unshift(
-    notification
-  );
-
-
-  saveNotifications();
-
-  playNotificationSound();
-
-  browserNotification(
-    notification
-  );
-
-}
-
-
-/* =========================================================
-   RENDER NOTIFICATIONS
-========================================================= */
-
-function renderNotifications(){
-
-  const list =
-  $("notificationList");
-
-  if(!list) return;
-
-
-  const unread =
-  notifications.filter(
-    function(n){
-      return !n.read;
-    }
-  ).length;
-
-
-  $("notificationBadge")
-    .textContent =
-    unread;
-
-
-  $("notificationBadge")
-    .style.display =
-    unread
-    ? "flex"
-    : "none";
-
-
-  if(!notifications.length){
-
-    list.innerHTML =
-    `<div class="empty">
-      কোনো নতুন নোটিফিকেশন নেই
-    </div>`;
-
-    return;
-
-  }
-
-
-  list.innerHTML =
-  notifications.map(
-    function(n,index){
-
-      return `
-
-        <div
-          class="notification-item ${n.read ? "" : "unread"}"
-          onclick="openNotificationOrder(${index})"
-        >
-
-          <strong>
-            🔔 নতুন অর্ডার
-          </strong>
-
-          <br>
-
-          ${esc(n.shop)}
-
-          ${
-            n.mobile
-            ?
-            `<br>
-             <span class="small">
-             ${esc(n.mobile)}
-             </span>`
-            :
-            ""
-          }
-
-          <br>
-
-          <span class="small">
-            মোট: ৳ ${money(n.total)}
-          </span>
-
-          <div class="notification-time">
-            ${formatDateTime(n.created_at)}
-          </div>
-
-        </div>
-
-      `;
-
-    }
-  ).join("");
-
-}
-
-
-/* =========================================================
-   OPEN NOTIFICATION ORDER
-========================================================= */
-
-async function openNotificationOrder(index){
-
-  const notification =
-  notifications[index];
-
-  if(!notification) return;
-
-
-  notification.read=true;
-
-  saveNotifications();
-
-
-  $("notificationPanel")
-    .classList.remove("show");
-
-
-  if(
-    notification.id &&
-    !String(
-      notification.id
-    ).startsWith("local-")
-  ){
-
-    const result =
-    await supabaseClient
-      .from("orders")
-      .select("*")
-      .eq(
-        "id",
-        notification.id
-      )
-      .maybeSingle();
-
-
-    if(
-      !result.error &&
-      result.data
-    ){
-
-      showOrderDetail(
-        result.data
-      );
-
-      return;
-
-    }
-
-  }
-
-
-  const localOrder =
-  orders.find(
-    function(order){
-
-      return String(order.id) ===
-      String(notification.id);
-
-    }
-  );
-
-
-  if(localOrder){
-
-    showOrderDetail(
-      localOrder
-    );
-
-  }else{
-
-    openHistory();
-
-  }
-
-}
-
-
-/* =========================================================
-   SOUND
-========================================================= */
-
-function playNotificationSound(){
-
-  try{
-
-    const AudioContext =
-    window.AudioContext ||
-    window.webkitAudioContext;
-
-    if(!AudioContext) return;
-
-
-    const context =
-    new AudioContext();
-
-    const oscillator =
-    context.createOscillator();
-
-    const gain =
-    context.createGain();
-
-
-    oscillator.frequency.value =
-    880;
-
-    gain.gain.value =
-    0.05;
-
-
-    oscillator.connect(gain);
-
-    gain.connect(
-      context.destination
-    );
-
-
-    oscillator.start();
-
-    oscillator.stop(
-      context.currentTime + 0.15
-    );
-
-  }catch(error){}
-
-}
-
-
-/* =========================================================
-   BROWSER NOTIFICATION
-========================================================= */
-
-function browserNotification(notification){
-
-  try{
-
-    if(
-      "Notification" in window &&
-      Notification.permission ===
-      "granted"
-    ){
-
-      new Notification(
-        "নতুন অর্ডার",
-        {
-          body:
-          notification.shop +
-          " — ৳ " +
-          money(notification.total)
-        }
-      );
-
-    }
-
-  }catch(error){}
-
-}
-
-
-async function requestNotificationPermission(){
-
-  try{
-
-    if(
-      "Notification" in window &&
-      Notification.permission ===
-      "default"
-    ){
-
-      await Notification.requestPermission();
-
-    }
-
-  }catch(error){}
-
 }
 
 
@@ -2159,74 +1161,57 @@ async function requestNotificationPermission(){
 
 async function openProductManager(){
 
-  /*
-    আগে Local list দেখাবে,
-    তারপর Supabase থেকে fresh list আনবে।
-  */
-
   renderManagerProducts();
 
-  updateProductCount();
-
-  openModal(
-    "productModal"
-  );
-
+  openModal("productModal");
 
   const loaded =
-  await loadProductsFromSupabase();
+    await loadProductsFromSupabase();
 
+  if(loaded){
 
-  if(!loaded){
-
-    console.warn(
-      "Supabase product refresh failed. Local products remain."
-    );
+    renderManagerProducts();
 
   }
-
 }
 
 
 function resetProductForm(){
 
-  editingProductCode=null;
+  editingProductCode = null;
 
-  $("productCode").value="";
-  $("productName").value="";
-  $("productPack").value="";
-  $("productPrice").value="";
-  $("productStock").value="";
+  $("editingProductCode").value = "";
 
+  $("productCode").value = "";
+  $("productName").value = "";
+  $("productPack").value = "";
+  $("productPrice").value = "";
+  $("productStock").value = "";
+
+  $("productCode").disabled = false;
 }
 
 
-/* =========================================================
-   RENDER PRODUCT MANAGER
-========================================================= */
-
 function renderManagerProducts(){
 
+  const body =
+    $("managerProductsBody");
+
+  if(!body) return;
+
   const search =
-  (
-    $("managerSearch")?.value ||
-    ""
-  )
-  .trim()
-  .toLowerCase();
+    String($("managerSearch")?.value || "")
+      .trim()
+      .toLowerCase();
 
-
-  const list =
-  products.filter(
-    function(product){
+  const filtered =
+    products.filter(product => {
 
       const code =
-      String(product.code || "")
-        .toLowerCase();
+        String(product.code || "").toLowerCase();
 
       const name =
-      String(product.name || "")
-        .toLowerCase();
+        String(product.name || "").toLowerCase();
 
       return (
         !search ||
@@ -2234,271 +1219,197 @@ function renderManagerProducts(){
         name.includes(search)
       );
 
-    }
-  );
+    });
 
+  if(!filtered.length){
 
-  updateProductCount();
-
-
-  if(!list.length){
-
-    $("managerProductsBody").innerHTML =
-    `
+    body.innerHTML = `
       <tr>
-        <td
-          colspan="6"
-          class="empty"
-        >
-          কোনো পণ্য নেই
+        <td colspan="6" class="empty">
+          কোনো Product পাওয়া যায়নি
         </td>
       </tr>
     `;
 
     return;
-
   }
 
+  body.innerHTML =
+    filtered.map(product => {
 
-  $("managerProductsBody").innerHTML =
-  list.map(
-    function(product){
-
-      const safeCode =
-      JSON.stringify(
-        String(product.code || "")
-      );
-
+      const code =
+        escapeHtml(product.code);
 
       return `
-
         <tr>
+          <td>${code}</td>
 
           <td>
-            ${esc(product.code)}
+            ${escapeHtml(product.name)}
           </td>
 
           <td>
-            ${esc(product.name)}
+            ${escapeHtml(product.pack)}
           </td>
 
           <td>
-            ${esc(product.pack)}
+            ${money(product.price)}
           </td>
 
           <td>
-            ৳ ${money(product.price)}
+            ${Number(product.stock || 0)}
           </td>
 
           <td>
-            ${esc(product.stock)}
+            <div style="display:flex;gap:5px">
+              <button
+                type="button"
+                class="btn btn-small btn-warning"
+                onclick="editProductByCode(${JSON.stringify(product.code)})">
+                Edit
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-small btn-danger"
+                onclick="deleteProductByCode(${JSON.stringify(product.code)})">
+                Delete
+              </button>
+            </div>
           </td>
-
-          <td>
-
-            <button
-              class="secondary"
-              type="button"
-              onclick="editProductByCode(${safeCode})"
-            >
-              Edit
-            </button>
-
-            <button
-              class="danger"
-              type="button"
-              onclick="deleteProductByCode(${safeCode})"
-            >
-              ×
-            </button>
-
-          </td>
-
         </tr>
-
       `;
 
-    }
-  ).join("");
-
+    }).join("");
 }
 
 
 /* =========================================================
-   SAVE PRODUCT
-   FIXED
+   PRODUCT SAVE
 ========================================================= */
 
 async function saveProduct(){
 
   const code =
-  $("productCode").value.trim();
+    String($("productCode").value || "")
+      .trim();
 
   const name =
-  $("productName").value.trim();
+    String($("productName").value || "")
+      .trim();
 
   const pack =
-  $("productPack").value.trim();
+    String($("productPack").value || "")
+      .trim();
 
   const price =
-  Number(
-    $("productPrice").value || 0
-  );
+    Number($("productPrice").value || 0);
 
   const stock =
-  Number(
-    $("productStock").value || 0
-  );
+    Number($("productStock").value || 0);
 
 
-  if(!code || !name){
+  if(!code){
 
-    alert(
-      "কোড এবং পণ্যের নাম দিন।"
-    );
-
+    alert("Product Code দিন।");
     return;
 
   }
 
+  if(!name){
 
-  if(!Number.isFinite(price)){
-
-    alert(
-      "সঠিক মূল্য দিন।"
-    );
-
+    alert("Product Name দিন।");
     return;
 
   }
 
+  if(!Number.isFinite(price) || price < 0){
 
-  if(!Number.isFinite(stock)){
-
-    alert(
-      "সঠিক স্টক দিন।"
-    );
-
+    alert("সঠিক Price দিন।");
     return;
 
   }
 
+  if(!Number.isFinite(stock) || stock < 0){
 
-  const item = {
+    alert("সঠিক Stock দিন।");
+    return;
 
-    code,
-    name,
-    pack,
-    price,
-    stock
-
-  };
+  }
 
 
   /* =====================================================
-     EDIT EXISTING PRODUCT
+     EDIT
   ===================================================== */
 
   if(editingProductCode !== null){
 
     const oldCode =
-    String(editingProductCode)
-      .trim();
+      String(editingProductCode).trim();
 
 
-    /*
-      যদি code পরিবর্তন করা হয়,
-      নতুন code আগে থেকেই আছে কি না check।
-    */
+    /* code changed হলে duplicate check */
 
-    if(code !== oldCode){
+    if(oldCode !== code){
 
       const localDuplicate =
-      products.some(
-        function(product){
-
-          return (
-            String(product.code || "")
-              .trim() === code
-            &&
-            String(product.code || "")
-              .trim() !== oldCode
-          );
-
-        }
-      );
-
+        products.some(product =>
+          String(product.code || "").trim() === code
+        );
 
       if(localDuplicate){
 
         alert(
-          "এই নতুন কোডের পণ্য ইতিমধ্যে আছে।"
+          "এই Product Code ইতিমধ্যে আছে।"
         );
 
         return;
-
       }
 
 
-      const duplicateResult =
-      await supabaseClient
-        .from("products")
-        .select("code")
-        .eq("code",code)
-        .maybeSingle();
+      const remoteCheck =
+        await supabaseClient
+          .from("products")
+          .select("code")
+          .eq("code",code)
+          .maybeSingle();
 
-
-      if(
-        duplicateResult.error
-      ){
-
-        console.error(
-          "Duplicate code check error:",
-          duplicateResult.error
-        );
+      if(remoteCheck.error){
 
         alert(
-          "Product code যাচাই করা যায়নি:\n\n" +
-          duplicateResult.error.message
+          "Product Code যাচাই করা যায়নি:\n\n" +
+          remoteCheck.error.message
         );
 
         return;
-
       }
 
-
-      if(duplicateResult.data){
+      if(remoteCheck.data){
 
         alert(
-          "এই কোডের পণ্য Supabase-এ ইতিমধ্যে আছে।"
+          "এই Product Code Supabase-এ ইতিমধ্যে আছে।"
         );
 
         return;
-
       }
 
     }
 
 
-    /*
-      প্রথমে Supabase update।
-      সফল হলে Local update।
-    */
+    /* Supabase update প্রথমে */
 
     const result =
-    await supabaseClient
-      .from("products")
-      .update({
-        code:code,
-        name:name,
-        pack:pack,
-        price:price,
-        stock:stock
-      })
-      .eq(
-        "code",
-        oldCode
-      );
+      await supabaseClient
+        .from("products")
+        .update({
+          code:code,
+          name:name,
+          pack:pack,
+          price:price,
+          stock:stock,
+          updated_at:new Date().toISOString()
+        })
+        .eq("code",oldCode);
 
 
     if(result.error){
@@ -2508,42 +1419,41 @@ async function saveProduct(){
         result.error
       );
 
-
       alert(
-        "পণ্য Edit করা যায়নি।\n\n" +
+        "Product Update করা যায়নি:\n\n" +
         result.error.message
       );
 
       return;
-
     }
 
 
-    /*
-      Supabase সফল হয়েছে।
-      এখন Local list update।
-    */
+    /* Local update */
 
     const index =
-    products.findIndex(
-      function(product){
+      products.findIndex(product =>
+        String(product.code || "").trim() === oldCode
+      );
 
-        return String(product.code || "")
-          .trim() === oldCode;
 
-      }
-    );
+    const updatedProduct = {
+      code:code,
+      name:name,
+      pack:pack,
+      price:price,
+      stock:stock
+    };
 
 
     if(index >= 0){
 
       products[index] =
-      normalizeProduct(item);
+        updatedProduct;
 
     }else{
 
       products.push(
-        normalizeProduct(item)
+        updatedProduct
       );
 
     }
@@ -2551,19 +1461,23 @@ async function saveProduct(){
 
     saveLocalProducts();
 
+    editingProductCode = null;
+
     resetProductForm();
 
     renderManagerProducts();
 
-    updateProductCount();
+    updateDashboard();
 
+    populateOrderProductSelect();
+
+    searchProducts();
 
     alert(
-      "পণ্য সফলভাবে Edit হয়েছে।"
+      "✅ Product সফলভাবে Update হয়েছে।"
     );
 
     return;
-
   }
 
 
@@ -2571,38 +1485,33 @@ async function saveProduct(){
      NEW PRODUCT
   ===================================================== */
 
-  const existsLocal =
-  products.some(
-    function(product){
+  const localDuplicate =
+    products.some(product =>
+      String(product.code || "").trim() === code
+    );
 
-      return String(product.code || "")
-        .trim() === code;
-
-    }
-  );
-
-
-  if(existsLocal){
+  if(localDuplicate){
 
     alert(
-      "এই কোডের পণ্য আগে থেকেই আছে।"
+      "এই Product Code ইতিমধ্যে আছে।"
     );
 
     return;
-
   }
 
 
-  /*
-    Supabase-এ আগে Insert।
-  */
+  /* Supabase insert */
 
   const result =
-  await supabaseClient
-    .from("products")
-    .insert([
-      item
-    ]);
+    await supabaseClient
+      .from("products")
+      .insert({
+        code:code,
+        name:name,
+        pack:pack,
+        price:price,
+        stock:stock
+      });
 
 
   if(result.error){
@@ -2612,25 +1521,22 @@ async function saveProduct(){
       result.error
     );
 
-
     alert(
-      "পণ্য সংরক্ষণ করা যায়নি।\n\n" +
+      "Product Save করা যায়নি:\n\n" +
       result.error.message
     );
 
     return;
-
   }
 
 
-  /*
-    Supabase সফল হলে Local-এ যোগ।
-  */
-
-  products.push(
-    normalizeProduct(item)
-  );
-
+  products.push({
+    code:code,
+    name:name,
+    pack:pack,
+    price:price,
+    stock:stock
+  });
 
   saveLocalProducts();
 
@@ -2638,154 +1544,110 @@ async function saveProduct(){
 
   renderManagerProducts();
 
-  updateProductCount();
+  updateDashboard();
 
+  populateOrderProductSelect();
+
+  searchProducts();
 
   alert(
-    "পণ্য সফলভাবে সংরক্ষণ হয়েছে।"
+    "✅ নতুন Product সফলভাবে Save হয়েছে।"
   );
-
 }
 
 
 /* =========================================================
-   EDIT PRODUCT
-   FIXED
+   PRODUCT EDIT
 ========================================================= */
 
 function editProductByCode(code){
 
-  const wantedCode =
-  String(code ?? "")
-    .trim();
-
+  const targetCode =
+    String(code ?? "").trim();
 
   const product =
-  products.find(
-    function(item){
-
-      return String(item.code ?? "")
-        .trim() === wantedCode;
-
-    }
-  );
-
+    products.find(p =>
+      String(p.code ?? "").trim() === targetCode
+    );
 
   if(!product){
 
     alert(
-      "এই Product পাওয়া যায়নি।\n\n" +
-      "Supabase থেকে Product list Refresh করুন।"
+      "এই Product পাওয়া যায়নি।\nSupabase থেকে Refresh করুন।"
     );
 
     return;
-
   }
 
 
   editingProductCode =
-  String(product.code ?? "")
-    .trim();
+    targetCode;
 
+  $("editingProductCode").value =
+    targetCode;
 
   $("productCode").value =
-  product.code || "";
+    product.code;
 
   $("productName").value =
-  product.name || "";
+    product.name;
 
   $("productPack").value =
-  product.pack || "";
+    product.pack;
 
   $("productPrice").value =
-  product.price ?? 0;
+    product.price;
 
   $("productStock").value =
-  product.stock ?? 0;
+    product.stock;
 
-
-  /*
-    Form-এর কাছে নিয়ে যাবে।
-  */
+  $("productCode").disabled = false;
 
   $("productCode").focus();
 
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
 }
 
 
 /* =========================================================
-   DELETE PRODUCT
-   FIXED
+   PRODUCT DELETE
 ========================================================= */
 
 async function deleteProductByCode(code){
 
-  const wantedCode =
-  String(code ?? "")
-    .trim();
-
-
-  if(!wantedCode){
-
-    alert(
-      "Product code পাওয়া যায়নি।"
-    );
-
-    return;
-
-  }
-
+  const targetCode =
+    String(code ?? "").trim();
 
   const product =
-  products.find(
-    function(item){
-
-      return String(item.code ?? "")
-        .trim() === wantedCode;
-
-    }
-  );
-
+    products.find(p =>
+      String(p.code ?? "").trim() === targetCode
+    );
 
   if(!product){
 
-    alert(
-      "এই Product পাওয়া যায়নি।"
+    alert("Product পাওয়া যায়নি।");
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      `আপনি কি "${product.name}" (${targetCode}) Product টি Delete করতে চান?`
     );
 
-    return;
-
-  }
+  if(!confirmed) return;
 
 
-  if(
-    !confirm(
-      "এই পণ্যটি মুছে ফেলবেন?\n\n" +
-      product.name +
-      "\nকোড: " +
-      wantedCode
-    )
-  ){
-
-    return;
-
-  }
-
-
-  /*
-    IMPORTANT:
-    আগে Supabase থেকে Delete।
-    Supabase সফল হলে Local থেকে Delete।
-  */
+  /* Supabase delete প্রথমে */
 
   const result =
-  await supabaseClient
-    .from("products")
-    .delete()
-    .eq(
-      "code",
-      wantedCode
-    );
+    await supabaseClient
+      .from("products")
+      .delete()
+      .eq("code",targetCode);
 
 
   if(result.error){
@@ -2795,42 +1657,28 @@ async function deleteProductByCode(code){
       result.error
     );
 
-
     alert(
-      "পণ্য Delete করা যায়নি।\n\n" +
+      "Product Delete করা যায়নি:\n\n" +
       result.error.message
     );
 
     return;
-
   }
 
 
-  /*
-    Supabase সফল।
-    এখন Local থেকে Delete।
-  */
+  /* Local delete */
 
   products =
-  products.filter(
-    function(product){
-
-      return String(product.code ?? "")
-        .trim() !== wantedCode;
-
-    }
-  );
-
+    products.filter(p =>
+      String(p.code ?? "").trim() !== targetCode
+    );
 
   saveLocalProducts();
 
-  renderManagerProducts();
-
-  updateProductCount();
-
 
   if(
-    editingProductCode === wantedCode
+    editingProductCode !== null &&
+    String(editingProductCode).trim() === targetCode
   ){
 
     resetProductForm();
@@ -2838,359 +1686,318 @@ async function deleteProductByCode(code){
   }
 
 
-  alert(
-    "পণ্য সফলভাবে Delete হয়েছে।"
-  );
+  renderManagerProducts();
 
+  updateDashboard();
+
+  populateOrderProductSelect();
+
+  searchProducts();
+
+
+  alert(
+    "✅ Product সফলভাবে Delete হয়েছে।"
+  );
 }
 
 
 /* =========================================================
-   ORDER FORM
+   PRODUCT SEARCH
 ========================================================= */
 
-function openOrderForm(){
+function searchProducts(){
 
-  $("shop").value="";
+  const container =
+    $("productResults");
 
-  $("mobile").value="";
+  if(!container) return;
 
-  $("address").value="";
+  const query =
+    String($("productSearch").value || "")
+      .trim()
+      .toLowerCase();
 
-  $("representative").value="";
+  if(!query){
+
+    container.innerHTML = "";
+
+    return;
+  }
+
+
+  const result =
+    products.filter(product => {
+
+      const code =
+        String(product.code || "").toLowerCase();
+
+      const name =
+        String(product.name || "").toLowerCase();
+
+      return (
+        code.includes(query) ||
+        name.includes(query)
+      );
+
+    }).slice(0,20);
+
+
+  if(!result.length){
+
+    container.innerHTML =
+      `<div class="empty">কোনো Product পাওয়া যায়নি</div>`;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    result.map(product => `
+      <div class="product-result">
+
+        <div>
+          <strong>
+            ${escapeHtml(product.name)}
+          </strong>
+
+          <div class="small">
+            Code: ${escapeHtml(product.code)}
+            · Pack: ${escapeHtml(product.pack)}
+            · Stock: ${Number(product.stock || 0)}
+          </div>
+        </div>
+
+        <strong>
+          ${money(product.price)}
+        </strong>
+
+      </div>
+    `).join("");
+}
+
+
+/* =========================================================
+   ORDER PRODUCT SELECT
+========================================================= */
+
+function populateOrderProductSelect(){
+
+  const select =
+    $("orderProductSelect");
+
+  if(!select) return;
+
+  select.innerHTML =
+    `<option value="">-- Product নির্বাচন করুন --</option>` +
+    products.map(product => `
+      <option value="${escapeHtml(product.code)}">
+        ${escapeHtml(product.name)}
+        (${escapeHtml(product.code)})
+        — ${money(product.price)}
+      </option>
+    `).join("");
+}
+
+
+/* =========================================================
+   ORDER
+========================================================= */
+
+function openOrderModal(){
 
   $("orderDate").value =
-  today();
+    $("orderDate").value || today();
 
-  $("deliveryDate").value="";
+  $("deliveryDate").value =
+    $("deliveryDate").value || today();
 
-  $("orderNote").value="";
+  populateOrderProductSelect();
 
-  $("orderProducts").innerHTML="";
-
-
-  if(!products.length){
-
-    alert(
-      "কোনো Product পাওয়া যায়নি।\n\n" +
-      "প্রথমে Product section খুলে Supabase থেকে Product load করুন।"
-    );
-
-    return;
-
-  }
-
-
-  addOrderProductRow();
-
-  calculateOrderTotal();
-
-  openModal(
-    "orderModal"
-  );
-
+  openModal("orderModal");
 }
 
 
-/* =========================================================
-   ADD ORDER PRODUCT
-========================================================= */
+function addOrderProduct(){
 
-function addOrderProductRow(){
+  const code =
+    String($("orderProductSelect").value || "")
+      .trim();
 
-  if(!products.length){
+  const qty =
+    Number($("orderQty").value || 0);
 
-    alert(
-      "কোনো Product নেই।"
-    );
+  const bonus =
+    Number($("orderBonus").value || 0);
 
+
+  if(!code){
+
+    alert("Product নির্বাচন করুন।");
     return;
-
   }
 
+  if(qty <= 0){
 
-  const row =
-  document.createElement("div");
-
-
-  row.className =
-  "product-row order-product-row";
-
-
-  let options =
-  `<option value="">
-     পণ্য নির্বাচন
-   </option>`;
-
-
-  products.forEach(
-    function(product){
-
-      options +=
-      `
-        <option
-          value="${esc(product.code)}"
-        >
-          ${esc(product.code)}
-          —
-          ${esc(product.name)}
-          —
-          ৳${money(product.price)}
-        </option>
-      `;
-
-    }
-  );
-
-
-  row.innerHTML = `
-
-    <select
-      class="op-product"
-      onchange="orderProductChanged(this)"
-    >
-      ${options}
-    </select>
-
-
-    <input
-      class="op-pack pack"
-      placeholder="প্যাক"
-      readonly
-    >
-
-
-    <input
-      class="op-price"
-      type="number"
-      step="0.01"
-      placeholder="দাম"
-      oninput="calculateOrderTotal()"
-    >
-
-
-    <input
-      class="op-qty"
-      type="number"
-      min="1"
-      value="1"
-      oninput="calculateOrderTotal()"
-    >
-
-
-    <input
-      class="op-bonus"
-      type="number"
-      min="0"
-      value="0"
-      placeholder="বোনাস"
-    >
-
-
-    <button
-      class="danger"
-      type="button"
-      onclick="
-        this.parentElement.remove();
-        calculateOrderTotal();
-      "
-    >
-      ×
-    </button>
-
-  `;
-
-
-  $("orderProducts")
-    .appendChild(row);
-
-}
-
-
-/* =========================================================
-   PRODUCT SELECTED
-========================================================= */
-
-function orderProductChanged(select){
-
-  const row =
-  select.closest(
-    ".order-product-row"
-  );
+    alert("Quantity দিন।");
+    return;
+  }
 
 
   const product =
-  products.find(
-    function(item){
+    products.find(p =>
+      String(p.code || "").trim() === code
+    );
 
-      return String(item.code) ===
-      String(select.value);
 
-    }
+  if(!product){
+
+    alert("Product পাওয়া যায়নি।");
+    return;
+  }
+
+
+  const existing =
+    currentOrderItems.find(item =>
+      String(item.code) === code
+    );
+
+
+  if(existing){
+
+    existing.quantity += qty;
+    existing.bonus += bonus;
+
+  }else{
+
+    currentOrderItems.push({
+      code:product.code,
+      name:product.name,
+      pack:product.pack,
+      price:Number(product.price || 0),
+      quantity:qty,
+      bonus:bonus,
+      value:Number(product.price || 0) * qty
+    });
+
+  }
+
+
+  $("orderQty").value = 1;
+  $("orderBonus").value = 0;
+
+  renderOrderItems();
+}
+
+
+function renderOrderItems(){
+
+  const container =
+    $("orderItems");
+
+  if(!currentOrderItems.length){
+
+    container.innerHTML =
+      `<div class="empty">এখনও কোনো Product যোগ করা হয়নি।</div>`;
+
+    $("orderTotal").textContent =
+      money(0);
+
+    return;
+  }
+
+
+  container.innerHTML =
+    currentOrderItems.map((item,index) => {
+
+      const value =
+        Number(item.price || 0) *
+        Number(item.quantity || 0);
+
+      item.value = value;
+
+      return `
+        <div class="order-item">
+
+          <div class="order-item-head">
+
+            <div>
+              <strong>
+                ${escapeHtml(item.name)}
+              </strong>
+
+              <div class="small">
+                ${escapeHtml(item.code)}
+                · Pack ${escapeHtml(item.pack)}
+              </div>
+            </div>
+
+            <button
+              class="btn btn-small btn-danger"
+              onclick="removeOrderProduct(${index})">
+              ✕
+            </button>
+
+          </div>
+
+          <div style="margin-top:8px">
+            Qty: <strong>${item.quantity}</strong>
+            · Bonus: <strong>${item.bonus}</strong>
+            · Price: <strong>${money(item.price)}</strong>
+            · Value: <strong>${money(value)}</strong>
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+
+  const total =
+    currentOrderItems.reduce(
+      (sum,item) =>
+        sum +
+        Number(item.price || 0) *
+        Number(item.quantity || 0),
+      0
+    );
+
+
+  $("orderTotal").textContent =
+    money(total);
+}
+
+
+function removeOrderProduct(index){
+
+  currentOrderItems.splice(
+    index,
+    1
   );
 
-
-  if(!product) return;
-
-
-  row.querySelector(
-    ".op-pack"
-  ).value =
-  product.pack || "";
-
-
-  row.querySelector(
-    ".op-price"
-  ).value =
-  product.price || 0;
-
-
-  calculateOrderTotal();
-
+  renderOrderItems();
 }
 
 
-/* =========================================================
-   ORDER TOTAL
-========================================================= */
+function resetOrderForm(){
 
-function calculateOrderTotal(){
+  $("shop").value = "";
+  $("mobile").value = "";
+  $("address").value = "";
+  $("representative").value = "";
+  $("note").value = "";
 
-  let total=0;
+  $("orderDate").value =
+    today();
 
+  $("deliveryDate").value =
+    today();
 
-  document
-    .querySelectorAll(
-      ".order-product-row"
-    )
-    .forEach(
-      function(row){
+  $("orderQty").value = 1;
+  $("orderBonus").value = 0;
 
-        const price =
-        Number(
-          row.querySelector(
-            ".op-price"
-          )?.value || 0
-        );
+  currentOrderItems = [];
 
-
-        const qty =
-        Number(
-          row.querySelector(
-            ".op-qty"
-          )?.value || 0
-        );
-
-
-        total +=
-        price * qty;
-
-      }
-    );
-
-
-  $("orderTotal")
-    .textContent =
-    money(total);
-
-
-  return total;
-
-}
-
-
-/* =========================================================
-   COLLECT ORDER PRODUCTS
-========================================================= */
-
-function collectOrderProducts(){
-
-  const result=[];
-
-
-  document
-    .querySelectorAll(
-      ".order-product-row"
-    )
-    .forEach(
-      function(row){
-
-        const code =
-        row.querySelector(
-          ".op-product"
-        )?.value;
-
-
-        if(!code) return;
-
-
-        const product =
-        products.find(
-          function(item){
-
-            return String(item.code) ===
-            String(code);
-
-          }
-        );
-
-
-        const price =
-        Number(
-          row.querySelector(
-            ".op-price"
-          )?.value || 0
-        );
-
-
-        const qty =
-        Number(
-          row.querySelector(
-            ".op-qty"
-          )?.value || 0
-        );
-
-
-        const bonus =
-        Number(
-          row.querySelector(
-            ".op-bonus"
-          )?.value || 0
-        );
-
-
-        if(qty > 0){
-
-          result.push({
-
-            code,
-
-            name:
-            product?.name || "",
-
-            pack:
-            row.querySelector(
-              ".op-pack"
-            )?.value ||
-            product?.pack ||
-            "",
-
-            price,
-
-            qty,
-
-            bonus
-
-          });
-
-        }
-
-      }
-    );
-
-
-  return result;
-
+  renderOrderItems();
 }
 
 
@@ -3201,99 +2008,88 @@ function collectOrderProducts(){
 async function saveOrder(){
 
   const shop =
-  $("shop").value.trim();
+    String($("shop").value || "").trim();
 
   const address =
-  $("address").value.trim();
+    String($("address").value || "").trim();
 
   const mobile =
-  $("mobile").value.trim();
+    String($("mobile").value || "").trim();
 
   const representative =
-  $("representative").value.trim();
+    String($("representative").value || "").trim();
 
-  const orderDate =
-  $("orderDate").value ||
-  today();
+  const order_date =
+    $("orderDate").value || today();
 
-  const deliveryDate =
-  $("deliveryDate").value ||
-  "";
+  const delivery_date =
+    $("deliveryDate").value || today();
 
   const note =
-  $("orderNote").value.trim();
-
-  const orderItems =
-  collectOrderProducts();
-
-  const total =
-  calculateOrderTotal();
+    String($("note").value || "").trim();
 
 
   if(!shop){
 
-    alert(
-      "দোকানের নাম দিন।"
-    );
-
+    alert("Shop Name দিন।");
     return;
-
   }
 
 
-  if(!orderItems.length){
+  if(!currentOrderItems.length){
 
-    alert(
-      "কমপক্ষে একটি পণ্য নির্বাচন করুন।"
-    );
-
+    alert("কমপক্ষে একটি Product যোগ করুন।");
     return;
-
   }
 
 
-  const button =
-  $("saveOrderBtn");
+  const total =
+    currentOrderItems.reduce(
+      (sum,item) =>
+        sum +
+        Number(item.price || 0) *
+        Number(item.quantity || 0),
+      0
+    );
 
 
-  button.disabled=true;
+  const orderData = {
 
-  button.textContent =
-  "অর্ডার পাঠানো হচ্ছে...";
+    shop:shop,
 
+    address:address,
 
-  const payload = {
+    mobile:mobile,
 
-    shop,
+    representative:representative,
 
-    address,
+    order_date:order_date,
 
-    mobile,
+    delivery_date:delivery_date,
 
-    representative,
+    note:note,
 
-    order_date:
-    orderDate,
+    products:currentOrderItems.map(item => ({
+      code:item.code,
+      name:item.name,
+      pack:item.pack,
+      price:item.price,
+      quantity:item.quantity,
+      bonus:item.bonus,
+      value:
+        Number(item.price || 0) *
+        Number(item.quantity || 0)
+    })),
 
-    delivery_date:
-    deliveryDate,
-
-    note,
-
-    products:
-    orderItems,
-
-    total
+    total:total
 
   };
 
 
   const result =
-  await supabaseClient
-    .from("orders")
-    .insert([
-      payload
-    ]);
+    await supabaseClient
+      .from("orders")
+      .insert(orderData);
 
 
   if(result.error){
@@ -3303,396 +2099,150 @@ async function saveOrder(){
       result.error
     );
 
-
     alert(
-      "অর্ডার পাঠানো যায়নি:\n\n" +
+      "অর্ডার Save করা যায়নি:\n\n" +
       result.error.message
     );
 
-
-    button.disabled=false;
-
-    button.textContent =
-    "অর্ডার পাঠান";
-
     return;
-
   }
 
 
-  const localOrder = {
-
-    ...payload,
-
-    id:
-    "local-" +
-    Date.now(),
-
-    created_at:
-    new Date().toISOString()
-
-  };
-
-
-  orders.unshift(
-    localOrder
-  );
-
+  orders.unshift({
+    ...orderData,
+    id:"local-" + Date.now(),
+    created_at:new Date().toISOString()
+  });
 
   saveLocalOrders();
 
+  updateDashboard();
 
-  button.disabled=false;
-
-  button.textContent =
-  "অর্ডার পাঠান";
-
-
-  closeModal(
-    "orderModal"
+  addNotification(
+    "নতুন অর্ডার",
+    `${shop} থেকে নতুন অর্ডার এসেছে।`
   );
 
 
   alert(
-    "অর্ডার সফলভাবে পাঠানো হয়েছে।"
+    "✅ অর্ডার সফলভাবে পাঠানো হয়েছে।"
   );
+
+
+  resetOrderForm();
+
+  closeModal("orderModal");
+
+  await loadOrdersFromSupabase();
 
 }
 
 
 /* =========================================================
-   LOAD ORDERS FROM SUPABASE
+   ORDERS FROM SUPABASE
 ========================================================= */
 
-async function loadOrdersFromSupabase(){
-
-  const result =
-  await supabaseClient
-    .from("orders")
-    .select("*")
-    .order(
-      "created_at",
-      {
-        ascending:false
-      }
-    )
-    .limit(500);
-
-
-  if(result.error){
-
-    console.error(
-      "ORDER LOAD ERROR:",
-      result.error
-    );
-
-    renderHistory();
-
-    return;
-
-  }
-
-
-  if(
-    Array.isArray(
-      result.data
-    )
-  ){
-
-    orders =
-    result.data;
-
-    saveLocalOrders();
-
-
-    if(!initialRemoteLoadDone){
-
-      result.data.forEach(
-        function(order){
-
-          if(order.id){
-
-            lastKnownRemoteOrderIds.add(
-              String(order.id)
-            );
-
-          }
-
-        }
-      );
-
-
-      initialRemoteLoadDone =
-      true;
-
-    }
-
-  }
-
-
-  renderHistory();
-
-}
-
-
-/* =========================================================
-   REALTIME NEW ORDER
-========================================================= */
-
-function handleRealtimeOrder(order){
-
-  if(!order) return;
-
-  if(!order.id) return;
-
-
-  const id =
-  String(order.id);
-
-
-  if(
-    lastKnownRemoteOrderIds.has(id)
-  ){
-
-    return;
-
-  }
-
-
-  lastKnownRemoteOrderIds.add(
-    id
-  );
-
-
-  orders.unshift(
-    order
-  );
-
-
-  orders =
-  orders.slice(
-    0,
-    500
-  );
-
-
-  saveLocalOrders();
-
-
-  addNotification(
-    order
-  );
-
-
-  if(
-    $("historyModal")
-      .classList
-      .contains("show")
-  ){
-
-    renderHistory();
-
-  }
-
-}
-
-
-/* =========================================================
-   START REALTIME
-========================================================= */
-
-function startRealtime(){
+async function loadOrdersFromSupabase(showMessage=false){
 
   try{
 
-    if(realtimeChannel){
-
-      supabaseClient
-        .removeChannel(
-          realtimeChannel
-        );
-
-    }
-
-
-    realtimeChannel =
-    supabaseClient
-      .channel(
-        "orders-realtime-admin"
-      )
-      .on(
-        "postgres_changes",
-        {
-          event:"INSERT",
-          schema:"public",
-          table:"orders"
-        },
-        function(payload){
-
-          console.log(
-            "Realtime new order:",
-            payload.new
-          );
-
-
-          handleRealtimeOrder(
-            payload.new
-          );
-
-        }
-      )
-      .subscribe(
-        function(status){
-
-          console.log(
-            "Realtime status:",
-            status
-          );
-
-        }
-      );
-
-
-  }catch(error){
-
-    console.error(
-      "Realtime error:",
-      error
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   FALLBACK POLLING
-========================================================= */
-
-function startOrderPolling(){
-
-  if(pollingTimer){
-
-    clearInterval(
-      pollingTimer
-    );
-
-  }
-
-
-  pollingTimer =
-  setInterval(
-    async function(){
-
-      const result =
+    const result =
       await supabaseClient
         .from("orders")
         .select("*")
-        .order(
-          "created_at",
-          {
-            ascending:false
-          }
-        )
-        .limit(100);
+        .order("created_at",{ascending:false});
 
 
-      if(
-        result.error ||
-        !Array.isArray(
-          result.data
-        )
-      ){
+    if(result.error){
 
-        return;
+      console.error(
+        "ORDER LOAD ERROR:",
+        result.error
+      );
 
-      }
+      if(showMessage){
 
-
-      if(!initialRemoteLoadDone){
-
-        result.data.forEach(
-          function(order){
-
-            if(order.id){
-
-              lastKnownRemoteOrderIds.add(
-                String(order.id)
-              );
-
-            }
-
-          }
+        alert(
+          "Order Load করা যায়নি:\n\n" +
+          result.error.message
         );
 
-
-        initialRemoteLoadDone =
-        true;
-
-        return;
-
       }
 
-
-      result.data.forEach(
-        function(order){
-
-          if(!order.id) return;
+      return false;
+    }
 
 
-          const id =
-          String(order.id);
+    if(Array.isArray(result.data)){
 
-
-          if(
-            !lastKnownRemoteOrderIds.has(id)
-          ){
-
-            lastKnownRemoteOrderIds.add(
-              id
-            );
-
-
-            orders.unshift(
-              order
-            );
-
-
-            addNotification(
-              order
-            );
-
-          }
-
-        }
-      );
+      const oldIds =
+        new Set(lastKnownRemoteOrderIds);
 
 
       orders =
-      orders.slice(
-        0,
-        500
-      );
-
+        result.data;
 
       saveLocalOrders();
 
 
+      lastKnownRemoteOrderIds =
+        new Set(
+          result.data
+            .map(row => String(row.id))
+        );
+
+
+      if(initialRemoteLoadDone){
+
+        for(const row of result.data){
+
+          const id =
+            String(row.id);
+
+          if(!oldIds.has(id)){
+
+            addNotification(
+              "নতুন অর্ডার",
+              `${row.shop || "একটি দোকান"} থেকে নতুন অর্ডার এসেছে।`
+            );
+
+          }
+
+        }
+
+      }
+
+
+      initialRemoteLoadDone = true;
+
+      updateDashboard();
+
       if(
-        $("historyModal")
-          .classList
-          .contains("show")
+        $("historyModal").style.display === "block"
       ){
 
         renderHistory();
 
       }
 
+      if(showMessage){
 
-    },
-    20000
-  );
+        alert(
+          "✅ Orders Refresh হয়েছে।"
+        );
 
+      }
+
+      return true;
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+  return false;
 }
 
 
@@ -3704,621 +2254,700 @@ function openHistory(){
 
   renderHistory();
 
-  openModal(
-    "historyModal"
-  );
+  openModal("historyModal");
 
 }
 
 
 function renderHistory(){
 
-  const search =
-  (
-    $("historySearch").value ||
-    ""
-  )
-  .trim()
-  .toLowerCase();
+  const container =
+    $("historyList");
 
+  if(!container) return;
+
+
+  const search =
+    String($("historySearch").value || "")
+      .trim()
+      .toLowerCase();
 
   const date =
-  $("historyDate").value ||
-  "";
+    $("historyDate").value;
 
 
   historyFilteredOrders =
-  orders.filter(
-    function(order){
+    orders.filter(order => {
 
-      const text = [
+      const shop =
+        String(order.shop || "").toLowerCase();
 
-        order.shop,
-
-        order.mobile,
-
-        order.address,
-
-        order.representative
-
-      ]
-      .join(" ")
-      .toLowerCase();
-
+      const mobile =
+        String(order.mobile || "").toLowerCase();
 
       const orderDate =
-      String(
-        order.order_date ||
-        ""
-      ).slice(
-        0,
-        10
-      );
+        String(order.order_date || "")
+          .slice(0,10);
 
 
-      return (
-
-        (!search ||
-          text.includes(search))
-
-        &&
-
-        (!date ||
-          orderDate === date)
-
-      );
-
-    }
-  );
+      const matchSearch =
+        !search ||
+        shop.includes(search) ||
+        mobile.includes(search);
 
 
-  if(
-    !historyFilteredOrders.length
-  ){
+      const matchDate =
+        !date ||
+        orderDate === date;
 
-    $("historyBody").innerHTML =
-    `
-      <tr>
-        <td
-          colspan="6"
-          class="empty"
-        >
-          কোনো অর্ডার পাওয়া যায়নি
-        </td>
-      </tr>
-    `;
+
+      return matchSearch && matchDate;
+
+    });
+
+
+  if(!historyFilteredOrders.length){
+
+    container.innerHTML =
+      `<div class="empty">
+        কোনো Order পাওয়া যায়নি।
+      </div>`;
 
     return;
-
   }
 
 
-  $("historyBody").innerHTML =
-  historyFilteredOrders.map(
-    function(order,index){
+  container.innerHTML =
+    historyFilteredOrders.map((order,index) => {
 
-      const items =
-      Array.isArray(
-        order.products
-      )
-      ?
-      order.products
-      :
-      [];
-
+      const itemCount =
+        Array.isArray(order.products)
+          ? order.products.length
+          : 0;
 
       return `
+        <div class="card">
 
-        <tr>
+          <div style="display:flex;justify-content:space-between;gap:8px">
 
-          <td>
-            ${
-              esc(
-                order.order_date ||
-                formatDate(
-                  order.created_at
-                )
-              )
-            }
-          </td>
+            <div>
+              <strong>
+                ${escapeHtml(order.shop || "Shop")}
+              </strong>
 
+              <div class="small">
+                ${escapeHtml(order.mobile || "")}
+              </div>
 
-          <td>
+              <div class="small">
+                ${escapeHtml(order.order_date || "")}
+              </div>
+            </div>
 
             <strong>
-              ${esc(order.shop)}
+              ${money(order.total)}
             </strong>
 
-            <br>
+          </div>
 
-            <span class="small">
-              ${esc(order.address || "")}
-            </span>
+          <div class="small" style="margin-top:8px">
+            ${itemCount} টি Product
+          </div>
 
-          </td>
+          <button
+            class="btn btn-small btn-light"
+            style="margin-top:8px"
+            onclick="showOrderDetail(${index})">
+            বিস্তারিত
+          </button>
 
-
-          <td>
-            ${esc(order.mobile)}
-          </td>
-
-
-          <td>
-            ৳ ${money(order.total)}
-          </td>
-
-
-          <td>
-            ${items.length}
-          </td>
-
-
-          <td>
-
-            <button
-              class="secondary"
-              type="button"
-              onclick="showOrderDetailByIndex(${index})"
-            >
-              দেখুন
-            </button>
-
-          </td>
-
-        </tr>
-
+        </div>
       `;
 
-    }
-  ).join("");
-
+    }).join("");
 }
 
 
-/* =========================================================
-   SHOW HISTORY ORDER
-========================================================= */
-
-function showOrderDetailByIndex(index){
+function showOrderDetail(index){
 
   const order =
-  historyFilteredOrders[index];
+    historyFilteredOrders[index];
 
-  if(order){
-
-    showOrderDetail(
-      order
-    );
-
-  }
-
-}
+  if(!order) return;
 
 
-/* =========================================================
-   ORDER DETAIL
-========================================================= */
+  const productsHtml =
+    Array.isArray(order.products)
+      ? order.products.map(item => `
+          <tr>
+            <td>${escapeHtml(item.code)}</td>
+            <td>${escapeHtml(item.name)}</td>
+            <td>${item.quantity}</td>
+            <td>${item.bonus || 0}</td>
+            <td>${money(item.price)}</td>
+            <td>${money(item.value)}</td>
+          </tr>
+        `).join("")
+      : "";
 
-function showOrderDetail(order){
 
-  const items =
-  Array.isArray(
-    order.products
-  )
-  ?
-  order.products
-  :
-  [];
-
-
-  $("orderDetail").innerHTML = `
+  $("detailContent").innerHTML = `
 
     <div class="card">
 
-      <div class="grid2">
+      <strong>Shop:</strong>
+      ${escapeHtml(order.shop || "")}
 
-        <div>
-          <strong>দোকান</strong>
-          <br>
-          ${esc(order.shop)}
-        </div>
+      <br>
 
+      <strong>Mobile:</strong>
+      ${escapeHtml(order.mobile || "")}
 
-        <div>
-          <strong>মোবাইল</strong>
-          <br>
-          ${esc(order.mobile)}
-        </div>
+      <br>
 
+      <strong>Address:</strong>
+      ${escapeHtml(order.address || "")}
 
-        <div>
-          <strong>ঠিকানা</strong>
-          <br>
-          ${esc(order.address)}
-        </div>
+      <br>
 
+      <strong>Representative:</strong>
+      ${escapeHtml(order.representative || "")}
 
-        <div>
-          <strong>রিপ্রেজেন্টেটিভ</strong>
-          <br>
-          ${esc(order.representative)}
-        </div>
+      <br>
 
+      <strong>Order Date:</strong>
+      ${escapeHtml(order.order_date || "")}
 
-        <div>
-          <strong>অর্ডার তারিখ</strong>
-          <br>
-          ${esc(order.order_date)}
-        </div>
+      <br>
 
+      <strong>Delivery Date:</strong>
+      ${escapeHtml(order.delivery_date || "")}
 
-        <div>
-          <strong>ডেলিভারি</strong>
-          <br>
-          ${esc(order.delivery_date)}
-        </div>
+      <br>
 
-      </div>
-
-
-      ${
-        order.note
-        ?
-        `
-          <p>
-            <strong>নোট:</strong>
-            ${esc(order.note)}
-          </p>
-        `
-        :
-        ""
-      }
+      <strong>Note:</strong>
+      ${escapeHtml(order.note || "")}
 
     </div>
-
 
     <div class="table-wrap">
 
       <table>
 
         <thead>
-
           <tr>
-            <th>কোড</th>
-            <th>পণ্য</th>
-            <th>প্যাক</th>
-            <th>দাম</th>
+            <th>Code</th>
+            <th>Product</th>
             <th>Qty</th>
             <th>Bonus</th>
-            <th>মোট</th>
+            <th>Price</th>
+            <th>Value</th>
           </tr>
-
         </thead>
 
-
         <tbody>
-
-          ${
-            items.map(
-              function(product){
-
-                return `
-
-                  <tr>
-
-                    <td>
-                      ${esc(product.code)}
-                    </td>
-
-                    <td>
-                      ${esc(product.name)}
-                    </td>
-
-                    <td>
-                      ${esc(product.pack)}
-                    </td>
-
-                    <td>
-                      ৳ ${money(product.price)}
-                    </td>
-
-                    <td>
-                      ${esc(product.qty)}
-                    </td>
-
-                    <td>
-                      ${esc(product.bonus)}
-                    </td>
-
-                    <td>
-                      ৳ ${
-                        money(
-                          Number(product.price) *
-                          Number(product.qty)
-                        )
-                      }
-                    </td>
-
-                  </tr>
-
-                `;
-
-              }
-            ).join("")
-          }
-
+          ${productsHtml}
         </tbody>
 
       </table>
 
     </div>
 
-
-    <div
-      class="order-total"
-      style="margin-top:15px"
-    >
-      মোট:
-      ৳ ${money(order.total)}
+    <div class="card">
+      <strong>
+        Total: ${money(order.total)}
+      </strong>
     </div>
 
   `;
 
 
-  openModal(
-    "detailModal"
-  );
-
+  openModal("detailModal");
 }
 
-
-/* =========================================================
-   DATE FORMAT
-========================================================= */
-
-function formatDate(value){
-
-  if(!value) return "";
-
-  try{
-
-    return new Date(value)
-      .toLocaleDateString(
-        "bn-BD"
-      );
-
-  }catch(error){
-
-    return String(value);
-
-  }
-
-}
-
-
-function formatDateTime(value){
-
-  if(!value) return "";
-
-  try{
-
-    return new Date(value)
-      .toLocaleString(
-        "bn-BD"
-      );
-
-  }catch(error){
-
-    return String(value);
-
-  }
-
-}
-
-
-/* =========================================================
-   CLEAR LOCAL HISTORY
-========================================================= */
 
 function clearLocalHistory(){
 
   if(
     !confirm(
-      "লোকাল হিস্টোরি মুছবেন? Supabase-এর অর্ডার মুছবে না।"
+      "শুধু এই ডিভাইসের Local Order History মুছবেন?"
     )
-  ){
-
-    return;
-
-  }
+  ) return;
 
 
-  orders=[];
+  orders = [];
 
   saveLocalOrders();
 
   renderHistory();
 
+  updateDashboard();
+
 }
 
 
 /* =========================================================
-   ONLINE ORDER
+   NOTIFICATIONS
+========================================================= */
+
+function saveNotifications(){
+
+  localStorage.setItem(
+    NOTIFICATION_KEY,
+    JSON.stringify(notifications)
+  );
+}
+
+
+function addNotification(title,message){
+
+  notifications.unshift({
+
+    id:Date.now(),
+
+    title:title,
+
+    message:message,
+
+    time:new Date().toISOString(),
+
+    read:false
+
+  });
+
+
+  notifications =
+    notifications.slice(0,50);
+
+  saveNotifications();
+
+  renderNotifications();
+
+  playNotificationSound();
+
+  browserNotification(
+    title,
+    message
+  );
+}
+
+
+function renderNotifications(){
+
+  const list =
+    $("notificationList");
+
+  const badge =
+    $("notificationBadge");
+
+
+  if(!list || !badge) return;
+
+
+  const unread =
+    notifications.filter(n => !n.read).length;
+
+
+  badge.textContent =
+    unread;
+
+
+  badge.style.display =
+    unread ? "inline-block" : "none";
+
+
+  if(!notifications.length){
+
+    list.innerHTML =
+      `<div class="empty">
+        কোনো Notification নেই।
+      </div>`;
+
+    return;
+  }
+
+
+  list.innerHTML =
+    notifications.map((item,index) => `
+
+      <div
+        class="notification ${item.read ? "" : "unread"}"
+        onclick="readNotification(${index})">
+
+        <strong>
+          ${escapeHtml(item.title)}
+        </strong>
+
+        <div>
+          ${escapeHtml(item.message)}
+        </div>
+
+        <div class="small">
+          ${new Date(item.time).toLocaleString("bn-BD")}
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+
+function readNotification(index){
+
+  if(notifications[index]){
+
+    notifications[index].read = true;
+
+    saveNotifications();
+
+    renderNotifications();
+
+  }
+
+}
+
+
+function toggleNotifications(){
+
+  const panel =
+    $("notificationPanel");
+
+  const visible =
+    panel.style.display === "block";
+
+  panel.style.display =
+    visible ? "none" : "block";
+
+
+  if(!visible){
+
+    notifications =
+      notifications.map(n => ({
+        ...n,
+        read:true
+      }));
+
+    saveNotifications();
+
+    renderNotifications();
+
+  }
+}
+
+
+function clearNotifications(){
+
+  notifications = [];
+
+  saveNotifications();
+
+  renderNotifications();
+
+}
+
+
+function playNotificationSound(){
+
+  try{
+
+    const AudioContext =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+    if(!AudioContext) return;
+
+    const ctx =
+      new AudioContext();
+
+    const oscillator =
+      ctx.createOscillator();
+
+    const gain =
+      ctx.createGain();
+
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+
+    oscillator.frequency.value = 800;
+
+    gain.gain.setValueAtTime(
+      0.08,
+      ctx.currentTime
+    );
+
+    oscillator.start();
+
+    oscillator.stop(
+      ctx.currentTime + 0.15
+    );
+
+  }catch(e){}
+}
+
+
+function browserNotification(title,message){
+
+  try{
+
+    if(
+      "Notification" in window &&
+      Notification.permission === "granted"
+    ){
+
+      new Notification(
+        title,
+        {
+          body:message
+        }
+      );
+
+    }
+
+  }catch(e){}
+}
+
+
+/* =========================================================
+   REALTIME
+========================================================= */
+
+function startRealtime(){
+
+  try{
+
+    if(realtimeChannel){
+
+      supabaseClient
+        .removeChannel(realtimeChannel);
+
+    }
+
+
+    realtimeChannel =
+      supabaseClient
+        .channel("orders-realtime-" + Date.now())
+        .on(
+          "postgres_changes",
+          {
+            event:"INSERT",
+            schema:"public",
+            table:"orders"
+          },
+          payload => {
+
+            console.log(
+              "Realtime Order:",
+              payload.new
+            );
+
+
+            const row =
+              payload.new;
+
+
+            const id =
+              String(row.id);
+
+
+            if(
+              !lastKnownRemoteOrderIds.has(id)
+            ){
+
+              lastKnownRemoteOrderIds.add(id);
+
+              orders.unshift(row);
+
+              saveLocalOrders();
+
+              addNotification(
+                "নতুন অর্ডার",
+                `${row.shop || "একটি দোকান"} থেকে নতুন অর্ডার এসেছে।`
+              );
+
+              updateDashboard();
+
+              if(
+                $("historyModal").style.display === "block"
+              ){
+
+                renderHistory();
+
+              }
+
+            }
+
+          }
+        )
+        .subscribe(
+          status => {
+
+            console.log(
+              "Realtime status:",
+              status
+            );
+
+          }
+        );
+
+  }catch(error){
+
+    console.error(
+      "Realtime Error:",
+      error
+    );
+
+  }
+}
+
+
+/* =========================================================
+   POLLING
+========================================================= */
+
+function startPolling(){
+
+  if(pollingTimer){
+
+    clearInterval(
+      pollingTimer
+    );
+
+  }
+
+
+  pollingTimer =
+    setInterval(
+      async () => {
+
+        await loadOrdersFromSupabase();
+
+      },
+      20000
+    );
+
+}
+
+
+/* =========================================================
+   ONLINE SETUP
 ========================================================= */
 
 function openOnlineSetup(){
 
   $("onlineUrl").value =
-  localStorage.getItem(
-    ONLINE_URL_KEY
-  ) ||
-  DEFAULT_ONLINE_URL;
+    localStorage.getItem(
+      ONLINE_KEY
+    ) ||
+    "https://forms.gle/776PMNGr7WoujFxg8";
 
 
-  openModal(
-    "onlineModal"
-  );
-
+  openModal("onlineModal");
 }
 
 
-function saveOnlineUrl(){
+function saveOnlineSetup(){
 
   const url =
-  $("onlineUrl")
-    .value
-    .trim();
+    String($("onlineUrl").value || "")
+      .trim();
 
 
   if(!url){
 
-    alert(
-      "URL দিন।"
-    );
-
+    alert("URL দিন।");
     return;
-
   }
 
 
   localStorage.setItem(
-    ONLINE_URL_KEY,
+    ONLINE_KEY,
     url
   );
 
 
+  $("onlineStatus").textContent =
+    "অনলাইন সেট করা আছে";
+
+
   alert(
-    "অনলাইন অর্ডার URL সংরক্ষণ হয়েছে।"
+    "✅ Online URL Save হয়েছে।"
   );
 
+
+  closeModal("onlineModal");
 }
 
 
-function openOnlineUrl(){
+function loadOnlineSetup(){
 
   const url =
-  localStorage.getItem(
-    ONLINE_URL_KEY
-  ) ||
-  DEFAULT_ONLINE_URL;
+    localStorage.getItem(
+      ONLINE_KEY
+    );
 
 
-  window.open(
-    url,
-    "_blank"
-  );
+  if(url){
+
+    $("onlineStatus").textContent =
+      "অনলাইন সেট করা আছে";
+
+  }
 
 }
 
 
 /* =========================================================
-   NOTIFICATION BUTTON
+   DASHBOARD
 ========================================================= */
 
-$("notificationBtn")
-.addEventListener(
-  "click",
-  function(event){
+function updateDashboard(){
 
-    event.stopPropagation();
-
-    $("notificationPanel")
-      .classList
-      .toggle("show");
-
-  }
-);
+  $("dashProducts").textContent =
+    products.length;
 
 
-document.addEventListener(
-  "click",
-  function(event){
+  $("dashOrders").textContent =
+    orders.length;
 
-    if(
-      !event.target.closest(
-        ".notification-wrap"
-      )
-    ){
 
-      $("notificationPanel")
-        .classList
-        .remove("show");
+  let items = 0;
+  let total = 0;
+
+
+  orders.forEach(order => {
+
+    total +=
+      Number(order.total || 0);
+
+
+    if(Array.isArray(order.products)){
+
+      order.products.forEach(item => {
+
+        items +=
+          Number(item.quantity || 0);
+
+      });
 
     }
 
-  }
-);
+  });
+
+
+  $("dashItems").textContent =
+    items;
+
+
+  $("dashTotal").textContent =
+    money(total);
+}
 
 
 /* =========================================================
-   CLEAR NOTIFICATIONS
-========================================================= */
-
-$("clearNotificationsBtn")
-.addEventListener(
-  "click",
-  function(event){
-
-    event.stopPropagation();
-
-    notifications=[];
-
-    saveNotifications();
-
-  }
-);
-
-
-/* =========================================================
-   LOGOUT BUTTON
-========================================================= */
-
-$("logoutBtn")
-.addEventListener(
-  "click",
-  logout
-);
-
-
-/* =========================================================
-   CLOSE MODALS WHEN CLICK OUTSIDE
-========================================================= */
-
-document
-  .querySelectorAll(".modal")
-  .forEach(
-    function(modal){
-
-      modal.addEventListener(
-        "click",
-        function(event){
-
-          if(
-            event.target === modal
-          ){
-
-            modal.classList.remove(
-              "show"
-            );
-
-          }
-
-        }
-      );
-
-    }
-  );
-
-
-/* =========================================================
-   INITIALIZE
+   INIT
 ========================================================= */
 
 async function init(){
-
-  /*
-    Local data প্রথমে load
-  */
 
   loadLocalProducts();
 
@@ -4328,70 +2957,115 @@ async function init(){
 
   resetProductForm();
 
-  updateProductCount();
+  resetOrderForm();
+
+  loadOnlineSetup();
 
 
-  /*
-    Login check
-  */
+  /* AUTH */
 
   const loggedIn =
-  await checkAdmin();
+    await checkAdmin();
 
 
-  if(!loggedIn){
-    return;
-  }
+  if(!loggedIn) return;
 
 
   /*
-    IMPORTANT:
-    Login হওয়ার পর Supabase থেকে
-    সব Product load হবে।
-
-    এতে LocalStorage-এ ৬টি থাকলেও
-    Supabase-এর আসল Product list
-    ব্যবহার হবে।
+   IMPORTANT:
+   Supabase থেকে Product load
+   এখানে করা হচ্ছে।
   */
 
   await loadProductsFromSupabase();
 
 
   /*
-    Existing Supabase orders
+   Product load হওয়ার পর
+   Order dropdown তৈরি হবে।
   */
+
+  populateOrderProductSelect();
+
+  updateDashboard();
+
+
+  /* Orders */
 
   await loadOrdersFromSupabase();
 
 
-  /*
-    Realtime
-  */
+  /* Realtime */
 
   startRealtime();
 
 
-  /*
-    Fallback polling
-  */
+  /* Fallback polling */
 
-  startOrderPolling();
+  startPolling();
 
 
-  /*
-    Browser notification
-  */
+  /* Browser notification */
 
-  requestNotificationPermission();
+  if(
+    "Notification" in window &&
+    Notification.permission === "default"
+  ){
+
+    try{
+
+      await Notification.requestPermission();
+
+    }catch(e){}
+
+  }
 
 }
+
+
+/* =========================================================
+   UI HELPERS
+========================================================= */
+
+function scrollToTop(){
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =========================================================
+   CLOSE MODAL ON BACKGROUND CLICK
+========================================================= */
+
+document.addEventListener(
+  "click",
+  function(event){
+
+    if(
+      event.target.classList.contains("modal")
+    ){
+
+      event.target.style.display =
+        "none";
+
+    }
+
+  }
+);
 
 
 /* =========================================================
    START
 ========================================================= */
 
-init();
+document.addEventListener(
+  "DOMContentLoaded",
+  init
+);
 
 </script>
 

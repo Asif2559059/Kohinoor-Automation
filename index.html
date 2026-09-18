@@ -65,7 +65,7 @@ textarea{min-height:75px;resize:vertical}
 .nav-btn{border:0;background:#fff;padding:9px 4px;color:#567067;font-size:11px}.nav-btn b{display:block;font-size:19px}.nav-btn.active{color:#087f50}
 .status{font-weight:700}.online{color:#087f50}.offline{color:#b47700}
 .notification-list{max-height:400px;overflow:auto}.notice{padding:10px;border-bottom:1px solid #eee}
-.toast{position:fixed;left:50%;bottom:75px;transform:translateX(-50%);background:#18352a;color:#fff;padding:11px 16px;border-radius:10px;z-index:100;display:none}
+.list-box{margin-top:12px;display:grid;gap:8px}.list-row{border:1px solid #dfe9e5;border-radius:11px;padding:10px;background:#fbfdfc}.list-row-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.list-row-actions{display:flex;gap:6px;margin-top:8px}.list-row-actions button{flex:1}.select-note{font-size:11px;color:#6c7c75;margin-top:4px}.toast{position:fixed;left:50%;bottom:75px;transform:translateX(-50%);background:#18352a;color:#fff;padding:11px 16px;border-radius:10px;z-index:100;display:none}
 @media(max-width:520px){
   .form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}
   .actions{grid-template-columns:1fr}.actions .full{grid-column:auto}
@@ -116,6 +116,7 @@ textarea{min-height:75px;resize:vertical}
       <button class="btn btn-warning" onclick="openHistory()">📝 Draft / History</button>
       <button class="btn btn-light" onclick="focusProductSearch()">🔎 Product খুঁজুন</button>
       <button class="btn btn-light" onclick="openProductManager()">📦 Products</button>
+      <button class="btn btn-light" onclick="openMarketShopManager()">📍 Market / Shop</button>
     </div>
   </section>
 
@@ -152,7 +153,8 @@ textarea{min-height:75px;resize:vertical}
     </div>
 
     <div class="form-grid">
-      <div class="field"><label>দোকানের নাম *</label><input id="shop" placeholder="দোকানের নাম"></div>
+      <div class="field"><label>মার্কেট</label><select id="marketSelect" onchange="filterShopList()"><option value="">-- মার্কেট নির্বাচন করুন --</option></select></div>
+      <div class="field"><label>দোকানের নাম *</label><select id="shopSelect" onchange="selectSavedShop()"><option value="">-- দোকান নির্বাচন করুন --</option></select><input id="shop" placeholder="দোকানের নাম" style="margin-top:6px"></div>
       <div class="field"><label>মোবাইল</label><input id="mobile" placeholder="01XXXXXXXXX"></div>
       <div class="field full"><label>ঠিকানা</label><input id="address" placeholder="দোকানের ঠিকানা"></div>
       <div class="field"><label>Representative</label><input id="representative" placeholder="প্রতিনিধির নাম"></div>
@@ -250,6 +252,28 @@ textarea{min-height:75px;resize:vertical}
   </div>
 </div>
 
+<!-- MARKET & SHOP MANAGER MODAL -->
+<div class="modal" id="marketShopModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3>📍 Market & Shop List</h3><button class="close" onclick="closeModal('marketShopModal')">✕</button></div>
+    <div class="small" style="margin-bottom:10px">এখানে নতুন মার্কেট ও দোকানের নাম/ঠিকানা যোগ করতে পারবেন। যেকোনো পুরোনো তথ্য Edit বা Delete করা যাবে। তথ্য এই ডিভাইসে সংরক্ষিত থাকবে।</div>
+
+    <div class="form-grid">
+      <div class="field"><label>মার্কেটের নাম *</label><input id="msMarket" placeholder="যেমন: মিরপুর মার্কেট"></div>
+      <div class="field"><label>দোকানের নাম *</label><input id="msShop" placeholder="যেমন: রহিম স্টোর"></div>
+      <div class="field full"><label>ঠিকানা</label><input id="msAddress" placeholder="দোকানের ঠিকানা"></div>
+      <div class="field"><label>মোবাইল</label><input id="msMobile" placeholder="01XXXXXXXXX"></div>
+      <div class="field"><label>Representative</label><input id="msRepresentative" placeholder="প্রতিনিধির নাম"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="saveMarketShop()">💾 Save</button>
+      <button class="btn btn-light" onclick="clearMarketShopForm()">✚ নতুন</button>
+    </div>
+    <input id="marketShopSearch" class="search" style="margin-top:12px" placeholder="মার্কেট/দোকান/ঠিকানা দিয়ে খুঁজুন" oninput="renderMarketShopList()">
+    <div id="marketShopList" class="list-box"></div>
+  </div>
+</div>
+
 <!-- NOTIFICATION MODAL -->
 <div class="modal" id="notificationModal">
   <div class="modal-box">
@@ -286,6 +310,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadNotifications();
   const ok = await checkAdmin();
   if(!ok)return;
+  loadMarketShops();
   await loadProducts();
   await loadOrdersFromSupabase();
   renderProductResults();
@@ -741,6 +766,7 @@ function getOrderFormData(){
   const total=productsForOrder.reduce((s,x)=>s+Number(x.value||0),0);
 
   return {
+    market:document.getElementById("marketSelect")?.value.trim()||"",
     shop,
     address:document.getElementById("address").value.trim(),
     mobile:document.getElementById("mobile").value.trim(),
@@ -781,6 +807,8 @@ function openOrderModal(draftId=null){
       return;
     }
 
+    populateMarketSelect(d.market||"");
+    populateShopSelect(findSavedShopId(d.shop||"",d.market||"",d.address||""));
     document.getElementById("shop").value=d.shop||"";
     document.getElementById("address").value=d.address||"";
     document.getElementById("mobile").value=d.mobile||"";
@@ -802,6 +830,9 @@ function openOrderModal(draftId=null){
       bonus:Number(x.bonus||0)
     }));
   }else{
+    document.getElementById("marketSelect").value="";
+    populateShopSelect();
+    document.getElementById("shopSelect").value="";
     document.getElementById("shop").value="";
     document.getElementById("address").value="";
     document.getElementById("mobile").value="";
@@ -818,8 +849,10 @@ function openOrderModal(draftId=null){
 function resetOrderForm(){
   editingDraftId=null;
   currentOrderItems=[];
-  ["shop","address","mobile","representative","note"]
-    .forEach(id=>document.getElementById(id).value="");
+  ["shop","address","mobile","representative","note"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("marketSelect").value="";
+  populateShopSelect();
+  document.getElementById("shopSelect").value="";
   document.getElementById("orderProductSearch").value="";
   setTodayDates();
   renderOrderProductResults();
@@ -1088,6 +1121,7 @@ function showOrderDetail(index){
 
   document.getElementById("detailContent").innerHTML=`
     <div class="card" style="margin:0 0 10px;background:#f8fbfa">
+      <b>মার্কেট:</b> ${escapeHtml(o.market||"")}<br>
       <b>দোকান:</b> ${escapeHtml(o.shop)}<br>
       <b>মোবাইল:</b> ${escapeHtml(o.mobile||"")}<br>
       <b>ঠিকানা:</b> ${escapeHtml(o.address||"")}<br>
@@ -1296,6 +1330,128 @@ function renderNotifications(){
 function openNotifications(){
   renderNotifications();
   openModal("notificationModal");
+}
+
+const MARKET_SHOPS_KEY = "kohinoor_market_shop_list_v2_user_";
+let marketShops = [];
+let editingMarketShopId = null;
+
+function getMarketShopsKey(){
+  return currentUser?.id ? MARKET_SHOPS_KEY + currentUser.id : null;
+}
+
+function loadMarketShops(){
+  const key=getMarketShopsKey();
+  if(!key){ marketShops=[]; populateMarketSelect(); populateShopSelect(); return; }
+  try{ marketShops = JSON.parse(localStorage.getItem(key)||"[]"); if(!Array.isArray(marketShops)) marketShops=[]; }
+  catch{ marketShops=[]; }
+  populateMarketSelect();
+  populateShopSelect();
+}
+
+function saveMarketShops(){
+  const key=getMarketShopsKey();
+  if(!key){ alert("User session পাওয়া যায়নি। আবার Login করুন।"); return; }
+  localStorage.setItem(key, JSON.stringify(marketShops));
+  populateMarketSelect();
+  populateShopSelect();
+}
+
+function openMarketShopManager(){
+  loadMarketShops();
+  clearMarketShopForm();
+  renderMarketShopList();
+  openModal("marketShopModal");
+}
+
+function clearMarketShopForm(){
+  editingMarketShopId=null;
+  ["msMarket","msShop","msAddress","msMobile","msRepresentative"].forEach(id=>document.getElementById(id).value="");
+}
+
+function saveMarketShop(){
+  const market=document.getElementById("msMarket").value.trim();
+  const shop=document.getElementById("msShop").value.trim();
+  if(!market){alert("মার্কেটের নাম দিন");return;}
+  if(!shop){alert("দোকানের নাম দিন");return;}
+  const item={
+    id:editingMarketShopId||("ms-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)),
+    market,shop,
+    address:document.getElementById("msAddress").value.trim(),
+    mobile:document.getElementById("msMobile").value.trim(),
+    representative:document.getElementById("msRepresentative").value.trim(),
+    updated_at:new Date().toISOString()
+  };
+  if(editingMarketShopId){
+    const i=marketShops.findIndex(x=>x.id===editingMarketShopId);
+    if(i>=0) marketShops[i]={...marketShops[i],...item};
+  }else marketShops.unshift(item);
+  saveMarketShops();
+  renderMarketShopList();
+  clearMarketShopForm();
+  showToast("✅ Market/Shop Save হয়েছে");
+}
+
+function editMarketShop(id){
+  const x=marketShops.find(v=>String(v.id)===String(id)); if(!x)return;
+  editingMarketShopId=x.id;
+  document.getElementById("msMarket").value=x.market||"";
+  document.getElementById("msShop").value=x.shop||"";
+  document.getElementById("msAddress").value=x.address||"";
+  document.getElementById("msMobile").value=x.mobile||"";
+  document.getElementById("msRepresentative").value=x.representative||"";
+  document.getElementById("msMarket").focus();
+}
+
+function deleteMarketShop(id){
+  const x=marketShops.find(v=>String(v.id)===String(id)); if(!x)return;
+  if(!confirm(`"${x.market} — ${x.shop}" ডিলিট করবেন?`))return;
+  marketShops=marketShops.filter(v=>String(v.id)!==String(id));
+  saveMarketShops(); renderMarketShopList(); clearMarketShopForm();
+  showToast("🗑️ তথ্য Delete হয়েছে");
+}
+
+function renderMarketShopList(){
+  const box=document.getElementById("marketShopList"); if(!box)return;
+  const q=(document.getElementById("marketShopSearch")?.value||"").trim().toLowerCase();
+  const list=marketShops.filter(x=>!q || [x.market,x.shop,x.address,x.mobile].some(v=>String(v||"").toLowerCase().includes(q)));
+  box.innerHTML=list.length?list.map(x=>`\
+    <div class="list-row">\
+      <div class="list-row-head"><div><b>${escapeHtml(x.shop)}</b><div class="small">📍 ${escapeHtml(x.market)}</div><div class="small">${escapeHtml(x.address||"")}</div>${x.mobile?`<div class="small">📞 ${escapeHtml(x.mobile)}</div>`:""}</div><span class="badge">Saved</span></div>\
+      <div class="list-row-actions"><button class="btn btn-light" onclick="editMarketShop('${escapeHtml(String(x.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteMarketShop('${escapeHtml(String(x.id))}')">🗑 Delete</button></div>\
+    </div>`).join(""):'<div class="empty">কোনো Market/Shop তালিকা নেই</div>';
+}
+
+function populateMarketSelect(selected=""){
+  const s=document.getElementById("marketSelect"); if(!s)return;
+  const markets=[...new Set(marketShops.map(x=>x.market).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'bn'));
+  s.innerHTML='<option value="">-- মার্কেট নির্বাচন করুন --</option>'+markets.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
+  if(selected) s.value=selected;
+}
+
+function populateShopSelect(selected=""){
+  const s=document.getElementById("shopSelect"); if(!s)return;
+  const market=document.getElementById("marketSelect")?.value||"";
+  const list=marketShops.filter(x=>!market||x.market===market);
+  s.innerHTML='<option value="">-- দোকান নির্বাচন করুন --</option>'+list.map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.shop)}${x.market?` — ${escapeHtml(x.market)}`:""}</option>`).join("");
+  if(selected) s.value=selected;
+}
+
+function filterShopList(){ populateShopSelect(); }
+
+function selectSavedShop(){
+  const id=document.getElementById("shopSelect")?.value; if(!id)return;
+  const x=marketShops.find(v=>String(v.id)===String(id)); if(!x)return;
+  document.getElementById("marketSelect").value=x.market||"";
+  document.getElementById("shop").value=x.shop||"";
+  document.getElementById("address").value=x.address||"";
+  document.getElementById("mobile").value=x.mobile||"";
+  document.getElementById("representative").value=x.representative||"";
+}
+
+function findSavedShopId(shop,market,address){
+  const x=marketShops.find(v=>v.shop===shop && (!market || v.market===market) && (!address || v.address===address));
+  return x?.id||"";
 }
 
 function setupRealtime(){

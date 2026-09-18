@@ -594,6 +594,7 @@ function addProductToOrder(p){
       name:p.name||"",
       pack:p.pack||"",
       price:mainRate(p),
+      base_price:mainRate(p),
       carton_rate:cartonRate(p),
       rate_type:"main",
       rate:mainRate(p),
@@ -645,7 +646,7 @@ function renderOrderItems(){
         </div>
 
         <div class="small" style="margin-top:7px">
-          মূল রেট: ${money(item.price)} · Carton Rate: ${money(item.carton_rate)}
+          মূল রেট: ${money(item.base_price??item.price)} · Carton Rate: ${money(item.carton_rate)}
         </div>
 
         <div class="qty-row">
@@ -723,7 +724,11 @@ function getOrderFormData(){
       code:item.code||"",
       name:item.name||"",
       pack:item.pack||"",
-      price:Number(item.price||0),
+      // base_price keeps the original/main rate.
+      base_price:Number(item.price||0),
+      // IMPORTANT: price is the ACTUAL rate used for this order.
+      // This keeps older order/admin pages from accidentally calculating with the main rate.
+      price:selectedRate,
       carton_rate:Number(item.carton_rate||0),
       rate_type:rateType,
       rate:selectedRate,
@@ -786,7 +791,8 @@ function openOrderModal(draftId=null){
 
     currentOrderItems=(d.products||[]).map(x=>({
       ...x,
-      price:Number(x.price||0),
+      price:Number(x.base_price??x.price??0),
+      base_price:Number(x.base_price??x.price??0),
       carton_rate:Number(x.carton_rate||0),
       rate_type:x.rate_type||"main",
       rate:Number(x.rate||(
@@ -906,20 +912,35 @@ async function sendDraftOrder(draftId){
     order_date:draft.order_date,
     delivery_date:draft.delivery_date,
     note:draft.note,
-    products:(draft.products||[]).map(p=>({
-      product_id:p.product_id||null,
-      code:p.code||"",
-      name:p.name||"",
-      pack:p.pack||"",
-      price:Number(p.price||0),
-      carton_rate:Number(p.carton_rate||0),
-      rate_type:p.rate_type==="carton"?"carton":"main",
-      rate:Number(p.rate||p.price||0),
-      quantity:Number(p.quantity||0),
-      bonus:Number(p.bonus||0),
-      value:Number(p.value||0)
-    })),
-    total:Number(draft.total||0)
+    products:(draft.products||[]).map(p=>{
+      const rateType=p.rate_type==="carton"?"carton":"main";
+      const selectedRate=rateType==="carton"
+        ? Number(p.carton_rate||0)
+        : Number(p.base_price??p.price??0);
+      const quantity=Number(p.quantity||0);
+      return {
+        product_id:p.product_id||null,
+        code:p.code||"",
+        name:p.name||"",
+        pack:p.pack||"",
+        base_price:Number(p.base_price??p.price??0),
+        // price is deliberately the selected/actual order rate.
+        price:selectedRate,
+        carton_rate:Number(p.carton_rate||0),
+        rate_type:rateType,
+        rate:selectedRate,
+        quantity,
+        bonus:Number(p.bonus||0),
+        value:selectedRate*quantity
+      };
+    }),
+    total:(draft.products||[]).reduce((sum,p)=>{
+      const rateType=p.rate_type==="carton"?"carton":"main";
+      const selectedRate=rateType==="carton"
+        ? Number(p.carton_rate||0)
+        : Number(p.base_price??p.price??0);
+      return sum+selectedRate*Number(p.quantity||0);
+    },0)
   };
 
   const {data,error}=await supabaseClient

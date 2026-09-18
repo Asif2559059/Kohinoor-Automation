@@ -174,6 +174,7 @@ textarea{min-height:75px;resize:vertical}
       <div class="field"><label>Pack</label><input id="pPack" placeholder="60"></div>
       <div class="field full"><label>Name</label><input id="pName" placeholder="Product name"></div>
       <div class="field"><label>Price</label><input id="pPrice" type="number" step="0.01" placeholder="88"></div>
+      <div class="field"><label>MRP</label><input id="pMrp" type="number" step="0.01" placeholder="100"></div>
       <div class="field"><label>Stock</label><input id="pStock" type="number" placeholder="100"></div>
     </div>
     <div class="actions">
@@ -420,8 +421,8 @@ function renderProductResults(){
   const list=products.filter(p=>!q || String(p.name||"").toLowerCase().includes(q) || String(p.code||"").toLowerCase().includes(q)).slice(0,30);
   box.innerHTML=list.length?list.map(p=>`
     <div class="product-result">
-      <div><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Stock ${Number(p.stock||0)}</div></div>
-      <b>${money(p.price)}</b>
+      <div><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Price ${money(p.price)} · MRP ${money(p.mrp)} · Stock ${Number(p.stock||0)}</div></div>
+      <b>Price ${money(p.price)} · MRP ${money(p.mrp)}</b>
     </div>`).join(""):`<div class="empty">Product পাওয়া যায়নি</div>`;
 }
 
@@ -440,7 +441,7 @@ function addProductToOrder(p){
   const existing=currentOrderItems.find(x=>String(x.product_id||"")===String(p.id||"") || (x.code&&p.code&&x.code===p.code));
   if(existing) existing.quantity=Number(existing.quantity||0)+1;
   else currentOrderItems.push({
-    product_id:p.id,code:p.code||"",name:p.name||"",pack:p.pack||"",price:Number(p.price||0),
+    product_id:p.id,code:p.code||"",name:p.name||"",pack:p.pack||"",price:Number(p.price||0),mrp:Number(p.mrp||0),
     quantity:1,bonus:0,value:Number(p.price||0)
   });
   renderOrderItems();
@@ -454,7 +455,7 @@ function renderOrderItems(){
     box.innerHTML=currentOrderItems.map((item,i)=>`
       <div class="order-item">
         <div class="order-item-top">
-          <div><div class="order-item-name">${escapeHtml(item.name)}</div><div class="small">${escapeHtml(item.code)} · Pack ${escapeHtml(item.pack)} · ${money(item.price)}</div></div>
+          <div><div class="order-item-name">${escapeHtml(item.name)}</div><div class="small">${escapeHtml(item.code)} · Pack ${escapeHtml(item.pack)} · Price ${money(item.price)} · MRP ${money(item.mrp)}</div></div>
           <button class="btn btn-danger" style="padding:7px 9px" onclick="removeOrderItem(${i})">✕</button>
         </div>
         <div class="qty-row">
@@ -486,7 +487,7 @@ function getOrderFormData(){
     delivery_date:document.getElementById("deliveryDate").value,
     note:document.getElementById("note").value.trim(),
     products:currentOrderItems.map(item=>({
-      product_id:item.product_id||null,code:item.code,name:item.name,pack:item.pack,price:Number(item.price||0),
+      product_id:item.product_id||null,code:item.code,name:item.name,pack:item.pack,price:Number(item.price||0),mrp:Number(item.mrp||0),
       quantity:Number(item.quantity||0),bonus:Number(item.bonus||0),
       value:Number(item.price||0)*Number(item.quantity||0)
     })),
@@ -668,7 +669,7 @@ function showOrderDetail(index){
       <b>Order Date:</b> ${escapeHtml(o.order_date||"")}<br>
       <b>Delivery:</b> ${escapeHtml(o.delivery_date||"")}
     </div>
-    ${items.map(p=>`<div class="order-item"><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Qty ${Number(p.quantity||0)} · Bonus ${Number(p.bonus||0)}</div><div style="margin-top:4px">${money(p.value||Number(p.price||0)*Number(p.quantity||0))}</div></div>`).join("")}
+    ${items.map(p=>`<div class="order-item"><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Qty ${Number(p.quantity||0)} · Bonus ${Number(p.bonus||0)} · Price ${money(p.price)} · MRP ${money(p.mrp)}</div><div style="margin-top:4px">${money(p.value||Number(p.price||0)*Number(p.quantity||0))}</div></div>`).join("")}
     <div class="total">মোট: ${money(o.total)}</div>
     <div class="small">${escapeHtml(o.note||"")}</div>`;
   openModal("detailModal");
@@ -683,7 +684,7 @@ function openProductManager(){
 let editingProductCode=null;
 
 function clearProductForm(){
-  ["pCode","pName","pPack","pPrice","pStock"].forEach(id=>document.getElementById(id).value="");
+  ["pCode","pName","pPack","pPrice","pMrp","pStock"].forEach(id=>document.getElementById(id).value="");
 }
 function editProduct(id){
   const p=products.find(x=>String(x.id)===String(id));if(!p)return;
@@ -692,6 +693,7 @@ function editProduct(id){
   document.getElementById("pName").value=p.name||"";
   document.getElementById("pPack").value=p.pack||"";
   document.getElementById("pPrice").value=p.price||0;
+  document.getElementById("pMrp").value=p.mrp||0;
   document.getElementById("pStock").value=p.stock||0;
   openModal("productModal");
 }
@@ -701,6 +703,7 @@ async function saveProduct(){
     name:document.getElementById("pName").value.trim(),
     pack:document.getElementById("pPack").value.trim(),
     price:Number(document.getElementById("pPrice").value||0),
+    mrp:Number(document.getElementById("pMrp").value||0),
     stock:Number(document.getElementById("pStock").value||0)
   };
   if(!payload.name){alert("Product name দিন");return}
@@ -729,7 +732,7 @@ function renderProductManagerList(){
   if(!products.length){box.innerHTML='<div class="empty">Product নেই</div>';return}
   box.innerHTML=products.slice(0,150).map(p=>`
     <div class="history-row">
-      <div class="history-head"><div><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Stock ${Number(p.stock||0)} · ${money(p.price)}</div></div></div>
+      <div class="history-head"><div><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Price ${money(p.price)} · MRP ${money(p.mrp)} · Stock ${Number(p.stock||0)}</div></div></div>
       <div class="history-actions">
         <button class="btn btn-light" onclick="editProduct('${p.id}')">✏️ Edit</button>
         <button class="btn btn-danger" onclick="deleteProduct('${p.id}')">🗑 Delete</button>

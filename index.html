@@ -85,9 +85,26 @@ button{
   gap:12px;
 }
 
+.profile-card{
+  cursor:pointer;
+  transition:transform .15s,box-shadow .15s;
+}
+
+.profile-card:active{
+  transform:scale(.99);
+}
+
+.profile-arrow{
+  margin-left:auto;
+  font-size:25px;
+  color:#087f50;
+  font-weight:bold;
+}
+
 .avatar{
   width:48px;
   height:48px;
+  min-width:48px;
   border-radius:50%;
   background:#087f50;
   color:white;
@@ -96,6 +113,30 @@ button{
   justify-content:center;
   font-size:22px;
   font-weight:bold;
+  overflow:hidden;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+
+.profile-modal-avatar{
+  width:100px;
+  height:100px;
+  min-width:100px;
+  margin:auto;
+  font-size:38px;
+  overflow:hidden;
+  border:4px solid #e8f5ef;
+}
+
+.profile-photo-label{
+  display:inline-block;
+  cursor:pointer;
+  margin-top:12px;
 }
 
 .small{
@@ -191,6 +232,11 @@ input,select,textarea{
 input:focus,select:focus,textarea:focus{
   border-color:#087f50;
   box-shadow:0 0 0 2px #087f5015;
+}
+
+input[readonly]{
+  background:#f5f7f6;
+  color:#607169;
 }
 
 textarea{
@@ -386,6 +432,50 @@ th{
   color:#718078;
 }
 
+.profile-info-box{
+  background:#f5faf7;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:14px;
+}
+
+.profile-info-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 0;
+  border-bottom:1px solid #e1ebe5;
+}
+
+.profile-info-row:last-child{
+  border-bottom:0;
+}
+
+.profile-info-label{
+  color:#687a71;
+  font-size:13px;
+}
+
+.profile-info-value{
+  font-weight:bold;
+  text-align:right;
+  word-break:break-word;
+}
+
+.photo-help{
+  margin-top:7px;
+  font-size:12px;
+  color:#718078;
+}
+
+.profile-saving{
+  display:none;
+  text-align:center;
+  color:#087f50;
+  font-size:13px;
+  padding:8px;
+}
+
 @media(max-width:520px){
 
   .row,
@@ -477,7 +567,10 @@ th{
 
 <main class="container">
 
-  <section class="card">
+  <!-- PROFILE CARD -->
+  <section
+    class="card profile-card"
+    onclick="openProfileModal()">
 
     <div class="profile">
 
@@ -485,7 +578,7 @@ th{
         A
       </div>
 
-      <div>
+      <div style="flex:1;min-width:0">
 
         <strong id="profileName">
           লোড হচ্ছে...
@@ -496,6 +589,16 @@ th{
           id="profileEmail">
         </div>
 
+        <div
+          class="small"
+          style="margin-top:4px">
+          👤 Profile দেখতে এখানে চাপুন
+        </div>
+
+      </div>
+
+      <div class="profile-arrow">
+        ›
       </div>
 
     </div>
@@ -605,6 +708,165 @@ th{
   </section>
 
 </main>
+
+
+<!-- =====================================================
+     PROFILE MODAL
+===================================================== -->
+
+<div id="profileModal" class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h3>👤 আমার Profile</h3>
+
+      <button
+        class="close"
+        onclick="closeModal('profileModal')">
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- PROFILE PHOTO -->
+
+    <div
+      style="text-align:center;padding:5px 0 18px">
+
+      <div
+        id="profileModalAvatar"
+        class="avatar profile-modal-avatar">
+        A
+      </div>
+
+
+      <label
+        class="btn btn-light profile-photo-label">
+
+        📷 ছবি পরিবর্তন
+
+        <input
+          id="profilePhotoInput"
+          type="file"
+          accept="image/*"
+          style="display:none"
+          onchange="uploadProfilePhoto(event)">
+
+      </label>
+
+
+      <div class="photo-help">
+        JPG / PNG ছবি দিন। ছবিটি নিজে থেকে ছোট করে Save হবে।
+      </div>
+
+    </div>
+
+
+    <!-- PROFILE INFORMATION -->
+
+    <div class="profile-info-box">
+
+      <div class="profile-info-row">
+
+        <div class="profile-info-label">
+          Account Email
+        </div>
+
+        <div
+          class="profile-info-value"
+          id="profileDisplayEmail">
+          —
+        </div>
+
+      </div>
+
+
+      <div class="profile-info-row">
+
+        <div class="profile-info-label">
+          Account ID
+        </div>
+
+        <div
+          class="profile-info-value"
+          id="profileDisplayId">
+          —
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Username / নাম
+      </label>
+
+      <input
+        id="profileUsername"
+        placeholder="আপনার নাম">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Email
+      </label>
+
+      <input
+        id="profileInfoEmail"
+        readonly>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Status
+      </label>
+
+      <input
+        id="profileStatus"
+        value="Active"
+        readonly>
+
+    </div>
+
+
+    <div
+      id="profileSaving"
+      class="profile-saving">
+      ⏳ Profile Save হচ্ছে...
+    </div>
+
+
+    <div class="actions">
+
+      <button
+        class="btn btn-primary"
+        onclick="saveProfileInfo()">
+        💾 Profile Save
+      </button>
+
+      <button
+        class="btn btn-light"
+        onclick="closeModal('profileModal')">
+        বন্ধ করুন
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
 
 <!-- PRODUCT MODAL -->
@@ -1191,6 +1453,9 @@ let initialRemoteLoadDone = false;
 let historyFilteredOrders = [];
 let currentOrderItems = [];
 
+let currentProfileUser = null;
+let currentProfileData = null;
+
 
 /* =========================================================
    BASIC HELPERS
@@ -1401,23 +1666,106 @@ async function checkAdmin(){
 }
 
 
+/* =========================================================
+   PROFILE
+   COMPLETE FIX
+========================================================= */
+
+function setProfileAvatar(
+  element,
+  avatarUrl,
+  name,
+  fallbackEmail
+){
+
+  if(!element) return;
+
+
+  const displayName =
+    String(
+      name ||
+      fallbackEmail ||
+      "A"
+    ).trim();
+
+
+  const firstLetter =
+    displayName
+      .charAt(0)
+      .toUpperCase() ||
+    "A";
+
+
+  /*
+    ছবি থাকলে ছবি দেখাবে।
+  */
+
+  if(
+    avatarUrl &&
+    String(avatarUrl).trim()
+  ){
+
+    element.innerHTML = "";
+
+    const img =
+      document.createElement("img");
+
+    img.src =
+      String(avatarUrl);
+
+    img.alt =
+      "Profile Photo";
+
+    img.onerror =
+      function(){
+
+        element.innerHTML =
+          escapeHtml(firstLetter);
+
+      };
+
+
+    element.appendChild(img);
+
+  }else{
+
+    element.textContent =
+      firstLetter;
+
+  }
+
+}
+
+
 async function loadUserProfile(user){
 
   if(!user) return;
 
 
+  currentProfileUser = user;
+
+
+  /*
+    প্রথমে Auth email দেখানো হবে।
+    Database profile থাকলে পরে সেটি দিয়ে
+    update হবে।
+  */
+
   $("profileEmail").textContent =
     user.email || "";
 
 
-  const avatar =
-    (user.email || "A")
-      .charAt(0)
-      .toUpperCase();
+  $("profileName").textContent =
+    user.email ||
+    "User";
 
 
-  $("profileAvatar").textContent =
-    avatar;
+  setProfileAvatar(
+    $("profileAvatar"),
+    "",
+    user.email,
+    user.email
+  );
 
 
   try{
@@ -1426,16 +1774,815 @@ async function loadUserProfile(user){
       await supabaseClient
         .from("user_profiles")
         .select(
-          "username,email,status,avatar_url"
+          "id,username,email,status,avatar_url"
         )
-        .eq("id",user.id)
+        .eq(
+          "id",
+          user.id
+        )
+        .maybeSingle();
+
+
+    if(result.error){
+
+      /*
+        user_profiles row না থাকলে
+        dashboard যেন নষ্ট না হয়।
+      */
+
+      console.log(
+        "Profile load:",
+        result.error.message
+      );
+
+      currentProfileData = null;
+
+      return;
+
+    }
+
+
+    currentProfileData =
+      result.data || null;
+
+
+    if(result.data){
+
+      const username =
+        result.data.username ||
+        result.data.email ||
+        user.email ||
+        "User";
+
+
+      $("profileName").textContent =
+        username;
+
+
+      $("profileEmail").textContent =
+        result.data.email ||
+        user.email ||
+        "";
+
+
+      setProfileAvatar(
+        $("profileAvatar"),
+        result.data.avatar_url,
+        username,
+        user.email
+      );
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "Profile load exception:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   OPEN PROFILE
+========================================================= */
+
+async function openProfileModal(){
+
+  openModal(
+    "profileModal"
+  );
+
+
+  /*
+    Auth user আবার নেওয়া হচ্ছে,
+    যাতে profile সবসময় বর্তমান user-এর হয়।
+  */
+
+  try{
+
+    const authResult =
+      await supabaseClient.auth.getUser();
+
+
+    if(authResult.error){
+
+      console.error(
+        authResult.error
+      );
+
+      return;
+
+    }
+
+
+    const user =
+      authResult.data.user;
+
+
+    if(!user){
+
+      alert(
+        "Login session পাওয়া যায়নি। আবার Login করুন।"
+      );
+
+      closeModal(
+        "profileModal"
+      );
+
+      window.location.replace(
+        "signin.html"
+      );
+
+      return;
+
+    }
+
+
+    currentProfileUser =
+      user;
+
+
+    /*
+      Default values
+    */
+
+    $("profileUsername").value =
+      user.email
+        ? user.email.split("@")[0]
+        : "User";
+
+
+    $("profileInfoEmail").value =
+      user.email || "";
+
+
+    $("profileDisplayEmail").textContent =
+      user.email || "—";
+
+
+    $("profileDisplayId").textContent =
+      user.id
+        ? String(user.id).substring(0,8) + "..."
+        : "—";
+
+
+    $("profileStatus").value =
+      "Active";
+
+
+    setProfileAvatar(
+      $("profileModalAvatar"),
+      "",
+      user.email,
+      user.email
+    );
+
+
+    /*
+      user_profiles থেকে তথ্য নেওয়া
+    */
+
+    const result =
+      await supabaseClient
+        .from("user_profiles")
+        .select(
+          "id,username,email,status,avatar_url"
+        )
+        .eq(
+          "id",
+          user.id
+        )
         .maybeSingle();
 
 
     if(result.error){
 
       console.log(
-        "Profile load:",
+        "Profile modal load:",
+        result.error.message
+      );
+
+      /*
+        Row না থাকলেও modal কাজ করবে।
+      */
+
+      return;
+
+    }
+
+
+    currentProfileData =
+      result.data || null;
+
+
+    if(result.data){
+
+      $("profileUsername").value =
+        result.data.username ||
+        user.email?.split("@")[0] ||
+        "User";
+
+
+      $("profileInfoEmail").value =
+        result.data.email ||
+        user.email ||
+        "";
+
+
+      $("profileDisplayEmail").textContent =
+        result.data.email ||
+        user.email ||
+        "—";
+
+
+      $("profileStatus").value =
+        result.data.status ||
+        "Active";
+
+
+      setProfileAvatar(
+        $("profileModalAvatar"),
+        result.data.avatar_url,
+        result.data.username,
+        user.email
+      );
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "Open profile error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   IMAGE RESIZE
+========================================================= */
+
+function resizeImageToDataUrl(
+  file,
+  maxSize = 400,
+  quality = 0.80
+){
+
+  return new Promise(
+    (resolve,reject) => {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function(event){
+
+          const img =
+            new Image();
+
+
+          img.onload =
+            function(){
+
+              let width =
+                img.width;
+
+              let height =
+                img.height;
+
+
+              /*
+                ছবির বড় side 400px-এর মধ্যে রাখা।
+              */
+
+              if(
+                width > maxSize ||
+                height > maxSize
+              ){
+
+                if(width > height){
+
+                  height =
+                    Math.round(
+                      height *
+                      maxSize /
+                      width
+                    );
+
+                  width =
+                    maxSize;
+
+                }else{
+
+                  width =
+                    Math.round(
+                      width *
+                      maxSize /
+                      height
+                    );
+
+                  height =
+                    maxSize;
+
+                }
+
+              }
+
+
+              const canvas =
+                document.createElement(
+                  "canvas"
+                );
+
+
+              canvas.width =
+                width;
+
+              canvas.height =
+                height;
+
+
+              const ctx =
+                canvas.getContext(
+                  "2d"
+                );
+
+
+              /*
+                White background।
+                PNG transparent হলে JPEG করার সময়
+                সাদা background থাকবে।
+              */
+
+              ctx.fillStyle =
+                "#ffffff";
+
+              ctx.fillRect(
+                0,
+                0,
+                width,
+                height
+              );
+
+
+              ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+              );
+
+
+              const dataUrl =
+                canvas.toDataURL(
+                  "image/jpeg",
+                  quality
+                );
+
+
+              resolve(
+                dataUrl
+              );
+
+            };
+
+
+          img.onerror =
+            function(){
+
+              reject(
+                new Error(
+                  "ছবি পড়া যায়নি।"
+                )
+              );
+
+            };
+
+
+          img.src =
+            event.target.result;
+
+        };
+
+
+      reader.onerror =
+        function(){
+
+          reject(
+            new Error(
+              "ছবি পড়তে সমস্যা হয়েছে।"
+            )
+          );
+
+        };
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   PROFILE PHOTO UPLOAD
+========================================================= */
+
+async function uploadProfilePhoto(event){
+
+  const file =
+    event.target.files?.[0];
+
+
+  /*
+    একই ছবি আবার select করার সুযোগ।
+  */
+
+  event.target.value = "";
+
+
+  if(!file) return;
+
+
+  if(
+    !file.type ||
+    !file.type.startsWith(
+      "image/"
+    )
+  ){
+
+    alert(
+      "শুধু Image file নির্বাচন করুন।"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Original file সর্বোচ্চ 5MB।
+    Resize করার পর database-এ ছোট image রাখা হবে।
+  */
+
+  if(
+    file.size >
+    5 * 1024 * 1024
+  ){
+
+    alert(
+      "ছবির size 5MB-এর বেশি। ছোট ছবি নির্বাচন করুন।"
+    );
+
+    return;
+
+  }
+
+
+  if(!currentProfileUser){
+
+    const authResult =
+      await supabaseClient.auth.getUser();
+
+
+    if(authResult.error){
+
+      alert(
+        "Login user পাওয়া যায়নি।"
+      );
+
+      return;
+
+    }
+
+
+    currentProfileUser =
+      authResult.data.user;
+
+  }
+
+
+  if(!currentProfileUser){
+
+    alert(
+      "Login session পাওয়া যায়নি।"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    /*
+      প্রথমে local preview।
+    */
+
+    const dataUrl =
+      await resizeImageToDataUrl(
+        file,
+        400,
+        0.80
+      );
+
+
+    setProfileAvatar(
+      $("profileModalAvatar"),
+      dataUrl,
+      $("profileUsername").value,
+      currentProfileUser.email
+    );
+
+
+    /*
+      Profile row database-এ Save/Upsert।
+      এতে নতুন user_profiles row না থাকলেও
+      তৈরি হবে।
+    */
+
+    const username =
+      String(
+        $("profileUsername").value ||
+        currentProfileUser.email?.split("@")[0] ||
+        "User"
+      ).trim();
+
+
+    const payload = {
+
+      id:
+        currentProfileUser.id,
+
+      username:
+        username,
+
+      email:
+        currentProfileUser.email || "",
+
+      status:
+        $("profileStatus").value ||
+        "Active",
+
+      avatar_url:
+        dataUrl
+
+    };
+
+
+    const result =
+      await supabaseClient
+        .from("user_profiles")
+        .upsert(
+          payload,
+          {
+            onConflict:"id"
+          }
+        )
+        .select(
+          "id,username,email,status,avatar_url"
+        )
+        .single();
+
+
+    if(result.error){
+
+      console.error(
+        "PROFILE PHOTO SAVE ERROR:",
+        result.error
+      );
+
+
+      alert(
+        "❌ Profile Photo Save করা যায়নি:\n\n" +
+        result.error.message +
+        "\n\nSupabase user_profiles permission/schema check করতে হবে।"
+      );
+
+      return;
+
+    }
+
+
+    currentProfileData =
+      result.data;
+
+
+    /*
+      Dashboard avatar update
+    */
+
+    $("profileName").textContent =
+      result.data.username ||
+      currentProfileUser.email ||
+      "User";
+
+
+    $("profileEmail").textContent =
+      result.data.email ||
+      currentProfileUser.email ||
+      "";
+
+
+    setProfileAvatar(
+      $("profileAvatar"),
+      result.data.avatar_url,
+      result.data.username,
+      currentProfileUser.email
+    );
+
+
+    alert(
+      "✅ Profile Photo সফলভাবে Save হয়েছে।"
+    );
+
+  }catch(error){
+
+    console.error(
+      "PROFILE PHOTO EXCEPTION:",
+      error
+    );
+
+
+    alert(
+      "❌ ছবি Save করার সময় সমস্যা হয়েছে:\n\n" +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   SAVE PROFILE INFORMATION
+========================================================= */
+
+async function saveProfileInfo(){
+
+  const username =
+    String(
+      $("profileUsername").value || ""
+    ).trim();
+
+
+  if(!username){
+
+    alert(
+      "Username / নাম দিন।"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Login user নেওয়া।
+  */
+
+  let user =
+    currentProfileUser;
+
+
+  if(!user){
+
+    const authResult =
+      await supabaseClient.auth.getUser();
+
+
+    if(authResult.error){
+
+      alert(
+        "Login user পাওয়া যায়নি।"
+      );
+
+      return;
+
+    }
+
+
+    user =
+      authResult.data.user;
+
+  }
+
+
+  if(!user){
+
+    alert(
+      "Login session পাওয়া যায়নি। আবার Login করুন।"
+    );
+
+    return;
+
+  }
+
+
+  const saving =
+    $("profileSaving");
+
+
+  if(saving){
+
+    saving.style.display =
+      "block";
+
+  }
+
+
+  try{
+
+    /*
+      পুরোনো photo থাকলে সেটি রাখা হবে।
+    */
+
+    let avatarUrl =
+      currentProfileData?.avatar_url ||
+      "";
+
+
+    /*
+      Modal avatar-এ যদি নতুন preview image থাকে
+      এবং সেটি Data URL হয়, সেটি ব্যবহার করা হবে।
+    */
+
+    const modalImg =
+      $("profileModalAvatar")
+        ?.querySelector("img");
+
+
+    if(
+      modalImg &&
+      String(
+        modalImg.src || ""
+      ).startsWith("data:image/")
+    ){
+
+      avatarUrl =
+        modalImg.src;
+
+    }
+
+
+    const payload = {
+
+      id:
+        user.id,
+
+      username:
+        username,
+
+      email:
+        user.email || "",
+
+      status:
+        $("profileStatus").value ||
+        "Active",
+
+      avatar_url:
+        avatarUrl || null
+
+    };
+
+
+    const result =
+      await supabaseClient
+        .from("user_profiles")
+        .upsert(
+          payload,
+          {
+            onConflict:"id"
+          }
+        )
+        .select(
+          "id,username,email,status,avatar_url"
+        )
+        .single();
+
+
+    if(result.error){
+
+      console.error(
+        "PROFILE SAVE ERROR:",
+        result.error
+      );
+
+
+      alert(
+        "❌ Profile Save করা যায়নি:\n\n" +
         result.error.message
       );
 
@@ -1444,36 +2591,94 @@ async function loadUserProfile(user){
     }
 
 
-    if(result.data){
-
-      $("profileName").textContent =
-        result.data.username ||
-        result.data.email ||
-        user.email;
+    currentProfileUser =
+      user;
 
 
-      if(result.data.email){
-
-        $("profileEmail").textContent =
-          result.data.email;
-
-      }
+    currentProfileData =
+      result.data;
 
 
-      if(result.data.avatar_url){
+    /*
+      Dashboard update
+    */
 
-        $("profileAvatar").innerHTML =
-          `<img
-            src="${escapeHtml(result.data.avatar_url)}"
-            style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    $("profileName").textContent =
+      result.data.username ||
+      result.data.email ||
+      user.email ||
+      "User";
 
-      }
 
-    }
+    $("profileEmail").textContent =
+      result.data.email ||
+      user.email ||
+      "";
+
+
+    setProfileAvatar(
+      $("profileAvatar"),
+      result.data.avatar_url,
+      result.data.username,
+      user.email
+    );
+
+
+    /*
+      Modal update
+    */
+
+    setProfileAvatar(
+      $("profileModalAvatar"),
+      result.data.avatar_url,
+      result.data.username,
+      user.email
+    );
+
+
+    $("profileInfoEmail").value =
+      result.data.email ||
+      user.email ||
+      "";
+
+
+    $("profileDisplayEmail").textContent =
+      result.data.email ||
+      user.email ||
+      "—";
+
+
+    $("profileStatus").value =
+      result.data.status ||
+      "Active";
+
+
+    alert(
+      "✅ Profile সফলভাবে Save হয়েছে।"
+    );
+
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      "PROFILE SAVE EXCEPTION:",
+      error
+    );
+
+
+    alert(
+      "❌ Profile Save করার সময় সমস্যা হয়েছে:\n\n" +
+      error.message
+    );
+
+  }finally{
+
+    if(saving){
+
+      saving.style.display =
+        "none";
+
+    }
 
   }
 
@@ -1668,6 +2873,20 @@ function resetProductForm(){
 
   $("productCode").disabled = false;
 
+
+  const saveButton =
+    document.querySelector(
+      '#productModal button[onclick="saveProduct()"]'
+    );
+
+
+  if(saveButton){
+
+    saveButton.innerHTML =
+      "💾 Save Product";
+
+  }
+
 }
 
 
@@ -1795,7 +3014,6 @@ function renderManagerProducts(){
 
 /* =========================================================
    PRODUCT SAVE
-   FIXED VERSION
 ========================================================= */
 
 async function saveProduct(){
@@ -1880,10 +3098,6 @@ async function saveProduct(){
   }
 
 
-  /* =====================================================
-     EDIT PRODUCT
-  ===================================================== */
-
   if(editingProductCode !== null){
 
     const oldCode =
@@ -1891,11 +3105,6 @@ async function saveProduct(){
         editingProductCode
       ).trim();
 
-
-    /*
-      Code পরিবর্তন করা হলে
-      নতুন code duplicate কিনা পরীক্ষা
-    */
 
     if(oldCode !== code){
 
@@ -1931,12 +3140,6 @@ async function saveProduct(){
 
     }
 
-
-    /*
-      IMPORTANT FIX:
-      update করার পরে .select() দিয়ে
-      সত্যিই row update হয়েছে কিনা যাচাই করা হচ্ছে।
-    */
 
     try{
 
@@ -1985,11 +3188,6 @@ async function saveProduct(){
       }
 
 
-      /*
-        কোনো row ফেরত না এলে
-        update হয়নি।
-      */
-
       if(
         !Array.isArray(result.data) ||
         result.data.length === 0
@@ -2004,12 +3202,6 @@ async function saveProduct(){
 
       }
 
-
-      /*
-        Supabase সফল।
-        এখন আবার Supabase থেকেই
-        পুরো product list load করছি।
-      */
 
       await loadProductsFromSupabase();
 
@@ -2052,10 +3244,6 @@ async function saveProduct(){
 
   }
 
-
-  /* =====================================================
-     NEW PRODUCT
-  ===================================================== */
 
   const localDuplicate =
     products.some(product =>
@@ -2198,7 +3386,6 @@ async function saveProduct(){
 
 /* =========================================================
    PRODUCT EDIT
-   FIXED VERSION
 ========================================================= */
 
 function editProductByCode(code){
@@ -2256,16 +3443,8 @@ function editProductByCode(code){
     product.stock;
 
 
-  /*
-    Code edit করা যাবে।
-  */
-
   $("productCode").disabled = false;
 
-
-  /*
-    Save button-এ স্পষ্ট indication
-  */
 
   const saveButton =
     document.querySelector(
@@ -2288,7 +3467,6 @@ function editProductByCode(code){
 
 /* =========================================================
    PRODUCT DELETE
-   FIXED VERSION
 ========================================================= */
 
 async function deleteProductByCode(code){
@@ -2340,12 +3518,6 @@ async function deleteProductByCode(code){
 
   try{
 
-    /*
-      IMPORTANT FIX:
-      Delete-এর পরে .select() দিয়ে
-      সত্যিই row delete হয়েছে কিনা যাচাই করা হচ্ছে।
-    */
-
     const result =
       await supabaseClient
         .from("products")
@@ -2376,11 +3548,6 @@ async function deleteProductByCode(code){
     }
 
 
-    /*
-      কোনো row ফেরত না এলে
-      Delete হয়নি।
-    */
-
     if(
       !Array.isArray(result.data) ||
       result.data.length === 0
@@ -2396,19 +3563,8 @@ async function deleteProductByCode(code){
     }
 
 
-    /*
-      Supabase থেকে আবার list load।
-      এতে local data এবং database
-      একই থাকবে।
-    */
-
     await loadProductsFromSupabase();
 
-
-    /*
-      যদি এই product edit mode-এ থাকে,
-      form reset করা হবে।
-    */
 
     if(
       editingProductCode !== null &&

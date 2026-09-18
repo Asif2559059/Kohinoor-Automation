@@ -153,8 +153,9 @@ textarea{min-height:75px;resize:vertical}
     </div>
 
     <div class="form-grid">
-      <div class="field"><label>মার্কেট</label><select id="marketSelect" onchange="filterShopList()"><option value="">-- মার্কেট নির্বাচন করুন --</option></select></div>
+      <div class="field"><label>মার্কেট</label><select id="marketSelect" onchange="filterShopList(true)"><option value="">-- মার্কেট নির্বাচন করুন --</option></select></div>
       <div class="field"><label>দোকানের নাম *</label><select id="shopSelect" onchange="selectSavedShop()"><option value="">-- দোকান নির্বাচন করুন --</option></select><input id="shop" placeholder="দোকানের নাম" style="margin-top:6px"></div>
+      <div class="field"><label>দোকানের কোড</label><input id="shopCode" placeholder="দোকানের কোড"></div>
       <div class="field"><label>মোবাইল</label><input id="mobile" placeholder="01XXXXXXXXX"></div>
       <div class="field full"><label>ঠিকানা</label><input id="address" placeholder="দোকানের ঠিকানা"></div>
       <div class="field"><label>Representative</label><input id="representative" placeholder="প্রতিনিধির নাম"></div>
@@ -235,7 +236,7 @@ textarea{min-height:75px;resize:vertical}
 <!-- PROFILE MODAL -->
 <div class="modal" id="profileModal">
   <div class="modal-box">
-    <div class="modal-head"><h3>👤 Profile</h3><button class="close" onclick="closeModal('profileModal')">✕</button></div>
+    <div class="modal-head"><h3>👤 Profile</h3><button class="close" onclick="closeModal('orderModal')">✕</button></div>
     <div style="text-align:center">
       <div class="avatar" id="profileModalAvatar" style="margin:auto;width:85px;height:85px;font-size:28px">A</div>
       <input id="profilePhotoInput" type="file" accept="image/*" onchange="uploadProfilePhoto(event)" style="margin-top:12px;max-width:100%">
@@ -261,6 +262,7 @@ textarea{min-height:75px;resize:vertical}
     <div class="form-grid">
       <div class="field"><label>মার্কেটের নাম *</label><input id="msMarket" placeholder="যেমন: মিরপুর মার্কেট"></div>
       <div class="field"><label>দোকানের নাম *</label><input id="msShop" placeholder="যেমন: রহিম স্টোর"></div>
+      <div class="field"><label>দোকানের কোড</label><input id="msShopCode" placeholder="যেমন: S-001"></div>
       <div class="field full"><label>ঠিকানা</label><input id="msAddress" placeholder="দোকানের ঠিকানা"></div>
       <div class="field"><label>মোবাইল</label><input id="msMobile" placeholder="01XXXXXXXXX"></div>
       <div class="field"><label>Representative</label><input id="msRepresentative" placeholder="প্রতিনিধির নাম"></div>
@@ -768,6 +770,7 @@ function getOrderFormData(){
   return {
     market:document.getElementById("marketSelect")?.value.trim()||"",
     shop,
+    shop_code:document.getElementById("shopCode")?.value.trim()||"",
     address:document.getElementById("address").value.trim(),
     mobile:document.getElementById("mobile").value.trim(),
     representative:document.getElementById("representative").value.trim(),
@@ -810,6 +813,7 @@ function openOrderModal(draftId=null){
     populateMarketSelect(d.market||"");
     populateShopSelect(findSavedShopId(d.shop||"",d.market||"",d.address||""));
     document.getElementById("shop").value=d.shop||"";
+    document.getElementById("shopCode").value=d.shop_code||"";
     document.getElementById("address").value=d.address||"";
     document.getElementById("mobile").value=d.mobile||"";
     document.getElementById("representative").value=d.representative||"";
@@ -831,9 +835,12 @@ function openOrderModal(draftId=null){
     }));
   }else{
     document.getElementById("marketSelect").value="";
-    populateShopSelect();
     document.getElementById("shopSelect").value="";
     document.getElementById("shop").value="";
+    document.getElementById("shopCode").value="";
+    // Saved Market/Shop থাকলে অটোমেটিক নির্বাচন হবে।
+    populateMarketSelect("", true);
+    populateShopSelect("", true);
     document.getElementById("address").value="";
     document.getElementById("mobile").value="";
     document.getElementById("representative").value="";
@@ -849,7 +856,7 @@ function openOrderModal(draftId=null){
 function resetOrderForm(){
   editingDraftId=null;
   currentOrderItems=[];
-  ["shop","address","mobile","representative","note"].forEach(id=>document.getElementById(id).value="");
+  ["shop","shopCode","address","mobile","representative","note"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("marketSelect").value="";
   populateShopSelect();
   document.getElementById("shopSelect").value="";
@@ -938,7 +945,9 @@ async function sendDraftOrder(draftId){
   if(!confirm(`"${draft.shop}" এর অর্ডার Online-এ Send করবেন?`))return;
 
   const payload={
+    market:draft.market||"",
     shop:draft.shop,
+    shop_code:draft.shop_code||"",
     address:draft.address,
     mobile:draft.mobile,
     representative:draft.representative,
@@ -1123,6 +1132,7 @@ function showOrderDetail(index){
     <div class="card" style="margin:0 0 10px;background:#f8fbfa">
       <b>মার্কেট:</b> ${escapeHtml(o.market||"")}<br>
       <b>দোকান:</b> ${escapeHtml(o.shop)}<br>
+      <b>দোকানের কোড:</b> ${escapeHtml(o.shop_code||"")}<br>
       <b>মোবাইল:</b> ${escapeHtml(o.mobile||"")}<br>
       <b>ঠিকানা:</b> ${escapeHtml(o.address||"")}<br>
       <b>Representative:</b> ${escapeHtml(o.representative||"")}<br>
@@ -1366,7 +1376,7 @@ function openMarketShopManager(){
 
 function clearMarketShopForm(){
   editingMarketShopId=null;
-  ["msMarket","msShop","msAddress","msMobile","msRepresentative"].forEach(id=>document.getElementById(id).value="");
+  ["msMarket","msShop","msShopCode","msAddress","msMobile","msRepresentative"].forEach(id=>document.getElementById(id).value="");
 }
 
 function saveMarketShop(){
@@ -1377,6 +1387,7 @@ function saveMarketShop(){
   const item={
     id:editingMarketShopId||("ms-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)),
     market,shop,
+    shop_code:document.getElementById("msShopCode").value.trim(),
     address:document.getElementById("msAddress").value.trim(),
     mobile:document.getElementById("msMobile").value.trim(),
     representative:document.getElementById("msRepresentative").value.trim(),
@@ -1397,6 +1408,7 @@ function editMarketShop(id){
   editingMarketShopId=x.id;
   document.getElementById("msMarket").value=x.market||"";
   document.getElementById("msShop").value=x.shop||"";
+  document.getElementById("msShopCode").value=x.shop_code||"";
   document.getElementById("msAddress").value=x.address||"";
   document.getElementById("msMobile").value=x.mobile||"";
   document.getElementById("msRepresentative").value=x.representative||"";
@@ -1414,36 +1426,40 @@ function deleteMarketShop(id){
 function renderMarketShopList(){
   const box=document.getElementById("marketShopList"); if(!box)return;
   const q=(document.getElementById("marketShopSearch")?.value||"").trim().toLowerCase();
-  const list=marketShops.filter(x=>!q || [x.market,x.shop,x.address,x.mobile].some(v=>String(v||"").toLowerCase().includes(q)));
+  const list=marketShops.filter(x=>!q || [x.market,x.shop,x.shop_code,x.address,x.mobile].some(v=>String(v||"").toLowerCase().includes(q)));
   box.innerHTML=list.length?list.map(x=>`\
     <div class="list-row">\
-      <div class="list-row-head"><div><b>${escapeHtml(x.shop)}</b><div class="small">📍 ${escapeHtml(x.market)}</div><div class="small">${escapeHtml(x.address||"")}</div>${x.mobile?`<div class="small">📞 ${escapeHtml(x.mobile)}</div>`:""}</div><span class="badge">Saved</span></div>\
+      <div class="list-row-head"><div><b>${escapeHtml(x.shop)}</b><div class="small">📍 ${escapeHtml(x.market)}</div>${x.shop_code?`<div class="small">🏷️ কোড: ${escapeHtml(x.shop_code)}</div>`:""}<div class="small">${escapeHtml(x.address||"")}</div>${x.mobile?`<div class="small">📞 ${escapeHtml(x.mobile)}</div>`:""}</div><span class="badge">Saved</span></div>\
       <div class="list-row-actions"><button class="btn btn-light" onclick="editMarketShop('${escapeHtml(String(x.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteMarketShop('${escapeHtml(String(x.id))}')">🗑 Delete</button></div>\
     </div>`).join(""):'<div class="empty">কোনো Market/Shop তালিকা নেই</div>';
 }
 
-function populateMarketSelect(selected=""){
+function populateMarketSelect(selected="", autoSelect=false){
   const s=document.getElementById("marketSelect"); if(!s)return;
   const markets=[...new Set(marketShops.map(x=>x.market).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'bn'));
   s.innerHTML='<option value="">-- মার্কেট নির্বাচন করুন --</option>'+markets.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
   if(selected) s.value=selected;
+  else if(autoSelect && markets.length===1) s.value=markets[0];
 }
 
-function populateShopSelect(selected=""){
+function populateShopSelect(selected="", autoSelect=false){
   const s=document.getElementById("shopSelect"); if(!s)return;
   const market=document.getElementById("marketSelect")?.value||"";
   const list=marketShops.filter(x=>!market||x.market===market);
-  s.innerHTML='<option value="">-- দোকান নির্বাচন করুন --</option>'+list.map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.shop)}${x.market?` — ${escapeHtml(x.market)}`:""}</option>`).join("");
+  s.innerHTML='<option value="">-- দোকান নির্বাচন করুন --</option>'+list.map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.shop)}${x.shop_code?` — ${escapeHtml(x.shop_code)}`:""}</option>`).join("");
   if(selected) s.value=selected;
+  else if(autoSelect && list.length===1) s.value=String(list[0].id);
+  if(autoSelect && list.length===1) selectSavedShop();
 }
 
-function filterShopList(){ populateShopSelect(); }
+function filterShopList(autoSelect=false){ populateShopSelect("",autoSelect); }
 
 function selectSavedShop(){
   const id=document.getElementById("shopSelect")?.value; if(!id)return;
   const x=marketShops.find(v=>String(v.id)===String(id)); if(!x)return;
   document.getElementById("marketSelect").value=x.market||"";
   document.getElementById("shop").value=x.shop||"";
+  document.getElementById("shopCode").value=x.shop_code||"";
   document.getElementById("address").value=x.address||"";
   document.getElementById("mobile").value=x.mobile||"";
   document.getElementById("representative").value=x.representative||"";

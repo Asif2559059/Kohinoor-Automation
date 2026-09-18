@@ -95,7 +95,6 @@ textarea{min-height:75px;resize:vertical}
       <div class="avatar" id="profileAvatar">A</div>
       <div>
         <strong id="profileName">লোড হচ্ছে...</strong>
-        <div class="small" id="profileEmail"></div>
       </div>
     </div>
   </section>
@@ -236,15 +235,16 @@ textarea{min-height:75px;resize:vertical}
 <!-- PROFILE MODAL -->
 <div class="modal" id="profileModal">
   <div class="modal-box">
-    <div class="modal-head"><h3>👤 Profile</h3><button class="close" onclick="closeModal('orderModal')">✕</button></div>
+    <div class="modal-head"><h3>👤 Profile</h3><button class="close" onclick="closeModal('profileModal')">✕</button></div>
     <div style="text-align:center">
-      <div class="avatar" id="profileModalAvatar" style="margin:auto;width:85px;height:85px;font-size:28px">A</div>
-      <input id="profilePhotoInput" type="file" accept="image/*" onchange="uploadProfilePhoto(event)" style="margin-top:12px;max-width:100%">
+      <div class="avatar" id="profileModalAvatar" style="margin:auto;width:100px;height:100px;font-size:30px">A</div>
+      <label class="btn btn-light" style="display:inline-block;margin-top:12px">📷 ছবি পরিবর্তন
+        <input id="profilePhotoInput" type="file" accept="image/*" onchange="uploadProfilePhoto(event)" style="display:none">
+      </label>
     </div>
-    <div class="form-grid" style="margin-top:14px">
-      <div class="field full"><label>Username</label><input id="profileUsername"></div>
-      <div class="field full"><label>Email</label><input id="profileInfoEmail" readonly></div>
-      <div class="field full"><label>Status</label><input id="profileStatus" readonly></div>
+    <div class="field full" style="margin-top:16px">
+      <label>Username</label>
+      <input id="profileUsername" placeholder="আপনার User Name">
     </div>
     <div class="actions">
       <button class="btn btn-primary" onclick="saveProfileInfo()">💾 Save Profile</button>
@@ -390,18 +390,14 @@ async function loadUserProfile(user){
   const fallbackName=user.email?.split("@")[0] || "User";
   try{
     const {data,error}=await supabaseClient.from("user_profiles")
-      .select("username,email,status,avatar_url")
-      .eq("id",user.id).maybeSingle();
-
-    if(error)throw error;
+      .select("username,avatar_url").eq("id",user.id).maybeSingle();
+    if(error) throw error;
     const p=data||{};
     const name=p.username||fallbackName;
     document.getElementById("profileName").textContent=name;
-    document.getElementById("profileEmail").textContent=p.email||user.email||"";
     setProfileAvatar(document.getElementById("profileAvatar"),p.avatar_url,name);
   }catch(e){
     document.getElementById("profileName").textContent=fallbackName;
-    document.getElementById("profileEmail").textContent=user.email||"";
     setProfileAvatar(document.getElementById("profileAvatar"),"",fallbackName);
   }
 }
@@ -417,45 +413,35 @@ function setProfileAvatar(el,url,name){
 
 async function openProfileModal(){
   if(!currentUser)return;
-  document.getElementById("profileInfoEmail").value=currentUser.email||"";
   try{
-    const {data}=await supabaseClient.from("user_profiles")
-      .select("username,email,status,avatar_url")
-      .eq("id",currentUser.id).maybeSingle();
+    const {data,error}=await supabaseClient.from("user_profiles")
+      .select("username,avatar_url").eq("id",currentUser.id).maybeSingle();
+    if(error) throw error;
     const p=data||{};
-    document.getElementById("profileUsername").value=p.username||currentUser.email?.split("@")[0]||"";
-    document.getElementById("profileStatus").value=p.status||"Active";
-    setProfileAvatar(
-      document.getElementById("profileModalAvatar"),
-      p.avatar_url,
-      p.username||currentUser.email
-    );
+    const name=p.username||currentUser.email?.split("@")[0]||"User";
+    document.getElementById("profileUsername").value=name;
+    setProfileAvatar(document.getElementById("profileModalAvatar"),p.avatar_url,name);
   }catch(e){
-    document.getElementById("profileUsername").value=currentUser.email?.split("@")[0]||"";
-    document.getElementById("profileStatus").value="Active";
+    const name=currentUser.email?.split("@")[0]||"User";
+    document.getElementById("profileUsername").value=name;
+    setProfileAvatar(document.getElementById("profileModalAvatar"),"",name);
   }
   openModal("profileModal");
 }
 
 async function saveProfileInfo(){
+  if(!currentUser)return;
   const username=document.getElementById("profileUsername").value.trim();
-  if(!username)return alert("Username দিন");
-
-  const payload={
-    id:currentUser.id,
-    email:currentUser.email,
-    username,
-    status:"Active"
-  };
-
-  const {error}=await supabaseClient.from("user_profiles")
-    .upsert(payload,{onConflict:"id"});
-
-  if(error)return alert("Profile Save হয়নি: "+error.message);
-
+  if(!username){alert("Username দিন");return}
+  const {data:existing}=await supabaseClient.from("user_profiles")
+    .select("avatar_url").eq("id",currentUser.id).maybeSingle();
+  const payload={id:currentUser.id,email:currentUser.email,username,status:"Active",avatar_url:existing?.avatar_url||null};
+  const {error}=await supabaseClient.from("user_profiles").upsert(payload,{onConflict:"id"});
+  if(error){alert("Profile Save হয়নি: "+error.message);return}
   await loadUserProfile(currentUser);
+  setProfileAvatar(document.getElementById("profileModalAvatar"),existing?.avatar_url||"",username);
   closeModal("profileModal");
-  showToast("✅ Profile Save হয়েছে");
+  showToast("✅ Username Save হয়েছে");
 }
 
 function resizeImageToDataUrl(file,maxSize=500,quality=.82){
@@ -486,25 +472,21 @@ function resizeImageToDataUrl(file,maxSize=500,quality=.82){
 async function uploadProfilePhoto(event){
   const file=event.target.files?.[0];
   if(!file||!currentUser)return;
-
   try{
     const dataUrl=await resizeImageToDataUrl(file);
+    const {data:existing}=await supabaseClient.from("user_profiles")
+      .select("username,status").eq("id",currentUser.id).maybeSingle();
+    const username=existing?.username||currentUser.email?.split("@")[0]||"User";
     const {error}=await supabaseClient.from("user_profiles").upsert(
-      {id:currentUser.id,email:currentUser.email,avatar_url:dataUrl},
+      {id:currentUser.id,email:currentUser.email,username,status:existing?.status||"Active",avatar_url:dataUrl},
       {onConflict:"id"}
     );
     if(error)throw error;
-
     await loadUserProfile(currentUser);
-    setProfileAvatar(
-      document.getElementById("profileModalAvatar"),
-      dataUrl,
-      currentUser.email
-    );
+    setProfileAvatar(document.getElementById("profileModalAvatar"),dataUrl,username);
+    event.target.value="";
     showToast("✅ Profile photo Save হয়েছে");
-  }catch(e){
-    alert("Photo Save হয়নি: "+e.message);
-  }
+  }catch(e){alert("Photo Save হয়নি: "+e.message)}
 }
 
 async function loadProducts(){

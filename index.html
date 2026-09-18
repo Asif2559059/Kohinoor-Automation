@@ -430,18 +430,64 @@ async function openProfileModal(){
 }
 
 async function saveProfileInfo(){
-  if(!currentUser)return;
+  if(!currentUser){
+    alert("User session পাওয়া যায়নি। আবার Login করুন।");
+    return;
+  }
+
   const username=document.getElementById("profileUsername").value.trim();
-  if(!username){alert("Username দিন");return}
-  const {data:existing}=await supabaseClient.from("user_profiles")
-    .select("avatar_url").eq("id",currentUser.id).maybeSingle();
-  const payload={id:currentUser.id,email:currentUser.email,username,status:"Active",avatar_url:existing?.avatar_url||null};
-  const {error}=await supabaseClient.from("user_profiles").upsert(payload,{onConflict:"id"});
-  if(error){alert("Profile Save হয়নি: "+error.message);return}
-  await loadUserProfile(currentUser);
-  setProfileAvatar(document.getElementById("profileModalAvatar"),existing?.avatar_url||"",username);
-  closeModal("profileModal");
-  showToast("✅ Username Save হয়েছে");
+  if(!username){
+    alert("Username দিন");
+    return;
+  }
+
+  try{
+    /*
+      গুরুত্বপূর্ণ:
+      এখানে status/email/অন্যান্য field পাঠানো হচ্ছে না।
+      কারণ user_profiles_status_check অনুযায়ী status-এর নিজের নির্দিষ্ট
+      allowed value আছে। Username পরিবর্তনের সময় status বদলানোর কোনো দরকার নেই।
+    */
+    const {data:existing,error:readError}=await supabaseClient
+      .from("user_profiles")
+      .select("id,avatar_url")
+      .eq("id",currentUser.id)
+      .maybeSingle();
+
+    if(readError)throw readError;
+
+    if(existing){
+      const {error}=await supabaseClient
+        .from("user_profiles")
+        .update({username:username})
+        .eq("id",currentUser.id);
+
+      if(error)throw error;
+    }else{
+      // সাধারণত trigger-এর কারণে row আগে থেকেই থাকে।
+      // না থাকলে status না পাঠিয়ে DB-এর default status ব্যবহার করার চেষ্টা করা হবে।
+      const {error}=await supabaseClient
+        .from("user_profiles")
+        .insert({
+          id:currentUser.id,
+          username:username
+        });
+
+      if(error)throw error;
+    }
+
+    await loadUserProfile(currentUser);
+    setProfileAvatar(
+      document.getElementById("profileModalAvatar"),
+      existing?.avatar_url||"",
+      username
+    );
+    closeModal("profileModal");
+    showToast("✅ Username সফলভাবে পরিবর্তন হয়েছে");
+  }catch(e){
+    console.error("Username save error:",e);
+    alert("Username Save হয়নি:\n"+e.message);
+  }
 }
 
 function resizeImageToDataUrl(file,maxSize=500,quality=.82){

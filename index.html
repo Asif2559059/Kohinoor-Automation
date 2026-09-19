@@ -12,69 +12,14 @@
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-window.addEventListener("beforeunload",()=>{if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel)});
 
-// ===== PWA: Install + Service Worker =====
-let deferredInstallPrompt = null;
-
-function updateInstallButton(){
-  const btn=document.getElementById("installAppBtn");
-  const hint=document.getElementById("installHint");
-  if(!btn) return;
-  if(deferredInstallPrompt){
-    btn.style.display="block";
-    if(hint) hint.textContent="📲 এই ফোনে অ্যাপ হিসেবে Install করা যাবে।";
-  }else if(window.matchMedia && window.matchMedia("(display-mode: standalone)").matches){
-    btn.style.display="none";
-    if(hint) hint.textContent="✅ অ্যাপটি ইতিমধ্যে ইনস্টল করা আছে।";
-  }
-}
-
-window.addEventListener("beforeinstallprompt",(event)=>{
-  event.preventDefault();
-  deferredInstallPrompt=event;
-  updateInstallButton();
-});
-
-async function installPWA(){
-  if(!deferredInstallPrompt){
-    showToast("Chrome-এর Menu থেকে Add to Home screen / Install app নির্বাচন করুন");
-    return;
-  }
-  deferredInstallPrompt.prompt();
-  const result=await deferredInstallPrompt.userChoice;
-  deferredInstallPrompt=null;
-  updateInstallButton();
-  if(result.outcome==="accepted") showToast("✅ অ্যাপ Install করার প্রক্রিয়া শুরু হয়েছে");
-}
-
-window.addEventListener("appinstalled",()=>{
-  deferredInstallPrompt=null;
-  updateInstallButton();
-  showToast("✅ কহিনুর অর্ডার অ্যাপ Install হয়েছে");
-});
-
-if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./sw.js",{scope:"./"})
-      .then(()=>{
-        const hint=document.getElementById("installHint");
-        if(hint && !deferredInstallPrompt) hint.textContent="PWA প্রস্তুত। Chrome Menu থেকে Install app/Add to Home screen-ও ব্যবহার করতে পারবেন।";
-      })
-      .catch(err=>console.error("PWA service worker error:",err));
-  });
-}
-
-updateInstallButton();
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f4f7f6;color:#18352a}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 .header{position:sticky;top:0;z-index:20;background:#087f50;color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px #0002}
-.logo{width:42px;height:42px;border-radius:12px;background:#fff;color:#087f50;display:grid;place-items:center;font-weight:900;font-size:22px}
 .header-title{flex:1}.header-title strong{display:block;font-size:16px}.header-title small{opacity:.85}
 .icon-btn{border:0;background:#ffffff20;color:#fff;border-radius:10px;padding:10px}
 .container{max-width:720px;margin:auto;padding:12px 12px 90px}
@@ -142,7 +87,6 @@ textarea{min-height:75px;resize:vertical}
 <body>
 
 <header class="header">
-  <div class="logo">ক</div>
   <div class="header-title">
     <strong>কহিনুর কেমিক্যাল পিএলসি</strong>
     <small>অর্ডার অটোমেশন</small>
@@ -155,9 +99,7 @@ textarea{min-height:75px;resize:vertical}
   <section class="card" onclick="openProfileModal()" style="cursor:pointer">
     <div class="profile">
       <div class="avatar" id="profileAvatar">A</div>
-      <div>
-        <strong id="profileName">লোড হচ্ছে...</strong>
-      </div>
+      <div><strong id="profileName">লোড হচ্ছে...</strong></div>
     </div>
   </section>
 
@@ -179,15 +121,6 @@ textarea{min-height:75px;resize:vertical}
       <button class="btn btn-light" onclick="openProductManager()">📦 Products</button>
       <button class="btn btn-light" onclick="openMarketShopManager()">📍 Market / Shop</button>
     </div>
-  </section>
-
-  <section class="card no-print" id="appToolsCard">
-    <h3 style="margin-top:0">📲 অ্যাপ</h3>
-    <div class="grid">
-      <button id="installAppBtn" class="btn btn-primary" onclick="installPWA()" style="display:none">📲 অ্যাপ ইনস্টল করুন</button>
-      <a class="btn btn-light" href="./index.html" download="kohinoor-order.html" style="text-decoration:none;text-align:center">⬇️ HTML ডাউনলোড</a>
-    </div>
-    <div id="installHint" class="small" style="margin-top:8px;text-align:center">Android/Chrome-এ Install অপশন পাওয়া গেলে এখানে দেখাবে।</div>
   </section>
 
   <section class="card" id="productSearchCard">
@@ -212,16 +145,8 @@ textarea{min-height:75px;resize:vertical}
 <!-- ORDER MODAL -->
 <div class="modal" id="orderModal">
   <div class="modal-box">
-    <div class="modal-head">
-      <h3 id="orderModalTitle">➕ নতুন অর্ডার</h3>
-      <button class="close" onclick="closeModal('orderModal')">✕</button>
-    </div>
-
-    <div class="small" style="margin-bottom:10px">
-      প্রথমে <b>Save Draft</b> করুন। Save করলে অনলাইনে যাবে না।
-      পরে Draft খুলে Product যোগ/পরিবর্তন করে আবার Save করে <b>Send Order</b> চাপলে অনলাইনে যাবে।
-    </div>
-
+    <div class="modal-head"><h3 id="orderModalTitle">➕ নতুন অর্ডার</h3><button class="close" onclick="closeModal('orderModal')">✕</button></div>
+    <div class="small" style="margin-bottom:10px">প্রথমে <b>Save Draft</b> করুন। Save করলে অনলাইনে যাবে না। পরে Draft খুলে Product যোগ/পরিবর্তন করে আবার Save করে <b>Send Order</b> চাপলে অনলাইনে যাবে।</div>
     <div class="form-grid">
       <div class="field"><label>মার্কেট</label><select id="marketSelect" onchange="filterShopList(true)"><option value="">-- মার্কেট নির্বাচন করুন --</option></select></div>
       <div class="field"><label>দোকানের নাম *</label><select id="shopSelect" onchange="selectSavedShop()"><option value="">-- দোকান নির্বাচন করুন --</option></select><input id="shop" placeholder="দোকানের নাম" style="margin-top:6px"></div>
@@ -234,19 +159,14 @@ textarea{min-height:75px;resize:vertical}
       <div class="field full"><label>নোট</label><textarea id="note" placeholder="প্রয়োজনীয় নোট"></textarea></div>
     </div>
 
-    <!-- নতুন Order Product Search -->
     <div class="field" style="margin-top:12px">
       <label>🔎 Order-এর জন্য Product খুঁজুন</label>
-      <input id="orderProductSearch" class="search"
-             placeholder="Product code বা নাম লিখে সার্চ করুন..."
-             autocomplete="off"
-             oninput="renderOrderProductResults()">
+      <input id="orderProductSearch" class="search" placeholder="Product code বা নাম লিখে সার্চ করুন..." autocomplete="off" oninput="renderOrderProductResults()">
       <div id="orderProductResults" class="order-search-results"></div>
     </div>
 
     <div id="orderItems" class="order-items"></div>
     <div class="total">মোট: <span id="orderTotal">৳0.00</span></div>
-
     <div class="actions">
       <button class="btn btn-primary" onclick="saveOrder()">💾 Save Draft</button>
       <button class="btn btn-info" onclick="sendCurrentDraft()">📤 Send Order</button>
@@ -259,9 +179,7 @@ textarea{min-height:75px;resize:vertical}
 <div class="modal" id="productModal">
   <div class="modal-box">
     <div class="modal-head"><h3>📦 Product Manager</h3><button class="close" onclick="closeModal('productModal')">✕</button></div>
-    <div class="small" style="margin-bottom:10px">
-      এখানে <b>মূল রেট</b> হলো সাধারণ বিক্রির রেট, <b>Carton Rate</b> হলো কার্টন নিলে প্রযোজ্য রেট এবং <b>MRP</b> পণ্যের জন্য সংরক্ষিত থাকবে। অর্ডার পাঠানোর সময় MRP পাঠানো হবে না।
-    </div>
+    <div class="small" style="margin-bottom:10px">এখানে <b>মূল রেট</b> হলো সাধারণ বিক্রির রেট, <b>Carton Rate</b> হলো কার্টন নিলে প্রযোজ্য রেট এবং <b>MRP</b> পণ্যের জন্য সংরক্ষিত থাকবে। অর্ডার পাঠানোর সময় MRP পাঠানো হবে না।</div>
     <div class="form-grid">
       <div class="field"><label>Code</label><input id="pCode" placeholder="03227"></div>
       <div class="field"><label>Pack</label><input id="pPack" placeholder="60"></div>
@@ -313,10 +231,7 @@ textarea{min-height:75px;resize:vertical}
         <input id="profilePhotoInput" type="file" accept="image/*" onchange="uploadProfilePhoto(event)" style="display:none">
       </label>
     </div>
-    <div class="field full" style="margin-top:16px">
-      <label>Username</label>
-      <input id="profileUsername" placeholder="আপনার User Name">
-    </div>
+    <div class="field full" style="margin-top:16px"><label>Username</label><input id="profileUsername" placeholder="আপনার User Name"></div>
     <div class="actions">
       <button class="btn btn-primary" onclick="saveProfileInfo()">💾 Save Profile</button>
       <button class="btn btn-light" onclick="closeModal('profileModal')">Close</button>
@@ -329,7 +244,6 @@ textarea{min-height:75px;resize:vertical}
   <div class="modal-box">
     <div class="modal-head"><h3>📍 Market & Shop List</h3><button class="close" onclick="closeModal('marketShopModal')">✕</button></div>
     <div class="small" style="margin-bottom:10px">এখানে নতুন মার্কেট ও দোকানের নাম/ঠিকানা যোগ করতে পারবেন। যেকোনো পুরোনো তথ্য Edit বা Delete করা যাবে। তথ্য এই ডিভাইসে সংরক্ষিত থাকবে।</div>
-
     <div class="form-grid">
       <div class="field"><label>মার্কেটের নাম *</label><input id="msMarket" placeholder="যেমন: মিরপুর মার্কেট"></div>
       <div class="field"><label>দোকানের নাম *</label><input id="msShop" placeholder="যেমন: রহিম স্টোর"></div>
@@ -358,6 +272,15 @@ textarea{min-height:75px;resize:vertical}
 <div id="toast" class="toast"></div>
 
 <script>
+// ===== PWA: Install + Service Worker =====
+// App install UI card has been removed, so only Service Worker registration remains.
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js",{scope:"./"})
+      .catch(err=>console.error("PWA service worker error:",err));
+  });
+}
+
 const SUPABASE_URL = "https://utzkpsohkoiawvuupgeb.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
@@ -423,13 +346,8 @@ function money(n){
   return "৳"+Number(n||0).toFixed(2);
 }
 
-function mainRate(p){
-  return Number(p?.price||0);
-}
-
-function cartonRate(p){
-  return Number(p?.carton_rate||0);
-}
+function mainRate(p){ return Number(p?.price||0); }
+function cartonRate(p){ return Number(p?.carton_rate||0); }
 
 function showToast(msg){
   const el=document.getElementById("toast");
@@ -475,11 +393,8 @@ async function loadUserProfile(user){
 
 function setProfileAvatar(el,url,name){
   if(!el)return;
-  if(url){
-    el.innerHTML='<img src="'+escapeHtml(url)+'" alt="profile">';
-  }else{
-    el.textContent=(name||"A").trim().charAt(0).toUpperCase()||"A";
-  }
+  if(url)el.innerHTML='<img src="'+escapeHtml(url)+'" alt="profile">';
+  else el.textContent=(name||"A").trim().charAt(0).toUpperCase()||"A";
 }
 
 async function openProfileModal(){
@@ -487,7 +402,7 @@ async function openProfileModal(){
   try{
     const {data,error}=await supabaseClient.from("user_profiles")
       .select("username,avatar_url").eq("id",currentUser.id).maybeSingle();
-    if(error) throw error;
+    if(error)throw error;
     const p=data||{};
     const name=p.username||currentUser.email?.split("@")[0]||"User";
     document.getElementById("profileUsername").value=name;
@@ -501,58 +416,22 @@ async function openProfileModal(){
 }
 
 async function saveProfileInfo(){
-  if(!currentUser){
-    alert("User session পাওয়া যায়নি। আবার Login করুন।");
-    return;
-  }
-
+  if(!currentUser){alert("User session পাওয়া যায়নি। আবার Login করুন।");return;}
   const username=document.getElementById("profileUsername").value.trim();
-  if(!username){
-    alert("Username দিন");
-    return;
-  }
-
+  if(!username){alert("Username দিন");return;}
   try{
-    /*
-      গুরুত্বপূর্ণ:
-      এখানে status/email/অন্যান্য field পাঠানো হচ্ছে না।
-      কারণ user_profiles_status_check অনুযায়ী status-এর নিজের নির্দিষ্ট
-      allowed value আছে। Username পরিবর্তনের সময় status বদলানোর কোনো দরকার নেই।
-    */
-    const {data:existing,error:readError}=await supabaseClient
-      .from("user_profiles")
-      .select("id,avatar_url")
-      .eq("id",currentUser.id)
-      .maybeSingle();
-
+    const {data:existing,error:readError}=await supabaseClient.from("user_profiles")
+      .select("id,avatar_url").eq("id",currentUser.id).maybeSingle();
     if(readError)throw readError;
-
     if(existing){
-      const {error}=await supabaseClient
-        .from("user_profiles")
-        .update({username:username})
-        .eq("id",currentUser.id);
-
+      const {error}=await supabaseClient.from("user_profiles").update({username}).eq("id",currentUser.id);
       if(error)throw error;
     }else{
-      // সাধারণত trigger-এর কারণে row আগে থেকেই থাকে।
-      // না থাকলে status না পাঠিয়ে DB-এর default status ব্যবহার করার চেষ্টা করা হবে।
-      const {error}=await supabaseClient
-        .from("user_profiles")
-        .insert({
-          id:currentUser.id,
-          username:username
-        });
-
+      const {error}=await supabaseClient.from("user_profiles").insert({id:currentUser.id,username});
       if(error)throw error;
     }
-
     await loadUserProfile(currentUser);
-    setProfileAvatar(
-      document.getElementById("profileModalAvatar"),
-      existing?.avatar_url||"",
-      username
-    );
+    setProfileAvatar(document.getElementById("profileModalAvatar"),existing?.avatar_url||"",username);
     closeModal("profileModal");
     showToast("✅ Username সফলভাবে পরিবর্তন হয়েছে");
   }catch(e){
@@ -570,19 +449,16 @@ function resizeImageToDataUrl(file,maxSize=500,quality=.82){
         let w=img.width,h=img.height;
         if(w>maxSize||h>maxSize){
           const r=Math.min(maxSize/w,maxSize/h);
-          w=Math.round(w*r);
-          h=Math.round(h*r);
+          w=Math.round(w*r);h=Math.round(h*r);
         }
         const c=document.createElement("canvas");
         c.width=w;c.height=h;
         c.getContext("2d").drawImage(img,0,0,w,h);
         resolve(c.toDataURL("image/jpeg",quality));
       };
-      img.onerror=reject;
-      img.src=reader.result;
+      img.onerror=reject;img.src=reader.result;
     };
-    reader.onerror=reject;
-    reader.readAsDataURL(file);
+    reader.onerror=reject;reader.readAsDataURL(file);
   });
 }
 
@@ -607,1014 +483,342 @@ async function uploadProfilePhoto(event){
 }
 
 async function loadProducts(){
-  const {data,error}=await supabaseClient.from("products")
-    .select("*").order("name",{ascending:true});
-
+  const {data,error}=await supabaseClient.from("products").select("*").order("name",{ascending:true});
   if(error){
     console.error(error);
-    try{
-      products=JSON.parse(localStorage.getItem(LOCAL_PRODUCTS_KEY)||"[]");
-    }catch{
-      products=[];
-    }
-    updateDashboard();
-    populateOrderProductSearch();
-    return;
+    try{products=JSON.parse(localStorage.getItem(LOCAL_PRODUCTS_KEY)||"[]")}catch{products=[]}
+    updateDashboard();populateOrderProductSearch();return;
   }
-
   products=data||[];
   localStorage.setItem(LOCAL_PRODUCTS_KEY,JSON.stringify(products));
-  updateDashboard();
-  populateOrderProductSearch();
+  updateDashboard();populateOrderProductSearch();
 }
 
 function renderProductResults(){
   const q=document.getElementById("productSearch").value.trim().toLowerCase();
   const box=document.getElementById("productResults");
-
-  const list=products
-    .filter(p=>
-      !q ||
-      String(p.name||"").toLowerCase().includes(q) ||
-      String(p.code||"").toLowerCase().includes(q)
-    )
-    .slice(0,30);
-
-  box.innerHTML=list.length
-    ? list.map(p=>`
-      <div class="product-result">
-        <div class="product-result-info">
-          <b>${escapeHtml(p.name)}</b>
-          <div class="small">
-            ${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Stock ${Number(p.stock||0)}
-          </div>
-        </div>
-        <div class="product-result-rate">
-          <div><b>মূল ${money(mainRate(p))}</b></div>
-          <div class="small">Carton ${money(cartonRate(p))}</div>
-        </div>
-      </div>
-    `).join("")
-    : '<div class="empty">Product পাওয়া যায়নি</div>';
+  const list=products.filter(p=>!q||String(p.name||"").toLowerCase().includes(q)||String(p.code||"").toLowerCase().includes(q)).slice(0,30);
+  box.innerHTML=list.length?list.map(p=>`
+    <div class="product-result">
+      <div class="product-result-info"><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Stock ${Number(p.stock||0)}</div></div>
+      <div class="product-result-rate"><div><b>মূল ${money(mainRate(p))}</b></div><div class="small">Carton ${money(cartonRate(p))}</div></div>
+    </div>
+  `).join(""):'<div class="empty">Product পাওয়া যায়নি</div>';
 }
 
-/* Order-এর ভিতরে আলাদা Search */
-function populateOrderProductSearch(){
-  renderOrderProductResults();
-}
+function populateOrderProductSearch(){renderOrderProductResults()}
 
 function renderOrderProductResults(){
   const input=document.getElementById("orderProductSearch");
   const box=document.getElementById("orderProductResults");
   if(!input||!box)return;
-
   const q=input.value.trim().toLowerCase();
-
-  let list=products.filter(p=>
-    !q ||
-    String(p.name||"").toLowerCase().includes(q) ||
-    String(p.code||"").toLowerCase().includes(q)
-  );
-
-  if(!q)list=list.slice(0,20);
-  else list=list.slice(0,50);
-
-  box.innerHTML=list.length
-    ? list.map(p=>`
-      <div class="order-search-result" onclick="addProductById('${escapeHtml(String(p.id))}')">
-        <div style="display:flex;justify-content:space-between;gap:8px">
-          <div style="flex:1">
-            <b>${escapeHtml(p.code||"")} — ${escapeHtml(p.name||"")}</b>
-            <div class="small">Pack ${escapeHtml(p.pack||"")} · Stock ${Number(p.stock||0)}</div>
-          </div>
-          <div style="text-align:right;white-space:nowrap">
-            <b>মূল ${money(mainRate(p))}</b>
-            <div class="small">Carton ${money(cartonRate(p))}</div>
-          </div>
-        </div>
+  let list=products.filter(p=>!q||String(p.name||"").toLowerCase().includes(q)||String(p.code||"").toLowerCase().includes(q));
+  if(!q)list=list.slice(0,20);else list=list.slice(0,50);
+  box.innerHTML=list.length?list.map(p=>`
+    <div class="order-search-result" onclick="addProductById('${escapeHtml(String(p.id))}')">
+      <div style="display:flex;justify-content:space-between;gap:8px">
+        <div style="flex:1"><b>${escapeHtml(p.code||"")} — ${escapeHtml(p.name||"")}</b><div class="small">Pack ${escapeHtml(p.pack||"")} · Stock ${Number(p.stock||0)}</div></div>
+        <div style="text-align:right;white-space:nowrap"><b>মূল ${money(mainRate(p))}</b><div class="small">Carton ${money(cartonRate(p))}</div></div>
       </div>
-    `).join("")
-    : '<div class="empty" style="padding:12px">Product পাওয়া যায়নি</div>';
+    </div>
+  `).join(""):'<div class="empty" style="padding:12px">Product পাওয়া যায়নি</div>';
 }
 
 function addProductById(id){
-  const p=products.find(x=>String(x.id)===String(id));
-  if(!p)return;
+  const p=products.find(x=>String(x.id)===String(id));if(!p)return;
   addProductToOrder(p);
   document.getElementById("orderProductSearch").value="";
   renderOrderProductResults();
 }
 
 function addProductToOrder(p){
-  const existing=currentOrderItems.find(x=>
-    String(x.product_id||"")===String(p.id||"") ||
-    (x.code&&p.code&&x.code===p.code)
-  );
-
-  if(existing){
-    existing.quantity=Number(existing.quantity||0)+1;
-  }else{
-    currentOrderItems.push({
-      product_id:p.id,
-      code:p.code||"",
-      name:p.name||"",
-      pack:p.pack||"",
-      price:mainRate(p),
-      base_price:mainRate(p),
-      carton_rate:cartonRate(p),
-      rate_type:"main",
-      rate:mainRate(p),
-      quantity:1,
-      bonus:0,
-      value:mainRate(p)
-    });
-  }
-
+  const existing=currentOrderItems.find(x=>String(x.product_id||"")===String(p.id||"")||(x.code&&p.code&&x.code===p.code));
+  if(existing)existing.quantity=Number(existing.quantity||0)+1;
+  else currentOrderItems.push({product_id:p.id,code:p.code||"",name:p.name||"",pack:p.pack||"",price:mainRate(p),base_price:mainRate(p),carton_rate:cartonRate(p),rate_type:"main",rate:mainRate(p),quantity:1,bonus:0,value:mainRate(p)});
   renderOrderItems();
 }
 
 function renderOrderItems(){
   const box=document.getElementById("orderItems");
-
-  if(!currentOrderItems.length){
-    box.innerHTML='<div class="empty">এখনো কোনো Product যোগ করা হয়নি</div>';
-  }else{
-    box.innerHTML=currentOrderItems.map((item,i)=>{
-      const type=item.rate_type||"main";
-      const selectedRate=type==="carton"
-        ? Number(item.carton_rate||0)
-        : Number(item.price||0);
-
-      return `
+  if(!currentOrderItems.length)box.innerHTML='<div class="empty">এখনো কোনো Product যোগ করা হয়নি</div>';
+  else box.innerHTML=currentOrderItems.map((item,i)=>{
+    const type=item.rate_type||"main";
+    const selectedRate=type==="carton"?Number(item.carton_rate||0):Number(item.price||0);
+    return `
       <div class="order-item">
-        <div class="order-item-top">
-          <div>
-            <div class="order-item-name">${escapeHtml(item.name)}</div>
-            <div class="small">
-              ${escapeHtml(item.code)} · Pack ${escapeHtml(item.pack)}
-            </div>
-          </div>
-          <button class="btn btn-danger" style="padding:7px 9px" onclick="removeOrderItem(${i})">✕</button>
-        </div>
-
+        <div class="order-item-top"><div><div class="order-item-name">${escapeHtml(item.name)}</div><div class="small">${escapeHtml(item.code)} · Pack ${escapeHtml(item.pack)}</div></div><button class="btn btn-danger" style="padding:7px 9px" onclick="removeOrderItem(${i})">✕</button></div>
         <div class="rate-box">
-          <div class="field">
-            <label>Rate Type</label>
-            <select onchange="changeItemRateType(${i},this.value)">
-              <option value="main" ${type==="main"?"selected":""}>মূল রেট</option>
-              <option value="carton" ${type==="carton"?"selected":""}>Carton Rate</option>
-            </select>
-          </div>
-          <div class="selected-rate">
-            <div class="small">এই অর্ডারে প্রযোজ্য রেট</div>
-            ${type==="carton"?"Carton Rate":"মূল রেট"}: ${money(selectedRate)}
-          </div>
+          <div class="field"><label>Rate Type</label><select onchange="changeItemRateType(${i},this.value)"><option value="main" ${type==="main"?"selected":""}>মূল রেট</option><option value="carton" ${type==="carton"?"selected":""}>Carton Rate</option></select></div>
+          <div class="selected-rate"><div class="small">এই অর্ডারে প্রযোজ্য রেট</div>${type==="carton"?"Carton Rate":"মূল রেট"}: ${money(selectedRate)}</div>
         </div>
-
-        <div class="small" style="margin-top:7px">
-          মূল রেট: ${money(item.base_price??item.price)} · Carton Rate: ${money(item.carton_rate)}
-        </div>
-
+        <div class="small" style="margin-top:7px">মূল রেট: ${money(item.base_price??item.price)} · Carton Rate: ${money(item.carton_rate)}</div>
         <div class="qty-row">
-          <div class="field">
-            <label>Qty</label>
-            <input type="number" min="1" value="${Number(item.quantity||0)}"
-                   onchange="changeItemQty(${i},this.value)">
-          </div>
-          <div class="field">
-            <label>Bonus</label>
-            <input type="number" min="0" value="${Number(item.bonus||0)}"
-                   onchange="changeItemBonus(${i},this.value)">
-          </div>
-          <div class="field">
-            <label>Value</label>
-            <input readonly value="${money(selectedRate*Number(item.quantity||0))}">
-          </div>
+          <div class="field"><label>Qty</label><input type="number" min="1" value="${Number(item.quantity||0)}" onchange="changeItemQty(${i},this.value)"></div>
+          <div class="field"><label>Bonus</label><input type="number" min="0" value="${Number(item.bonus||0)}" onchange="changeItemBonus(${i},this.value)"></div>
+          <div class="field"><label>Value</label><input readonly value="${money(selectedRate*Number(item.quantity||0))}"></div>
         </div>
       </div>`;
-    }).join("");
-  }
-
-  const total=currentOrderItems.reduce((s,x)=>{
-    const rate=(x.rate_type==="carton")
-      ? Number(x.carton_rate||0)
-      : Number(x.price||0);
-    return s+rate*Number(x.quantity||0);
-  },0);
-
+  }).join("");
+  const total=currentOrderItems.reduce((s,x)=>s+(x.rate_type==="carton"?Number(x.carton_rate||0):Number(x.price||0))*Number(x.quantity||0),0);
   document.getElementById("orderTotal").textContent=money(total);
 }
 
-function changeItemRateType(i,type){
-  if(!currentOrderItems[i])return;
-  currentOrderItems[i].rate_type=type==="carton"?"carton":"main";
-  renderOrderItems();
-}
-
-function changeItemQty(i,v){
-  currentOrderItems[i].quantity=Math.max(1,Number(v||1));
-  renderOrderItems();
-}
-
-function changeItemBonus(i,v){
-  currentOrderItems[i].bonus=Math.max(0,Number(v||0));
-  renderOrderItems();
-}
-
-function removeOrderItem(i){
-  currentOrderItems.splice(i,1);
-  renderOrderItems();
-}
+function changeItemRateType(i,type){if(!currentOrderItems[i])return;currentOrderItems[i].rate_type=type==="carton"?"carton":"main";renderOrderItems()}
+function changeItemQty(i,v){currentOrderItems[i].quantity=Math.max(1,Number(v||1));renderOrderItems()}
+function changeItemBonus(i,v){currentOrderItems[i].bonus=Math.max(0,Number(v||0));renderOrderItems()}
+function removeOrderItem(i){currentOrderItems.splice(i,1);renderOrderItems()}
 
 function getOrderFormData(){
   const shop=document.getElementById("shop").value.trim();
-
-  if(!shop){
-    alert("দোকানের নাম দিন");
-    return null;
-  }
-
-  if(!currentOrderItems.length){
-    alert("কমপক্ষে ১টি Product যোগ করুন");
-    return null;
-  }
-
+  if(!shop){alert("দোকানের নাম দিন");return null}
+  if(!currentOrderItems.length){alert("কমপক্ষে ১টি Product যোগ করুন");return null}
   const productsForOrder=currentOrderItems.map(item=>{
     const rateType=item.rate_type==="carton"?"carton":"main";
-    const selectedRate=rateType==="carton"
-      ? Number(item.carton_rate||0)
-      : Number(item.price||0);
-
-    return {
-      product_id:item.product_id||null,
-      code:item.code||"",
-      name:item.name||"",
-      pack:item.pack||"",
-      // base_price keeps the original/main rate.
-      base_price:Number(item.price||0),
-      // IMPORTANT: price is the ACTUAL rate used for this order.
-      // This keeps older order/admin pages from accidentally calculating with the main rate.
-      price:selectedRate,
-      carton_rate:Number(item.carton_rate||0),
-      rate_type:rateType,
-      rate:selectedRate,
-      quantity:Number(item.quantity||0),
-      bonus:Number(item.bonus||0),
-      value:selectedRate*Number(item.quantity||0)
-    };
+    const selectedRate=rateType==="carton"?Number(item.carton_rate||0):Number(item.price||0);
+    return {product_id:item.product_id||null,code:item.code||"",name:item.name||"",pack:item.pack||"",base_price:Number(item.price||0),price:selectedRate,carton_rate:Number(item.carton_rate||0),rate_type:rateType,rate:selectedRate,quantity:Number(item.quantity||0),bonus:Number(item.bonus||0),value:selectedRate*Number(item.quantity||0)};
   });
-
   const total=productsForOrder.reduce((s,x)=>s+Number(x.value||0),0);
-
-  return {
-    market:document.getElementById("marketSelect")?.value.trim()||"",
-    shop,
-    shop_code:document.getElementById("shopCode")?.value.trim()||"",
-    address:document.getElementById("address").value.trim(),
-    mobile:document.getElementById("mobile").value.trim(),
-    representative:document.getElementById("representative").value.trim(),
-    order_date:document.getElementById("orderDate").value,
-    delivery_date:document.getElementById("deliveryDate").value,
-    note:document.getElementById("note").value.trim(),
-    products:productsForOrder,
-    total
-  };
+  return {market:document.getElementById("marketSelect")?.value.trim()||"",shop,shop_code:document.getElementById("shopCode")?.value.trim()||"",address:document.getElementById("address").value.trim(),mobile:document.getElementById("mobile").value.trim(),representative:document.getElementById("representative").value.trim(),order_date:document.getElementById("orderDate").value,delivery_date:document.getElementById("deliveryDate").value,note:document.getElementById("note").value.trim(),products:productsForOrder,total};
 }
 
-function saveDrafts(){
-  localStorage.setItem(DRAFTS_KEY,JSON.stringify(draftOrders));
-}
-
-function loadDrafts(){
-  try{
-    draftOrders=JSON.parse(localStorage.getItem(DRAFTS_KEY)||"[]");
-  }catch{
-    draftOrders=[];
-  }
-}
+function saveDrafts(){localStorage.setItem(DRAFTS_KEY,JSON.stringify(draftOrders))}
+function loadDrafts(){try{draftOrders=JSON.parse(localStorage.getItem(DRAFTS_KEY)||"[]")}catch{draftOrders=[]}}
 
 function openOrderModal(draftId=null){
-  editingDraftId=draftId;
-  currentOrderItems=[];
-
-  document.getElementById("orderModalTitle").textContent=
-    draftId?"✏️ Draft Edit":"➕ নতুন অর্ডার";
-
+  editingDraftId=draftId;currentOrderItems=[];
+  document.getElementById("orderModalTitle").textContent=draftId?"✏️ Draft Edit":"➕ নতুন অর্ডার";
   document.getElementById("orderProductSearch").value="";
-
   if(draftId){
-    const d=draftOrders.find(x=>x.id===draftId);
-    if(!d){
-      alert("Draft পাওয়া যায়নি");
-      return;
-    }
-
-    populateMarketSelect(d.market||"");
-    populateShopSelect(findSavedShopId(d.shop||"",d.market||"",d.address||""));
-    document.getElementById("shop").value=d.shop||"";
-    document.getElementById("shopCode").value=d.shop_code||"";
-    document.getElementById("address").value=d.address||"";
-    document.getElementById("mobile").value=d.mobile||"";
-    document.getElementById("representative").value=d.representative||"";
-    document.getElementById("orderDate").value=d.order_date||"";
-    document.getElementById("deliveryDate").value=d.delivery_date||"";
-    document.getElementById("note").value=d.note||"";
-
-    currentOrderItems=(d.products||[]).map(x=>({
-      ...x,
-      price:Number(x.base_price??x.price??0),
-      base_price:Number(x.base_price??x.price??0),
-      carton_rate:Number(x.carton_rate||0),
-      rate_type:x.rate_type||"main",
-      rate:Number(x.rate||(
-        x.rate_type==="carton"?Number(x.carton_rate||0):Number(x.price||0)
-      )),
-      quantity:Number(x.quantity||0),
-      bonus:Number(x.bonus||0)
-    }));
+    const d=draftOrders.find(x=>x.id===draftId);if(!d){alert("Draft পাওয়া যায়নি");return}
+    populateMarketSelect(d.market||"");populateShopSelect(findSavedShopId(d.shop||"",d.market||"",d.address||""));
+    document.getElementById("shop").value=d.shop||"";document.getElementById("shopCode").value=d.shop_code||"";document.getElementById("address").value=d.address||"";document.getElementById("mobile").value=d.mobile||"";document.getElementById("representative").value=d.representative||"";document.getElementById("orderDate").value=d.order_date||"";document.getElementById("deliveryDate").value=d.delivery_date||"";document.getElementById("note").value=d.note||"";
+    currentOrderItems=(d.products||[]).map(x=>({...x,price:Number(x.base_price??x.price??0),base_price:Number(x.base_price??x.price??0),carton_rate:Number(x.carton_rate||0),rate_type:x.rate_type||"main",rate:Number(x.rate||(x.rate_type==="carton"?Number(x.carton_rate||0):Number(x.price||0))),quantity:Number(x.quantity||0),bonus:Number(x.bonus||0)}));
   }else{
-    document.getElementById("marketSelect").value="";
-    document.getElementById("shopSelect").value="";
-    document.getElementById("shop").value="";
-    document.getElementById("shopCode").value="";
-    // Saved Market/Shop থাকলে অটোমেটিক নির্বাচন হবে।
-    populateMarketSelect("", true);
-    populateShopSelect("", true);
-    document.getElementById("address").value="";
-    document.getElementById("mobile").value="";
-    document.getElementById("representative").value="";
-    document.getElementById("note").value="";
+    document.getElementById("marketSelect").value="";document.getElementById("shopSelect").value="";document.getElementById("shop").value="";document.getElementById("shopCode").value="";
+    populateMarketSelect("",true);populateShopSelect("",true);
+    document.getElementById("address").value="";document.getElementById("mobile").value="";document.getElementById("representative").value="";document.getElementById("note").value="";
     setTodayDates();
   }
-
-  renderOrderProductResults();
-  renderOrderItems();
-  openModal("orderModal");
+  renderOrderProductResults();renderOrderItems();openModal("orderModal");
 }
 
 function resetOrderForm(){
-  editingDraftId=null;
-  currentOrderItems=[];
+  editingDraftId=null;currentOrderItems=[];
   ["shop","shopCode","address","mobile","representative","note"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("marketSelect").value="";
-  populateShopSelect();
-  document.getElementById("shopSelect").value="";
-  document.getElementById("orderProductSearch").value="";
-  setTodayDates();
-  renderOrderProductResults();
-  renderOrderItems();
+  document.getElementById("marketSelect").value="";populateShopSelect();document.getElementById("shopSelect").value="";document.getElementById("orderProductSearch").value="";
+  setTodayDates();renderOrderProductResults();renderOrderItems();
 }
 
 function saveOrder(){
-  const data=getOrderFormData();
-  if(!data)return;
-
+  const data=getOrderFormData();if(!data)return;
   const now=new Date().toISOString();
-
   if(editingDraftId){
-    const i=draftOrders.findIndex(x=>x.id===editingDraftId);
-    if(i<0){
-      alert("Draft পাওয়া যায়নি");
-      return;
-    }
-
-    draftOrders[i]={
-      ...draftOrders[i],
-      ...data,
-      updated_at:now,
-      status:"draft"
-    };
-
-    showToast("✅ Draft আপডেট হয়েছে");
+    const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft পাওয়া যায়নি");return}
+    draftOrders[i]={...draftOrders[i],...data,updated_at:now,status:"draft"};showToast("✅ Draft আপডেট হয়েছে");
   }else{
-    const draft={
-      ...data,
-      id:"draft-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),
-      status:"draft",
-      created_at:now,
-      updated_at:now
-    };
-
-    draftOrders.unshift(draft);
-    editingDraftId=draft.id;
-    showToast("✅ Draft Save হয়েছে — এখনো Send হয়নি");
+    const draft={...data,id:"draft-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),status:"draft",created_at:now,updated_at:now};
+    draftOrders.unshift(draft);editingDraftId=draft.id;showToast("✅ Draft Save হয়েছে — এখনো Send হয়নি");
   }
-
-  saveDrafts();
-  updateDashboard();
-  renderHistory();
-  closeModal("orderModal");
+  saveDrafts();updateDashboard();renderHistory();closeModal("orderModal");
 }
 
 async function sendCurrentDraft(){
-  if(!editingDraftId){
-    alert("আগে Save Draft করুন। তারপর Draft খুলে Send Order চাপুন।");
-    return;
-  }
-
-  const data=getOrderFormData();
-  if(!data)return;
-
-  const i=draftOrders.findIndex(x=>x.id===editingDraftId);
-  if(i<0){
-    alert("Draft পাওয়া যায়নি");
-    return;
-  }
-
-  const now=new Date().toISOString();
-
-  draftOrders[i]={
-    ...draftOrders[i],
-    ...data,
-    updated_at:now
-  };
-
-  saveDrafts();
-  await sendDraftOrder(editingDraftId);
+  if(!editingDraftId){alert("আগে Save Draft করুন। তারপর Draft খুলে Send Order চাপুন।");return}
+  const data=getOrderFormData();if(!data)return;
+  const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft পাওয়া যায়নি");return}
+  draftOrders[i]={...draftOrders[i],...data,updated_at:new Date().toISOString()};saveDrafts();await sendDraftOrder(editingDraftId);
 }
 
 async function sendDraftOrder(draftId){
-  const draft=draftOrders.find(x=>x.id===draftId);
-
-  if(!draft){
-    alert("Draft পাওয়া যায়নি");
-    return;
-  }
-
+  const draft=draftOrders.find(x=>x.id===draftId);if(!draft){alert("Draft পাওয়া যায়নি");return}
   if(!confirm(`"${draft.shop}" এর অর্ডার Online-এ Send করবেন?`))return;
-
   const payload={
-    market:draft.market||"",
-    shop:draft.shop,
-    shop_code:draft.shop_code||"",
-    address:draft.address,
-    mobile:draft.mobile,
-    representative:draft.representative,
-    order_date:draft.order_date,
-    delivery_date:draft.delivery_date,
-    note:draft.note,
+    market:draft.market||"",shop:draft.shop,shop_code:draft.shop_code||"",address:draft.address,mobile:draft.mobile,representative:draft.representative,order_date:draft.order_date,delivery_date:draft.delivery_date,note:draft.note,
     products:(draft.products||[]).map(p=>{
-      const rateType=p.rate_type==="carton"?"carton":"main";
-      const selectedRate=rateType==="carton"
-        ? Number(p.carton_rate||0)
-        : Number(p.base_price??p.price??0);
-      const quantity=Number(p.quantity||0);
-      return {
-        product_id:p.product_id||null,
-        code:p.code||"",
-        name:p.name||"",
-        pack:p.pack||"",
-        base_price:Number(p.base_price??p.price??0),
-        // price is deliberately the selected/actual order rate.
-        price:selectedRate,
-        carton_rate:Number(p.carton_rate||0),
-        rate_type:rateType,
-        rate:selectedRate,
-        quantity,
-        bonus:Number(p.bonus||0),
-        value:selectedRate*quantity
-      };
+      const rateType=p.rate_type==="carton"?"carton":"main";const selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);const quantity=Number(p.quantity||0);
+      return {product_id:p.product_id||null,code:p.code||"",name:p.name||"",pack:p.pack||"",base_price:Number(p.base_price??p.price??0),price:selectedRate,carton_rate:Number(p.carton_rate||0),rate_type:rateType,rate:selectedRate,quantity,bonus:Number(p.bonus||0),value:selectedRate*quantity};
     }),
-    total:(draft.products||[]).reduce((sum,p)=>{
-      const rateType=p.rate_type==="carton"?"carton":"main";
-      const selectedRate=rateType==="carton"
-        ? Number(p.carton_rate||0)
-        : Number(p.base_price??p.price??0);
-      return sum+selectedRate*Number(p.quantity||0);
-    },0)
+    total:(draft.products||[]).reduce((sum,p)=>{const rateType=p.rate_type==="carton"?"carton":"main";const selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);return sum+selectedRate*Number(p.quantity||0)},0)
   };
-
-  const {data,error}=await supabaseClient
-    .from("orders")
-    .insert(payload)
-    .select()
-    .single();
-
-  if(error){
-    alert("❌ অর্ডার Send হয়নি:\n"+error.message);
-    return;
-  }
-
-  draftOrders=draftOrders.filter(x=>x.id!==draftId);
-  saveDrafts();
-
-  if(data)orders.unshift(data);
-
-  addNotification(
-    "অর্ডার Sent",
-    `${draft.shop} এর অর্ডার Online-এ পাঠানো হয়েছে।`
-  );
-
-  updateDashboard();
-  renderHistory();
-  closeModal("orderModal");
-  showToast("✅ অর্ডার সফলভাবে Online-এ Send হয়েছে");
+  const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
+  if(error){alert("❌ অর্ডার Send হয়নি:\n"+error.message);return}
+  draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data)orders.unshift(data);
+  addNotification("অর্ডার Sent",`${draft.shop} এর অর্ডার Online-এ পাঠানো হয়েছে।`);
+  updateDashboard();renderHistory();closeModal("orderModal");showToast("✅ অর্ডার সফলভাবে Online-এ Send হয়েছে");
 }
 
 async function loadOrdersFromSupabase(){
-  const {data,error}=await supabaseClient
-    .from("orders")
-    .select("*")
-    .order("created_at",{ascending:false});
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  orders=data||[];
-  updateDashboard();
-  renderHistory();
+  const {data,error}=await supabaseClient.from("orders").select("*").order("created_at",{ascending:false});
+  if(error){console.error(error);return}
+  orders=data||[];updateDashboard();renderHistory();
 }
 
 function updateDashboard(){
   document.getElementById("dashProducts").textContent=products.length;
   document.getElementById("dashOrders").textContent=orders.length;
-
   let items=0,total=0;
-
-  orders.forEach(o=>{
-    (Array.isArray(o.products)?o.products:[]).forEach(p=>{
-      items+=Number(p.quantity||0);
-      total+=Number(
-        p.value||
-        Number(p.rate||p.price||0)*Number(p.quantity||0)
-      );
-    });
-  });
-
-  document.getElementById("dashItems").textContent=items;
-  document.getElementById("dashTotal").textContent=money(total);
+  orders.forEach(o=>{(Array.isArray(o.products)?o.products:[]).forEach(p=>{items+=Number(p.quantity||0);total+=Number(p.value||Number(p.rate||p.price||0)*Number(p.quantity||0))})});
+  document.getElementById("dashItems").textContent=items;document.getElementById("dashTotal").textContent=money(total);
 }
 
-function openHistory(){
-  renderHistory();
-  openModal("historyModal");
-}
+function openHistory(){renderHistory();openModal("historyModal")}
 
 function renderHistory(){
-  const q=(document.getElementById("historySearch")?.value||"")
-    .trim().toLowerCase();
-
-  const draftBox=document.getElementById("draftList");
-
-  const drafts=draftOrders.filter(d=>
-    !q ||
-    String(d.shop||"").toLowerCase().includes(q) ||
-    String(d.mobile||"").toLowerCase().includes(q)
-  );
-
-  draftBox.innerHTML=
-    '<h4 style="margin:0 0 5px">📝 Saved Drafts ('+drafts.length+')</h4>'+
-    (
-      drafts.length
-      ? drafts.map(d=>`
-        <div class="draft-card">
-          <div class="history-head">
-            <b>${escapeHtml(d.shop)}</b>
-            <span class="badge draft">DRAFT</span>
-          </div>
-          <div class="small">
-            ${escapeHtml(d.mobile||"")} ·
-            ${escapeHtml(d.order_date||"")} ·
-            ${d.products?.length||0} Product ·
-            ${money(d.total)}
-          </div>
-          <div class="draft-actions">
-            <button class="btn btn-light" onclick="openOrderModal('${escapeHtml(d.id)}')">✏️ Edit / Add</button>
-            <button class="btn btn-primary" onclick="sendDraftOrder('${escapeHtml(d.id)}')">📤 Send</button>
-          </div>
-        </div>
-      `).join("")
-      : '<div class="empty">কোনো Saved Draft নেই</div>'
-    );
-
-  const sent=orders.filter(o=>
-    !q ||
-    String(o.shop||"").toLowerCase().includes(q) ||
-    String(o.mobile||"").toLowerCase().includes(q)
-  );
-
-  document.getElementById("historyList").innerHTML=
-    sent.length
-    ? sent.map((o,i)=>`
-      <div class="history-row">
-        <div class="history-head">
-          <div>
-            <b>${escapeHtml(o.shop||"")}</b>
-            <div class="small">
-              ${escapeHtml(o.mobile||"")} ·
-              ${escapeHtml(o.order_date||"")}
-            </div>
-          </div>
-          <span class="badge sent">SENT</span>
-        </div>
-        <div style="margin-top:5px">
-          ${(o.products||[]).length} Product ·
-          <b>${money(o.total)}</b>
-        </div>
-        <div class="history-actions">
-          <button class="btn btn-light" onclick="showOrderDetail(${i})">👁 বিস্তারিত</button>
-        </div>
-      </div>
-    `).join("")
-    : '<div class="empty">কোনো Sent Order নেই</div>';
+  const q=(document.getElementById("historySearch")?.value||"").trim().toLowerCase();
+  const drafts=draftOrders.filter(d=>!q||String(d.shop||"").toLowerCase().includes(q)||String(d.mobile||"").toLowerCase().includes(q));
+  document.getElementById("draftList").innerHTML='<h4 style="margin:0 0 5px">📝 Saved Drafts ('+drafts.length+')</h4>'+(drafts.length?drafts.map(d=>`
+    <div class="draft-card"><div class="history-head"><b>${escapeHtml(d.shop)}</b><span class="badge draft">DRAFT</span></div>
+    <div class="small">${escapeHtml(d.mobile||"")} · ${escapeHtml(d.order_date||"")} · ${d.products?.length||0} Product · ${money(d.total)}</div>
+    <div class="draft-actions"><button class="btn btn-light" onclick="openOrderModal('${escapeHtml(d.id)}')">✏️ Edit / Add</button><button class="btn btn-primary" onclick="sendDraftOrder('${escapeHtml(d.id)}')">📤 Send</button></div></div>
+  `).join(""):'<div class="empty">কোনো Saved Draft নেই</div>');
+  const sent=orders.filter(o=>!q||String(o.shop||"").toLowerCase().includes(q)||String(o.mobile||"").toLowerCase().includes(q));
+  document.getElementById("historyList").innerHTML=sent.length?sent.map((o,i)=>`
+    <div class="history-row"><div class="history-head"><div><b>${escapeHtml(o.shop||"")}</b><div class="small">${escapeHtml(o.mobile||"")} · ${escapeHtml(o.order_date||"")}</div></div><span class="badge sent">SENT</span></div>
+    <div style="margin-top:5px">${(o.products||[]).length} Product · <b>${money(o.total)}</b></div>
+    <div class="history-actions"><button class="btn btn-light" onclick="showOrderDetail(${i})">👁 বিস্তারিত</button></div></div>
+  `).join(""):'<div class="empty">কোনো Sent Order নেই</div>';
 }
 
 function showOrderDetail(index){
-  const o=orders[index];
-  if(!o)return;
-
+  const o=orders[index];if(!o)return;
   const items=Array.isArray(o.products)?o.products:[];
-
   document.getElementById("detailContent").innerHTML=`
-    <div class="card" style="margin:0 0 10px;background:#f8fbfa">
-      <b>মার্কেট:</b> ${escapeHtml(o.market||"")}<br>
-      <b>দোকান:</b> ${escapeHtml(o.shop)}<br>
-      <b>দোকানের কোড:</b> ${escapeHtml(o.shop_code||"")}<br>
-      <b>মোবাইল:</b> ${escapeHtml(o.mobile||"")}<br>
-      <b>ঠিকানা:</b> ${escapeHtml(o.address||"")}<br>
-      <b>Representative:</b> ${escapeHtml(o.representative||"")}<br>
-      <b>Order Date:</b> ${escapeHtml(o.order_date||"")}<br>
-      <b>Delivery:</b> ${escapeHtml(o.delivery_date||"")}
-    </div>
-
-    ${items.map(p=>{
-      const type=p.rate_type==="carton"?"carton":"main";
-      const rate=Number(p.rate||(
-        type==="carton"?p.carton_rate:p.price
-      )||0);
-
-      return `
-      <div class="order-item">
-        <b>${escapeHtml(p.name)}</b>
-        <div class="small">
-          ${escapeHtml(p.code||"")} ·
-          Pack ${escapeHtml(p.pack||"")} ·
-          Qty ${Number(p.quantity||0)} ·
-          Bonus ${Number(p.bonus||0)}
-        </div>
-        <div class="small" style="margin-top:3px">
-          Rate Type: <b>${type==="carton"?"Carton Rate":"মূল রেট"}</b>
-          · Rate ${money(rate)}
-        </div>
-        <div style="margin-top:4px">${money(p.value||rate*Number(p.quantity||0))}</div>
-      </div>`;
-    }).join("")}
-
-    <div class="total">মোট: ${money(o.total)}</div>
-    <div class="small">${escapeHtml(o.note||"")}</div>
-  `;
-
+    <div class="card" style="margin:0 0 10px;background:#f8fbfa"><b>মার্কেট:</b> ${escapeHtml(o.market||"")}<br><b>দোকান:</b> ${escapeHtml(o.shop)}<br><b>দোকানের কোড:</b> ${escapeHtml(o.shop_code||"")}<br><b>মোবাইল:</b> ${escapeHtml(o.mobile||"")}<br><b>ঠিকানা:</b> ${escapeHtml(o.address||"")}<br><b>Representative:</b> ${escapeHtml(o.representative||"")}<br><b>Order Date:</b> ${escapeHtml(o.order_date||"")}<br><b>Delivery:</b> ${escapeHtml(o.delivery_date||"")}</div>
+    ${items.map(p=>{const type=p.rate_type==="carton"?"carton":"main";const rate=Number(p.rate||(type==="carton"?p.carton_rate:p.price)||0);return `<div class="order-item"><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Qty ${Number(p.quantity||0)} · Bonus ${Number(p.bonus||0)}</div><div class="small" style="margin-top:3px">Rate Type: <b>${type==="carton"?"Carton Rate":"মূল রেট"}</b> · Rate ${money(rate)}</div><div style="margin-top:4px">${money(p.value||rate*Number(p.quantity||0))}</div></div>`}).join("")}
+    <div class="total">মোট: ${money(o.total)}</div><div class="small">${escapeHtml(o.note||"")}</div>`;
   openModal("detailModal");
 }
 
-function openProductManager(){
-  editingProductId=null;
-  clearProductForm();
-  renderProductManagerList();
-  openModal("productModal");
-}
-
-function clearProductForm(){
-  ["pCode","pName","pPack","pPrice","pCartonRate","pMrp","pStock"]
-    .forEach(id=>document.getElementById(id).value="");
-}
+function openProductManager(){editingProductId=null;clearProductForm();renderProductManagerList();openModal("productModal")}
+function clearProductForm(){["pCode","pName","pPack","pPrice","pCartonRate","pMrp","pStock"].forEach(id=>document.getElementById(id).value="")}
 
 function editProduct(id){
-  const p=products.find(x=>String(x.id)===String(id));
-  if(!p)return;
-
+  const p=products.find(x=>String(x.id)===String(id));if(!p)return;
   editingProductId=id;
-
-  document.getElementById("pCode").value=p.code||"";
-  document.getElementById("pName").value=p.name||"";
-  document.getElementById("pPack").value=p.pack||"";
-  document.getElementById("pPrice").value=p.price||0;
-  document.getElementById("pCartonRate").value=p.carton_rate||0;
-  document.getElementById("pMrp").value=p.mrp||0;
-  document.getElementById("pStock").value=p.stock||0;
-
+  document.getElementById("pCode").value=p.code||"";document.getElementById("pName").value=p.name||"";document.getElementById("pPack").value=p.pack||"";document.getElementById("pPrice").value=p.price||0;document.getElementById("pCartonRate").value=p.carton_rate||0;document.getElementById("pMrp").value=p.mrp||0;document.getElementById("pStock").value=p.stock||0;
   openModal("productModal");
 }
 
 async function saveProduct(){
-  const payload={
-    code:document.getElementById("pCode").value.trim(),
-    name:document.getElementById("pName").value.trim(),
-    pack:document.getElementById("pPack").value.trim(),
-    price:Number(document.getElementById("pPrice").value||0),
-    carton_rate:Number(document.getElementById("pCartonRate").value||0),
-    mrp:Number(document.getElementById("pMrp").value||0),
-    stock:Number(document.getElementById("pStock").value||0)
-  };
-
-  if(!payload.name){
-    alert("Product name দিন");
-    return;
-  }
-
+  const payload={code:document.getElementById("pCode").value.trim(),name:document.getElementById("pName").value.trim(),pack:document.getElementById("pPack").value.trim(),price:Number(document.getElementById("pPrice").value||0),carton_rate:Number(document.getElementById("pCartonRate").value||0),mrp:Number(document.getElementById("pMrp").value||0),stock:Number(document.getElementById("pStock").value||0)};
+  if(!payload.name){alert("Product name দিন");return}
   let result;
-
-  if(editingProductId){
-    result=await supabaseClient
-      .from("products")
-      .update(payload)
-      .eq("id",editingProductId);
-  }else{
-    result=await supabaseClient
-      .from("products")
-      .insert(payload);
-  }
-
-  if(result.error){
-    alert(
-      "Product Save হয়নি:\n"+
-      result.error.message+
-      "\n\nProducts টেবিলে carton_rate কলাম আছে কিনা দেখুন।"
-    );
-    return;
-  }
-
-  await loadProducts();
-  renderProductManagerList();
-  clearProductForm();
-  editingProductId=null;
-  showToast("✅ Product Save হয়েছে");
+  if(editingProductId)result=await supabaseClient.from("products").update(payload).eq("id",editingProductId);
+  else result=await supabaseClient.from("products").insert(payload);
+  if(result.error){alert("Product Save হয়নি:\n"+result.error.message+"\n\nProducts টেবিলে carton_rate কলাম আছে কিনা দেখুন।");return}
+  await loadProducts();renderProductManagerList();clearProductForm();editingProductId=null;showToast("✅ Product Save হয়েছে");
 }
 
 async function deleteProduct(id){
-  const p=products.find(x=>String(x.id)===String(id));
-  if(!p)return;
-
+  const p=products.find(x=>String(x.id)===String(id));if(!p)return;
   if(!confirm(`"${p.name}" ডিলিট করবেন?`))return;
-
-  const {error}=await supabaseClient
-    .from("products")
-    .delete()
-    .eq("id",id);
-
-  if(error){
-    alert("❌ Delete হয়নি:\n"+error.message);
-    return;
-  }
-
-  await loadProducts();
-  renderProductManagerList();
-  showToast("✅ Product Delete হয়েছে");
+  const {error}=await supabaseClient.from("products").delete().eq("id",id);
+  if(error){alert("❌ Delete হয়নি:\n"+error.message);return}
+  await loadProducts();renderProductManagerList();showToast("✅ Product Delete হয়েছে");
 }
 
 function renderProductManagerList(){
   const box=document.getElementById("productManagerList");
-
-  if(!products.length){
-    box.innerHTML='<div class="empty">Product নেই</div>';
-    return;
-  }
-
+  if(!products.length){box.innerHTML='<div class="empty">Product নেই</div>';return}
   box.innerHTML=products.slice(0,150).map(p=>`
-    <div class="history-row">
-      <div class="history-head">
-        <div>
-          <b>${escapeHtml(p.name)}</b>
-          <div class="small">
-            ${escapeHtml(p.code||"")} ·
-            Pack ${escapeHtml(p.pack||"")} ·
-            মূল ${money(mainRate(p))} ·
-            Carton ${money(cartonRate(p))} ·
-            MRP ${money(p.mrp)} ·
-            Stock ${Number(p.stock||0)}
-          </div>
-        </div>
-      </div>
-      <div class="history-actions">
-        <button class="btn btn-light" onclick="editProduct('${escapeHtml(String(p.id))}')">✏️ Edit</button>
-        <button class="btn btn-danger" onclick="deleteProduct('${escapeHtml(String(p.id))}')">🗑 Delete</button>
-      </div>
-    </div>
+    <div class="history-row"><div class="history-head"><div><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · মূল ${money(mainRate(p))} · Carton ${money(cartonRate(p))} · MRP ${money(p.mrp)} · Stock ${Number(p.stock||0)}</div></div></div>
+    <div class="history-actions"><button class="btn btn-light" onclick="editProduct('${escapeHtml(String(p.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteProduct('${escapeHtml(String(p.id))}')">🗑 Delete</button></div></div>
   `).join("");
 }
 
 function addNotification(title,text){
-  notifications.unshift({
-    id:Date.now(),
-    title,
-    text,
-    created_at:new Date().toISOString()
-  });
-
+  notifications.unshift({id:Date.now(),title,text,created_at:new Date().toISOString()});
   notifications=notifications.slice(0,50);
-
-  localStorage.setItem(
-    LOCAL_NOTICES_KEY,
-    JSON.stringify(notifications)
-  );
-
+  localStorage.setItem(LOCAL_NOTICES_KEY,JSON.stringify(notifications));
   renderNotifications();
 }
-
-function loadNotifications(){
-  try{
-    notifications=JSON.parse(
-      localStorage.getItem(LOCAL_NOTICES_KEY)||"[]"
-    );
-  }catch{
-    notifications=[];
-  }
-}
-
+function loadNotifications(){try{notifications=JSON.parse(localStorage.getItem(LOCAL_NOTICES_KEY)||"[]")}catch{notifications=[]}}
 function renderNotifications(){
   const box=document.getElementById("notificationList");
-
-  box.innerHTML=notifications.length
-    ? notifications.map(n=>`
-      <div class="notice">
-        <b>${escapeHtml(n.title)}</b>
-        <div class="small">${escapeHtml(n.text)}</div>
-      </div>
-    `).join("")
-    : '<div class="empty">কোনো Notification নেই</div>';
+  box.innerHTML=notifications.length?notifications.map(n=>`<div class="notice"><b>${escapeHtml(n.title)}</b><div class="small">${escapeHtml(n.text)}</div></div>`).join(""):'<div class="empty">কোনো Notification নেই</div>';
 }
+function openNotifications(){renderNotifications();openModal("notificationModal")}
 
-function openNotifications(){
-  renderNotifications();
-  openModal("notificationModal");
-}
-
-const MARKET_SHOPS_KEY = "kohinoor_market_shop_list_v2_user_";
-let marketShops = [];
-let editingMarketShopId = null;
-
-function getMarketShopsKey(){
-  return currentUser?.id ? MARKET_SHOPS_KEY + currentUser.id : null;
-}
-
+const MARKET_SHOPS_KEY="kohinoor_market_shop_list_v2_user_";
+let marketShops=[];let editingMarketShopId=null;
+function getMarketShopsKey(){return currentUser?.id?MARKET_SHOPS_KEY+currentUser.id:null}
 function loadMarketShops(){
   const key=getMarketShopsKey();
-  if(!key){ marketShops=[]; populateMarketSelect(); populateShopSelect(); return; }
-  try{ marketShops = JSON.parse(localStorage.getItem(key)||"[]"); if(!Array.isArray(marketShops)) marketShops=[]; }
-  catch{ marketShops=[]; }
-  populateMarketSelect();
-  populateShopSelect();
+  if(!key){marketShops=[];populateMarketSelect();populateShopSelect();return}
+  try{marketShops=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(marketShops))marketShops=[]}catch{marketShops=[]}
+  populateMarketSelect();populateShopSelect();
 }
-
 function saveMarketShops(){
   const key=getMarketShopsKey();
-  if(!key){ alert("User session পাওয়া যায়নি। আবার Login করুন।"); return; }
-  localStorage.setItem(key, JSON.stringify(marketShops));
-  populateMarketSelect();
-  populateShopSelect();
+  if(!key){alert("User session পাওয়া যায়নি। আবার Login করুন।");return}
+  localStorage.setItem(key,JSON.stringify(marketShops));populateMarketSelect();populateShopSelect();
 }
-
-function openMarketShopManager(){
-  loadMarketShops();
-  clearMarketShopForm();
-  renderMarketShopList();
-  openModal("marketShopModal");
-}
-
-function clearMarketShopForm(){
-  editingMarketShopId=null;
-  ["msMarket","msShop","msShopCode","msAddress","msMobile","msRepresentative"].forEach(id=>document.getElementById(id).value="");
-}
-
+function openMarketShopManager(){loadMarketShops();clearMarketShopForm();renderMarketShopList();openModal("marketShopModal")}
+function clearMarketShopForm(){editingMarketShopId=null;["msMarket","msShop","msShopCode","msAddress","msMobile","msRepresentative"].forEach(id=>document.getElementById(id).value="")}
 function saveMarketShop(){
-  const market=document.getElementById("msMarket").value.trim();
-  const shop=document.getElementById("msShop").value.trim();
-  if(!market){alert("মার্কেটের নাম দিন");return;}
-  if(!shop){alert("দোকানের নাম দিন");return;}
-  const item={
-    id:editingMarketShopId||("ms-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)),
-    market,shop,
-    shop_code:document.getElementById("msShopCode").value.trim(),
-    address:document.getElementById("msAddress").value.trim(),
-    mobile:document.getElementById("msMobile").value.trim(),
-    representative:document.getElementById("msRepresentative").value.trim(),
-    updated_at:new Date().toISOString()
-  };
-  if(editingMarketShopId){
-    const i=marketShops.findIndex(x=>x.id===editingMarketShopId);
-    if(i>=0) marketShops[i]={...marketShops[i],...item};
-  }else marketShops.unshift(item);
-  saveMarketShops();
-  renderMarketShopList();
-  clearMarketShopForm();
-  showToast("✅ Market/Shop Save হয়েছে");
+  const market=document.getElementById("msMarket").value.trim(),shop=document.getElementById("msShop").value.trim();
+  if(!market){alert("মার্কেটের নাম দিন");return}if(!shop){alert("দোকানের নাম দিন");return}
+  const item={id:editingMarketShopId||("ms-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)),market,shop,shop_code:document.getElementById("msShopCode").value.trim(),address:document.getElementById("msAddress").value.trim(),mobile:document.getElementById("msMobile").value.trim(),representative:document.getElementById("msRepresentative").value.trim(),updated_at:new Date().toISOString()};
+  if(editingMarketShopId){const i=marketShops.findIndex(x=>x.id===editingMarketShopId);if(i>=0)marketShops[i]={...marketShops[i],...item}}else marketShops.unshift(item);
+  saveMarketShops();renderMarketShopList();clearMarketShopForm();showToast("✅ Market/Shop Save হয়েছে");
 }
-
 function editMarketShop(id){
-  const x=marketShops.find(v=>String(v.id)===String(id)); if(!x)return;
-  editingMarketShopId=x.id;
-  document.getElementById("msMarket").value=x.market||"";
-  document.getElementById("msShop").value=x.shop||"";
-  document.getElementById("msShopCode").value=x.shop_code||"";
-  document.getElementById("msAddress").value=x.address||"";
-  document.getElementById("msMobile").value=x.mobile||"";
-  document.getElementById("msRepresentative").value=x.representative||"";
-  document.getElementById("msMarket").focus();
+  const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;
+  editingMarketShopId=x.id;document.getElementById("msMarket").value=x.market||"";document.getElementById("msShop").value=x.shop||"";document.getElementById("msShopCode").value=x.shop_code||"";document.getElementById("msAddress").value=x.address||"";document.getElementById("msMobile").value=x.mobile||"";document.getElementById("msRepresentative").value=x.representative||"";document.getElementById("msMarket").focus();
 }
-
 function deleteMarketShop(id){
-  const x=marketShops.find(v=>String(v.id)===String(id)); if(!x)return;
+  const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;
   if(!confirm(`"${x.market} — ${x.shop}" ডিলিট করবেন?`))return;
-  marketShops=marketShops.filter(v=>String(v.id)!==String(id));
-  saveMarketShops(); renderMarketShopList(); clearMarketShopForm();
-  showToast("🗑️ তথ্য Delete হয়েছে");
+  marketShops=marketShops.filter(v=>String(v.id)!==String(id));saveMarketShops();renderMarketShopList();clearMarketShopForm();showToast("🗑️ তথ্য Delete হয়েছে");
 }
-
 function renderMarketShopList(){
-  const box=document.getElementById("marketShopList"); if(!box)return;
+  const box=document.getElementById("marketShopList");if(!box)return;
   const q=(document.getElementById("marketShopSearch")?.value||"").trim().toLowerCase();
-  const list=marketShops.filter(x=>!q || [x.market,x.shop,x.shop_code,x.address,x.mobile].some(v=>String(v||"").toLowerCase().includes(q)));
-  box.innerHTML=list.length?list.map(x=>`\
-    <div class="list-row">\
-      <div class="list-row-head"><div><b>${escapeHtml(x.shop)}</b><div class="small">📍 ${escapeHtml(x.market)}</div>${x.shop_code?`<div class="small">🏷️ কোড: ${escapeHtml(x.shop_code)}</div>`:""}<div class="small">${escapeHtml(x.address||"")}</div>${x.mobile?`<div class="small">📞 ${escapeHtml(x.mobile)}</div>`:""}</div><span class="badge">Saved</span></div>\
-      <div class="list-row-actions"><button class="btn btn-light" onclick="editMarketShop('${escapeHtml(String(x.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteMarketShop('${escapeHtml(String(x.id))}')">🗑 Delete</button></div>\
-    </div>`).join(""):'<div class="empty">কোনো Market/Shop তালিকা নেই</div>';
+  const list=marketShops.filter(x=>!q||[x.market,x.shop,x.shop_code,x.address,x.mobile].some(v=>String(v||"").toLowerCase().includes(q)));
+  box.innerHTML=list.length?list.map(x=>`
+    <div class="list-row"><div class="list-row-head"><div><b>${escapeHtml(x.shop)}</b><div class="small">📍 ${escapeHtml(x.market)}</div>${x.shop_code?`<div class="small">🏷️ কোড: ${escapeHtml(x.shop_code)}</div>`:""}<div class="small">${escapeHtml(x.address||"")}</div>${x.mobile?`<div class="small">📞 ${escapeHtml(x.mobile)}</div>`:""}</div><span class="badge">Saved</span></div>
+    <div class="list-row-actions"><button class="btn btn-light" onclick="editMarketShop('${escapeHtml(String(x.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteMarketShop('${escapeHtml(String(x.id))}')">🗑 Delete</button></div></div>
+  `).join(""):'<div class="empty">কোনো Market/Shop তালিকা নেই</div>';
 }
-
-function populateMarketSelect(selected="", autoSelect=false){
-  const s=document.getElementById("marketSelect"); if(!s)return;
-  const markets=[...new Set(marketShops.map(x=>x.market).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'bn'));
+function populateMarketSelect(selected="",autoSelect=false){
+  const s=document.getElementById("marketSelect");if(!s)return;
+  const markets=[...new Set(marketShops.map(x=>x.market).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"bn"));
   s.innerHTML='<option value="">-- মার্কেট নির্বাচন করুন --</option>'+markets.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
-  if(selected) s.value=selected;
-  else if(autoSelect && markets.length===1) s.value=markets[0];
+  if(selected)s.value=selected;else if(autoSelect&&markets.length===1)s.value=markets[0];
 }
-
-function populateShopSelect(selected="", autoSelect=false){
-  const s=document.getElementById("shopSelect"); if(!s)return;
+function populateShopSelect(selected="",autoSelect=false){
+  const s=document.getElementById("shopSelect");if(!s)return;
   const market=document.getElementById("marketSelect")?.value||"";
   const list=marketShops.filter(x=>!market||x.market===market);
   s.innerHTML='<option value="">-- দোকান নির্বাচন করুন --</option>'+list.map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.shop)}${x.shop_code?` — ${escapeHtml(x.shop_code)}`:""}</option>`).join("");
-  if(selected) s.value=selected;
-  else if(autoSelect && list.length===1) s.value=String(list[0].id);
-  if(autoSelect && list.length===1) selectSavedShop();
+  if(selected)s.value=selected;else if(autoSelect&&list.length===1)s.value=String(list[0].id);
+  if(autoSelect&&list.length===1)selectSavedShop();
 }
-
-function filterShopList(autoSelect=false){ populateShopSelect("",autoSelect); }
-
+function filterShopList(autoSelect=false){populateShopSelect("",autoSelect)}
 function selectSavedShop(){
-  const id=document.getElementById("shopSelect")?.value; if(!id)return;
-  const x=marketShops.find(v=>String(v.id)===String(id)); if(!x)return;
-  document.getElementById("marketSelect").value=x.market||"";
-  document.getElementById("shop").value=x.shop||"";
-  document.getElementById("shopCode").value=x.shop_code||"";
-  document.getElementById("address").value=x.address||"";
-  document.getElementById("mobile").value=x.mobile||"";
-  document.getElementById("representative").value=x.representative||"";
+  const id=document.getElementById("shopSelect")?.value;if(!id)return;
+  const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;
+  document.getElementById("marketSelect").value=x.market||"";document.getElementById("shop").value=x.shop||"";document.getElementById("shopCode").value=x.shop_code||"";document.getElementById("address").value=x.address||"";document.getElementById("mobile").value=x.mobile||"";document.getElementById("representative").value=x.representative||"";
 }
-
 function findSavedShopId(shop,market,address){
-  const x=marketShops.find(v=>v.shop===shop && (!market || v.market===market) && (!address || v.address===address));
-  return x?.id||"";
+  const x=marketShops.find(v=>v.shop===shop&&(!market||v.market===market)&&(!address||v.address===address));return x?.id||"";
 }
 
 function setupRealtime(){
   if(realtimeChannel)return;
-
-  realtimeChannel=supabaseClient
-    .channel("orders-live")
-    .on(
-      "postgres_changes",
-      {event:"INSERT",schema:"public",table:"orders"},
-      payload=>{
-        const row=payload.new;
-
-        if(!orders.some(o=>String(o.id)===String(row.id))){
-          orders.unshift(row);
-          updateDashboard();
-          renderHistory();
-
-          addNotification(
-            "নতুন Online Order",
-            `${row.shop||"একটি দোকান"} থেকে নতুন অর্ডার এসেছে।`
-          );
-        }
-      }
-    )
-    .subscribe(status=>{
-      const el=document.getElementById("onlineStatus");
-
-      if(status==="SUBSCRIBED"){
-        el.textContent="অনলাইন";
-        el.className="online";
-      }else{
-        el.textContent="অনলাইন সংযোগ অপেক্ষায়";
-        el.className="offline";
-      }
-    });
+  realtimeChannel=supabaseClient.channel("orders-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"orders"},payload=>{
+    const row=payload.new;
+    if(!orders.some(o=>String(o.id)===String(row.id))){
+      orders.unshift(row);updateDashboard();renderHistory();addNotification("নতুন Online Order",`${row.shop||"একটি দোকান"} থেকে নতুন অর্ডার এসেছে।`);
+    }
+  }).subscribe(status=>{
+    const el=document.getElementById("onlineStatus");
+    if(status==="SUBSCRIBED"){el.textContent="অনলাইন";el.className="online"}else{el.textContent="অনলাইন সংযোগ অপেক্ষায়";el.className="offline"}
+  });
 }
-
-function startPolling(){
-  clearInterval(pollingTimer);
-  pollingTimer=setInterval(loadOrdersFromSupabase,20000);
-}
-
-window.addEventListener("beforeunload",()=>{
-  if(realtimeChannel){
-    supabaseClient.removeChannel(realtimeChannel);
-  }
-});
+function startPolling(){clearInterval(pollingTimer);pollingTimer=setInterval(loadOrdersFromSupabase,20000)}
+window.addEventListener("beforeunload",()=>{if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel)});
 </script>
 </body>
 </html>

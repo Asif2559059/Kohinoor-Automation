@@ -12,7 +12,7 @@
 
 body{
   margin:0;
-  font-family:Arial,sans-serif;
+  font-family:Arial,"Noto Sans Bengali",sans-serif;
   background:linear-gradient(135deg,#0b6b45,#16a085);
   min-height:100vh;
   display:flex;
@@ -74,6 +74,7 @@ button:disabled{
   border-radius:8px;
   display:none;
   text-align:center;
+  line-height:1.5;
 }
 
 .error{
@@ -115,6 +116,7 @@ button:disabled{
     type="email"
     id="email"
     placeholder="আপনার ইমেইল"
+    autocomplete="email"
   >
 
   <label>পাসওয়ার্ড</label>
@@ -122,6 +124,7 @@ button:disabled{
     type="password"
     id="password"
     placeholder="পাসওয়ার্ড"
+    autocomplete="current-password"
   >
 
   <button id="loginBtn" onclick="login()">
@@ -148,11 +151,22 @@ const ADMIN_EMAIL =
   "mdyeamin10288@gmail.com";
 
 const supabaseClient =
-  supabase.createClient(
+  window.supabase.createClient(
     SUPABASE_URL,
-    SUPABASE_KEY
+    SUPABASE_KEY,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+      }
+    }
   );
 
+
+// ========================================
+// MESSAGE
+// ========================================
 
 function showMessage(text,type){
 
@@ -168,19 +182,46 @@ function showMessage(text,type){
 }
 
 
+function hideMessage(){
+
+  const box =
+    document.getElementById("message");
+
+  box.style.display = "none";
+}
+
+
+// ========================================
+// BUTTON
+// ========================================
+
+function setLoginButtonLoading(loading){
+
+  const btn =
+    document.getElementById("loginBtn");
+
+  btn.disabled = loading;
+
+  btn.textContent =
+    loading ? "যাচাই হচ্ছে..." : "লগইন";
+}
+
+
+// ========================================
+// LOGIN
+// ========================================
+
 async function login(){
 
   const email =
     document.getElementById("email")
-    .value
-    .trim();
+      .value
+      .trim()
+      .toLowerCase();
 
   const password =
     document.getElementById("password")
-    .value;
-
-  const btn =
-    document.getElementById("loginBtn");
+      .value;
 
   if(!email || !password){
 
@@ -192,188 +233,461 @@ async function login(){
     return;
   }
 
-  btn.disabled = true;
+  hideMessage();
 
-  btn.textContent = "যাচাই হচ্ছে...";
+  setLoginButtonLoading(true);
 
-  document.getElementById("message")
-    .style.display = "none";
+  try{
 
+    // ====================================
+    // LOGIN WITH SUPABASE
+    // ====================================
 
-  // =========================
-  // LOGIN
-  // =========================
-
-  const { data, error } =
+    const {
+      data,
+      error
+    } =
     await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
+      email:email,
+      password:password
     });
 
 
-  if(error){
+    if(error){
 
-    btn.disabled = false;
+      console.error(
+        "LOGIN ERROR:",
+        error
+      );
 
-    btn.textContent = "লগইন";
+      let message =
+        error.message || "লগইন করা যায়নি।";
 
-    showMessage(
-      "লগইন ব্যর্থ: " + error.message,
-      "error"
+      // Email confirmation না হলে
+      if(
+        message.toLowerCase().includes(
+          "email not confirmed"
+        )
+      ){
+
+        message =
+          "আপনার Email এখনো Confirm করা হয়নি। Email থেকে Confirmation Link-এ ক্লিক করুন।";
+      }
+
+      showMessage(
+        "❌ " + message,
+        "error"
+      );
+
+      setLoginButtonLoading(false);
+
+      return;
+    }
+
+
+    const user = data?.user;
+
+
+    if(!user){
+
+      showMessage(
+        "User পাওয়া যায়নি। আবার চেষ্টা করুন।",
+        "error"
+      );
+
+      setLoginButtonLoading(false);
+
+      return;
+    }
+
+
+    console.log(
+      "LOGIN USER:",
+      user
     );
 
-    return;
-  }
+
+    // ====================================
+    // ADMIN CHECK
+    // ====================================
+
+    if(
+      user.email &&
+      user.email.toLowerCase() ===
+      ADMIN_EMAIL.toLowerCase()
+    ){
+
+      localStorage.setItem(
+        "kohinoor_user_profile",
+        JSON.stringify({
+          id:user.id,
+          email:user.email,
+          username:"Admin",
+          status:"approved"
+        })
+      );
+
+      showMessage(
+        "✅ অ্যাডমিন হিসেবে লগইন সফল।",
+        "success"
+      );
+
+      setTimeout(function(){
+
+        window.location.replace(
+          "admin.html"
+        );
+
+      },500);
+
+      return;
+    }
 
 
-  const user = data.user;
+    // ====================================
+    // USER PROFILE
+    // ====================================
+
+    let profile = null;
 
 
-  // =========================
-  // ADMIN CHECK
-  // =========================
-
-  if(
-    user.email &&
-    user.email.toLowerCase() ===
-    ADMIN_EMAIL.toLowerCase()
-  ){
-
-    showMessage(
-      "অ্যাডমিন হিসেবে লগইন সফল।",
-      "success"
-    );
-
-    setTimeout(function(){
-
-      window.location.href = "admin.html";
-
-    },500);
-
-    return;
-  }
-
-
-  // =========================
-  // USER PROFILE CHECK
-  // =========================
-
-  const { data: profile, error: profileError } =
+    const {
+      data:profileData,
+      error:profileError
+    } =
     await supabaseClient
       .from("user_profiles")
       .select(
-        "id, username, email, status, created_at"
+        "id,username,email,status,created_at,avatar_url"
       )
-      .eq("id", user.id)
+      .eq("id",user.id)
       .maybeSingle();
 
 
-  console.log("PROFILE:", profile);
-  console.log("PROFILE ERROR:", profileError);
+    profile = profileData;
 
 
-  // Profile পাওয়া যায়নি
-  if(profileError || !profile){
-
-    await supabaseClient.auth.signOut();
-
-    btn.disabled = false;
-
-    btn.textContent = "লগইন";
-
-    showMessage(
-      "আপনার User Profile পাওয়া যায়নি। আবার Signup করুন।",
-      "error"
+    console.log(
+      "PROFILE:",
+      profile
     );
 
-    return;
-  }
+    console.log(
+      "PROFILE ERROR:",
+      profileError
+    );
 
 
-  // =========================
-  // PENDING
-  // =========================
+    // ====================================
+    // PROFILE ERROR
+    // ====================================
 
-  if(profile.status === "pending"){
+    if(profileError){
 
-    await supabaseClient.auth.signOut();
+      console.error(
+        "PROFILE LOAD ERROR:",
+        profileError
+      );
 
-    btn.disabled = false;
+      /*
+       IMPORTANT:
+       এখানে আর সঙ্গে সঙ্গে signOut করা হচ্ছে না।
+       কারণ RLS বা temporary database error হলে
+       account অযথা logout হয়ে যাচ্ছিল।
+      */
 
-    btn.textContent = "লগইন";
+      showMessage(
+        "⚠️ Account পাওয়া গেছে, কিন্তু User Profile লোড করা যাচ্ছে না। কিছুক্ষণ পরে আবার চেষ্টা করুন।",
+        "error"
+      );
+
+      setLoginButtonLoading(false);
+
+      return;
+    }
+
+
+    // ====================================
+    // PROFILE NOT FOUND
+    // ====================================
+
+    if(!profile){
+
+      /*
+       User account আছে কিন্তু profile নেই।
+       এই অবস্থায় logout না করে পরিষ্কার message দেখানো হবে।
+      */
+
+      showMessage(
+        "⚠️ আপনার User Profile পাওয়া যায়নি। Signup সম্পূর্ণ হয়েছে কিনা যাচাই করুন।",
+        "error"
+      );
+
+      setLoginButtonLoading(false);
+
+      return;
+    }
+
+
+    // ====================================
+    // STATUS
+    // ====================================
+
+    const status =
+      String(
+        profile.status || ""
+      )
+      .trim()
+      .toLowerCase();
+
+
+    // ====================================
+    // PENDING
+    // ====================================
+
+    if(status === "pending"){
+
+      showMessage(
+        "⏳ আপনার Account এখনো Admin Approval-এর অপেক্ষায় আছে। Approval হওয়ার পর Login করতে পারবেন।",
+        "warning"
+      );
+
+      /*
+       এখানে signOut করা হচ্ছে না।
+       Session ঠিক থাকবে।
+      */
+
+      setLoginButtonLoading(false);
+
+      return;
+    }
+
+
+    // ====================================
+    // REJECTED
+    // ====================================
+
+    if(status === "rejected"){
+
+      showMessage(
+        "❌ আপনার Account Admin কর্তৃক Reject করা হয়েছে।",
+        "error"
+      );
+
+      setLoginButtonLoading(false);
+
+      return;
+    }
+
+
+    // ====================================
+    // APPROVED
+    // ====================================
+
+    if(status === "approved"){
+
+      localStorage.setItem(
+        "kohinoor_user_profile",
+        JSON.stringify(profile)
+      );
+
+
+      showMessage(
+        "✅ Login সফল। Dashboard-এ প্রবেশ করা হচ্ছে...",
+        "success"
+      );
+
+
+      setTimeout(function(){
+
+        window.location.replace(
+          "index.html"
+        );
+
+      },500);
+
+      return;
+    }
+
+
+    // ====================================
+    // EMPTY / UNKNOWN STATUS
+    // ====================================
+
+    /*
+     যদি Signup থেকে status না আসে,
+     তাহলে account-কে pending হিসেবে
+     treat করা হবে।
+    */
 
     showMessage(
-      "⏳ আপনার অ্যাকাউন্ট এখনো Admin Approval-এর অপেক্ষায় আছে। Approval না পাওয়া পর্যন্ত Dashboard-এ প্রবেশ করা যাবে না।",
+      "⏳ আপনার Account Approval-এর অপেক্ষায় আছে। Admin Approval হওয়ার পর Dashboard-এ প্রবেশ করা যাবে।",
       "warning"
     );
 
-    return;
+    setLoginButtonLoading(false);
+
   }
+  catch(error){
 
-
-  // =========================
-  // REJECTED
-  // =========================
-
-  if(profile.status === "rejected"){
-
-    await supabaseClient.auth.signOut();
-
-    btn.disabled = false;
-
-    btn.textContent = "লগইন";
+    console.error(
+      "UNEXPECTED LOGIN ERROR:",
+      error
+    );
 
     showMessage(
-      "❌ আপনার অ্যাকাউন্ট Admin কর্তৃক Reject করা হয়েছে।",
+      "❌ Login করার সময় সমস্যা হয়েছে: " +
+      (error.message || "Unknown error"),
       "error"
     );
 
-    return;
+    setLoginButtonLoading(false);
   }
-
-
-  // =========================
-  // APPROVED
-  // =========================
-
-  if(profile.status === "approved"){
-
-    localStorage.setItem(
-      "kohinoor_user_profile",
-      JSON.stringify(profile)
-    );
-
-    showMessage(
-      "✅ Approval সফল। Dashboard-এ প্রবেশ করা হচ্ছে...",
-      "success"
-    );
-
-    setTimeout(function(){
-
-      window.location.href = "index.html";
-
-    },500);
-
-    return;
-  }
-
-
-  // =========================
-  // UNKNOWN STATUS
-  // =========================
-
-  await supabaseClient.auth.signOut();
-
-  btn.disabled = false;
-
-  btn.textContent = "লগইন";
-
-  showMessage(
-    "আপনার Account Status সঠিক নয়।",
-    "error"
-  );
 
 }
+
+
+// ========================================
+// ENTER KEY LOGIN
+// ========================================
+
+document
+  .getElementById("password")
+  .addEventListener(
+    "keydown",
+    function(event){
+
+      if(event.key === "Enter"){
+
+        login();
+
+      }
+
+    }
+  );
+
+
+// ========================================
+// CHECK EXISTING SESSION
+// ========================================
+
+async function checkExistingSession(){
+
+  try{
+
+    const {
+      data
+    } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+    const session =
+      data?.session;
+
+
+    if(!session){
+
+      return;
+    }
+
+
+    const user =
+      session.user;
+
+
+    if(!user){
+
+      return;
+    }
+
+
+    /*
+     Existing session থাকলে সরাসরি
+     Dashboard-এ পাঠানো হবে না।
+
+     কারণ status আবার check করতে হবে।
+    */
+
+    if(
+      user.email &&
+      user.email.toLowerCase() ===
+      ADMIN_EMAIL.toLowerCase()
+    ){
+
+      window.location.replace(
+        "admin.html"
+      );
+
+      return;
+    }
+
+
+    const {
+      data:profile,
+      error
+    } =
+    await supabaseClient
+      .from("user_profiles")
+      .select(
+        "id,username,email,status,created_at,avatar_url"
+      )
+      .eq("id",user.id)
+      .maybeSingle();
+
+
+    if(error || !profile){
+
+      return;
+    }
+
+
+    const status =
+      String(
+        profile.status || ""
+      )
+      .trim()
+      .toLowerCase();
+
+
+    if(status === "approved"){
+
+      localStorage.setItem(
+        "kohinoor_user_profile",
+        JSON.stringify(profile)
+      );
+
+      window.location.replace(
+        "index.html"
+      );
+
+    }
+
+  }
+  catch(error){
+
+    console.error(
+      "SESSION CHECK ERROR:",
+      error
+    );
+
+  }
+
+}
+
+
+// ========================================
+// START
+// ========================================
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    checkExistingSession();
+
+  }
+);
 
 </script>
 

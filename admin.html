@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#087f50">
+
 <title>Kohinoor Admin Panel</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -125,9 +126,9 @@ select{
   padding:25px;
 }
 
-/* ================================
+/* =========================================
    ORDER TABLE
-================================ */
+========================================= */
 
 .table-container{
   width:100%;
@@ -228,9 +229,9 @@ select{
   font-size:13px;
 }
 
-/* ================================
+/* =========================================
    ORDER DETAIL
-================================ */
+========================================= */
 
 .order-detail{
   background:#fff;
@@ -261,7 +262,7 @@ select{
 
 .product-table{
   width:100%;
-  min-width:750px;
+  min-width:700px;
   border-collapse:collapse;
 }
 
@@ -295,9 +296,9 @@ select{
   border-radius:8px;
 }
 
-/* ================================
-   USER
-================================ */
+/* =========================================
+   USER MANAGEMENT
+========================================= */
 
 .user-grid{
   display:grid;
@@ -350,6 +351,23 @@ select{
   color:#555;
 }
 
+.muted{
+  color:#666;
+  font-size:13px;
+}
+
+.count{
+  background:#087f50;
+  color:#fff;
+  border-radius:20px;
+  padding:3px 8px;
+  font-size:12px;
+}
+
+/* =========================================
+   ORDER STATUS COLORS
+========================================= */
+
 .processing{
   background:#cfe8ff;
   color:#07549a;
@@ -365,22 +383,9 @@ select{
   color:#155724;
 }
 
-.muted{
-  color:#666;
-  font-size:13px;
-}
-
-.count{
-  background:#087f50;
-  color:#fff;
-  border-radius:20px;
-  padding:3px 8px;
-  font-size:12px;
-}
-
-/* ================================
+/* =========================================
    MODAL
-================================ */
+========================================= */
 
 .modal{
   position:fixed;
@@ -420,9 +425,9 @@ select{
   color:#fff;
 }
 
-/* ================================
+/* =========================================
    MOBILE
-================================ */
+========================================= */
 
 @media(max-width:700px){
 
@@ -1251,6 +1256,7 @@ ${rows}
 
 /* =========================================
    ORDER DETAIL
+   RATE TYPE COMPLETELY REMOVED
 ========================================= */
 
 function showOrderDetail(id){
@@ -1295,7 +1301,10 @@ function showOrderDetail(id){
 
 <tr>
 
-<td>${index + 1}</td>
+<td>
+${index + 1}
+</td>
+
 
 <td>
 ${esc(
@@ -1305,6 +1314,7 @@ ${esc(
 )}
 </td>
 
+
 <td>
 ${esc(
   p.code ||
@@ -1312,6 +1322,7 @@ ${esc(
   "-"
 )}
 </td>
+
 
 <td>
 ${esc(
@@ -1321,25 +1332,21 @@ ${esc(
 )}
 </td>
 
+
 <td>
 ${esc(qty)}
 </td>
+
 
 <td>
 ${esc(p.bonus || 0)}
 </td>
 
-<td>
-${esc(
-  p.rate_type ||
-  p.rateType ||
-  "-"
-)}
-</td>
 
 <td>
 ৳${money(price)}
 </td>
+
 
 <td>
 ৳${money(subtotal)}
@@ -1360,7 +1367,7 @@ ${esc(
 <tr>
 
 <td
-colspan="9"
+colspan="8"
 style="text-align:center">
 
 কোনো পণ্যের তথ্য পাওয়া যায়নি।
@@ -1393,43 +1400,90 @@ style="text-align:center">
 
 
 <div>
-<b>অর্ডার ID:</b><br>
+
+<b>
+অর্ডার ID:
+</b>
+
+<br>
+
 ${esc(order.id)}
+
 </div>
 
 
 <div>
-<b>সময়:</b><br>
+
+<b>
+সময়:
+</b>
+
+<br>
+
 ${dateText(order.created_at)}
+
 </div>
 
 
 <div>
-<b>অর্ডার তারিখ:</b><br>
+
+<b>
+অর্ডার তারিখ:
+</b>
+
+<br>
+
 ${dateText(order.order_date)}
+
 </div>
 
 
 <div>
-<b>ডেলিভারি:</b><br>
+
+<b>
+ডেলিভারি:
+</b>
+
+<br>
+
 ${dateText(order.delivery_date)}
+
 </div>
 
 
 <div>
-<b>🏪 দোকান:</b><br>
+
+<b>
+🏪 দোকান:
+</b>
+
+<br>
+
 ${esc(order.shop || "-")}
+
 </div>
 
 
 <div>
-<b>📍 ঠিকানা:</b><br>
+
+<b>
+📍 ঠিকানা:
+</b>
+
+<br>
+
 ${esc(order.address || "-")}
+
 </div>
 
 
 <div>
-<b>📞 মোবাইল:</b><br>
+
+<b>
+📞 মোবাইল:
+</b>
+
+<br>
 
 ${
   mobile
@@ -1451,13 +1505,26 @@ ${
 
 
 <div>
-<b>👤 প্রতিনিধি:</b><br>
+
+<b>
+👤 প্রতিনিধি:
+</b>
+
+<br>
+
 ${esc(order.representative || "-")}
+
 </div>
 
 
 <div>
-<b>📌 Status:</b><br>
+
+<b>
+📌 Status:
+</b>
+
+<br>
+
 
 <select
 class="status-select"
@@ -1469,11 +1536,13 @@ this.value
 )
 ">
 
+
 <option
 value="pending"
 ${order.status==="pending"?"selected":""}>
 pending
 </option>
+
 
 <option
 value="processing"
@@ -1481,11 +1550,13 @@ ${order.status==="processing"?"selected":""}>
 processing
 </option>
 
+
 <option
 value="delivery"
 ${order.status==="delivery"?"selected":""}>
 delivery
 </option>
+
 
 <option
 value="completed"
@@ -1493,11 +1564,13 @@ ${order.status==="completed"?"selected":""}>
 completed
 </option>
 
+
 <option
 value="rejected"
 ${order.status==="rejected"?"selected":""}>
 rejected
 </option>
+
 
 </select>
 
@@ -1516,6 +1589,7 @@ rejected
 
 <table class="product-table">
 
+
 <thead>
 
 <tr>
@@ -1532,8 +1606,6 @@ rejected
 
 <th>Bonus</th>
 
-<th>Rate Type</th>
-
 <th>Rate</th>
 
 <th>মোট</th>
@@ -1549,6 +1621,7 @@ ${productRows}
 
 </tbody>
 
+
 </table>
 
 </div>
@@ -1557,6 +1630,7 @@ ${productRows}
 <div class="order-total">
 
 মোট অর্ডার:
+
 ৳${money(order.total)}
 
 </div>
@@ -1568,7 +1642,11 @@ ${
   `
   <div class="note-box">
 
-  <b>📝 মন্তব্য:</b><br>
+  <b>
+  📝 মন্তব্য:
+  </b>
+
+  <br>
 
   ${esc(order.note)}
 
@@ -1777,6 +1855,7 @@ async function deleteOrder(id){
 
 /* =========================================
    PRINT ORDER
+   RATE TYPE COMPLETELY REMOVED
 ========================================= */
 
 function printOrder(id){
@@ -1823,7 +1902,10 @@ function printOrder(id){
 
 <tr>
 
-<td>${index + 1}</td>
+<td>
+${index + 1}
+</td>
+
 
 <td>
 ${esc(
@@ -1833,6 +1915,7 @@ ${esc(
 )}
 </td>
 
+
 <td>
 ${esc(
   p.code ||
@@ -1840,6 +1923,7 @@ ${esc(
   "-"
 )}
 </td>
+
 
 <td>
 ${esc(
@@ -1849,25 +1933,21 @@ ${esc(
 )}
 </td>
 
+
 <td>
 ${esc(qty)}
 </td>
+
 
 <td>
 ${esc(p.bonus || 0)}
 </td>
 
-<td>
-${esc(
-  p.rate_type ||
-  p.rateType ||
-  "-"
-)}
-</td>
 
 <td>
 ৳${money(price)}
 </td>
+
 
 <td>
 ৳${money(subtotal)}
@@ -1887,7 +1967,8 @@ ${esc(
 
 <tr>
 
-<td colspan="9"
+<td
+colspan="8"
 style="text-align:center">
 
 কোনো পণ্যের তথ্য পাওয়া যায়নি।
@@ -1930,7 +2011,9 @@ style="text-align:center">
 
 <meta charset="utf-8">
 
-<title>অর্ডার মেমো</title>
+<title>
+অর্ডার মেমো
+</title>
 
 
 <style>
@@ -1948,6 +2031,7 @@ color:#111;
 
 }
 
+
 .memo{
 
 max-width:950px;
@@ -1955,6 +2039,7 @@ max-width:950px;
 margin:auto;
 
 }
+
 
 .company{
 
@@ -1969,6 +2054,7 @@ margin-bottom:18px;
 
 }
 
+
 .company h1{
 
 margin:0;
@@ -1976,6 +2062,7 @@ margin:0;
 font-size:25px;
 
 }
+
 
 .company p{
 
@@ -1996,6 +2083,7 @@ gap:8px;
 margin-bottom:18px;
 
 }
+
 
 .info div{
 
@@ -2078,6 +2166,7 @@ padding:0;
 
 <body>
 
+
 <div class="memo">
 
 
@@ -2096,50 +2185,116 @@ padding:0;
 
 <div class="info">
 
+
 <div>
-<b>অর্ডার ID:</b><br>
+
+<b>
+অর্ডার ID:
+</b>
+
+<br>
+
 ${esc(order.id)}
+
 </div>
 
+
 <div>
-<b>সময়:</b><br>
+
+<b>
+সময়:
+</b>
+
+<br>
+
 ${dateText(order.created_at)}
+
 </div>
 
+
 <div>
-<b>অর্ডার তারিখ:</b><br>
+
+<b>
+অর্ডার তারিখ:
+</b>
+
+<br>
+
 ${dateText(order.order_date)}
+
 </div>
 
+
 <div>
-<b>ডেলিভারি:</b><br>
+
+<b>
+ডেলিভারি:
+</b>
+
+<br>
+
 ${dateText(order.delivery_date)}
+
 </div>
 
+
 <div>
-<b>দোকান:</b><br>
+
+<b>
+দোকান:
+</b>
+
+<br>
+
 ${esc(order.shop || "-")}
+
 </div>
 
+
 <div>
-<b>মোবাইল:</b><br>
+
+<b>
+মোবাইল:
+</b>
+
+<br>
+
 ${esc(order.mobile || "-")}
+
 </div>
 
+
 <div>
-<b>ঠিকানা:</b><br>
+
+<b>
+ঠিকানা:
+</b>
+
+<br>
+
 ${esc(order.address || "-")}
+
 </div>
 
+
 <div>
-<b>প্রতিনিধি:</b><br>
+
+<b>
+প্রতিনিধি:
+</b>
+
+<br>
+
 ${esc(order.representative || "-")}
+
 </div>
+
 
 </div>
 
 
 <table>
+
 
 <thead>
 
@@ -2157,8 +2312,6 @@ ${esc(order.representative || "-")}
 
 <th>Bonus</th>
 
-<th>Rate Type</th>
-
 <th>Rate</th>
 
 <th>মোট</th>
@@ -2174,12 +2327,14 @@ ${rows}
 
 </tbody>
 
+
 </table>
 
 
 <div class="total">
 
 মোট অর্ডার:
+
 ৳${money(order.total)}
 
 </div>
@@ -2191,7 +2346,11 @@ ${
   `
   <div class="note">
 
-  <b>মন্তব্য:</b><br>
+  <b>
+  মন্তব্য:
+  </b>
+
+  <br>
 
   ${esc(order.note)}
 
@@ -2367,18 +2526,27 @@ function renderUsers(){
       div.innerHTML = `
 
 <h3>
-👤 ${esc(u.username || "-")}
+
+👤 ${esc(
+  u.username || "-"
+)}
+
 </h3>
 
 
 <div class="muted">
 
-${esc(u.email || "-")}
+${esc(
+  u.email || "-"
+)}
 
 <br>
 
 তৈরি:
-${dateText(u.created_at)}
+
+${dateText(
+  u.created_at
+)}
 
 </div>
 
@@ -2396,7 +2564,9 @@ Username
 
 <input
 id="name_${u.id}"
-value="${esc(u.username || "")}"
+value="${esc(
+  u.username || ""
+)}"
 >
 
 </div>
@@ -2411,6 +2581,7 @@ Role
 <select
 id="role_${u.id}">
 
+
 <option
 value="user"
 ${role==="user"?"selected":""}>
@@ -2419,6 +2590,7 @@ user
 
 </option>
 
+
 <option
 value="admin"
 ${role==="admin"?"selected":""}>
@@ -2426,6 +2598,7 @@ ${role==="admin"?"selected":""}>
 admin
 
 </option>
+
 
 </select>
 
@@ -2441,6 +2614,7 @@ Status
 <select
 id="status_${u.id}">
 
+
 <option
 value="pending"
 ${status==="pending"?"selected":""}>
@@ -2448,6 +2622,7 @@ ${status==="pending"?"selected":""}>
 pending
 
 </option>
+
 
 <option
 value="approved"
@@ -2457,6 +2632,7 @@ approved
 
 </option>
 
+
 <option
 value="rejected"
 ${status==="rejected"?"selected":""}>
@@ -2465,6 +2641,7 @@ rejected
 
 </option>
 
+
 <option
 value="inactive"
 ${status==="inactive"?"selected":""}>
@@ -2472,6 +2649,7 @@ ${status==="inactive"?"selected":""}>
 inactive
 
 </option>
+
 
 </select>
 
@@ -2502,6 +2680,7 @@ ${esc(status)}
 
 <div class="user-actions">
 
+
 <button
 class="save"
 onclick="
@@ -2529,6 +2708,7 @@ this
 
 </button>
 
+
 </div>
 
 `;
@@ -2546,7 +2726,10 @@ this
    SAVE USER
 ========================================= */
 
-async function saveUser(id,btn){
+async function saveUser(
+  id,
+  btn
+){
 
   btn.disabled = true;
 
@@ -2596,9 +2779,11 @@ async function saveUser(id,btn){
   await supabaseClient
     .from("profiles")
     .update({
+
       username,
       role,
       status
+
     })
     .eq("id",id);
 
@@ -2633,7 +2818,10 @@ async function saveUser(id,btn){
    QUICK REJECT
 ========================================= */
 
-async function quickReject(id,btn){
+async function quickReject(
+  id,
+  btn
+){
 
   if(
     !confirm(
@@ -2724,7 +2912,7 @@ function showUserMessage(
 
 
 /* =========================================
-   START
+   INITIALIZE
 ========================================= */
 
 async function initialize(){

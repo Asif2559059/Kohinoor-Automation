@@ -1,32 +1,94 @@
 <!DOCTYPE html>
 <html lang="bn">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#087f50">
-<meta name="application-name" content="কহিনুর কেমিক্যাল অর্ডার">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="কহিনুর অর্ডার">
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
-<link rel="apple-touch-icon" href="./icons/icon-192.png">
-<title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+  name="theme-color"
+  content="#087f50"
+>
+
+<meta
+  name="application-name"
+  content="কহিনুর কেমিক্যাল অর্ডার"
+>
+
+<meta
+  name="apple-mobile-web-app-capable"
+  content="yes"
+>
+
+<meta
+  name="apple-mobile-web-app-status-bar-style"
+  content="default"
+>
+
+<meta
+  name="apple-mobile-web-app-title"
+  content="কহিনুর অর্ডার"
+>
+
+<link
+  rel="manifest"
+  href="./manifest.json"
+>
+
+<link
+  rel="icon"
+  type="image/png"
+  sizes="192x192"
+  href="./icons/icon-192.png"
+>
+
+<link
+  rel="apple-touch-icon"
+  href="./icons/icon-192.png"
+>
+
+<title>
+কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন
+</title>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
-  font-family:Arial,"Noto Sans Bengali",sans-serif;
+  font-family:
+    Arial,
+    "Noto Sans Bengali",
+    sans-serif;
   background:#f4f7f6;
-  color:#18352a
+  color:#18352a;
 }
 
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+
+/* ================= HEADER ================= */
 
 .header{
   position:sticky;
@@ -38,25 +100,37 @@ button{cursor:pointer}
   display:flex;
   align-items:center;
   gap:10px;
-  box-shadow:0 2px 8px #0002
+  box-shadow:0 2px 8px #0002;
 }
 
-.header-title{flex:1}
-.header-title strong{display:block;font-size:16px}
-.header-title small{opacity:.85}
+.header-title{
+  flex:1;
+}
+
+.header-title strong{
+  display:block;
+  font-size:16px;
+}
+
+.header-title small{
+  opacity:.85;
+}
 
 .icon-btn{
   border:0;
   background:#ffffff20;
   color:#fff;
   border-radius:10px;
-  padding:10px
+  padding:10px;
 }
+
+
+/* ================= CONTAINER ================= */
 
 .container{
   max-width:720px;
   margin:auto;
-  padding:12px 12px 90px
+  padding:12px 12px 90px;
 }
 
 .card{
@@ -64,13 +138,16 @@ button{cursor:pointer}
   border-radius:16px;
   padding:14px;
   margin-bottom:12px;
-  box-shadow:0 3px 12px #0000000d
+  box-shadow:0 3px 12px #0000000d;
 }
+
+
+/* ================= PROFILE ================= */
 
 .profile{
   display:flex;
   align-items:center;
-  gap:12px
+  gap:12px;
 }
 
 .avatar{
@@ -83,64 +160,95 @@ button{cursor:pointer}
   place-items:center;
   font-size:20px;
   font-weight:800;
-  overflow:hidden
+  overflow:hidden;
 }
 
 .avatar img{
   width:100%;
   height:100%;
-  object-fit:cover
+  object-fit:cover;
 }
 
 .small{
   font-size:12px;
-  color:#6c7c75
+  color:#6c7c75;
 }
+
+
+/* ================= STATS ================= */
 
 .stats{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px
+  gap:8px;
 }
 
 .stat{
   background:#f1faf6;
   border-radius:12px;
   padding:12px;
-  text-align:center
+  text-align:center;
 }
 
 .stat b{
   font-size:22px;
   display:block;
-  color:#087f50
+  color:#087f50;
 }
+
+
+/* ================= GRID ================= */
 
 .grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:9px
+  gap:9px;
 }
+
+
+/* ================= BUTTON ================= */
 
 .btn{
   border:0;
   border-radius:11px;
   padding:11px 13px;
-  font-weight:700
+  font-weight:700;
 }
 
-.btn-primary{background:#087f50;color:#fff}
-.btn-light{background:#eef3f1;color:#21453a}
-.btn-danger{background:#d93025;color:#fff}
-.btn-warning{background:#f4b400;color:#222}
-.btn-info{background:#2878d7;color:#fff}
+.btn-primary{
+  background:#087f50;
+  color:#fff;
+}
+
+.btn-light{
+  background:#eef3f1;
+  color:#21453a;
+}
+
+.btn-danger{
+  background:#d93025;
+  color:#fff;
+}
+
+.btn-warning{
+  background:#f4b400;
+  color:#222;
+}
+
+.btn-info{
+  background:#2878d7;
+  color:#fff;
+}
+
+
+/* ================= SEARCH ================= */
 
 .search{
   width:100%;
   padding:12px;
   border:1px solid #d9e2de;
   border-radius:11px;
-  outline:none
+  outline:none;
 }
 
 .product-results{
@@ -148,7 +256,7 @@ button{cursor:pointer}
   display:grid;
   gap:7px;
   max-height:280px;
-  overflow:auto
+  overflow:auto;
 }
 
 .product-result{
@@ -159,25 +267,28 @@ button{cursor:pointer}
   display:flex;
   justify-content:space-between;
   gap:8px;
-  align-items:center
+  align-items:center;
 }
 
 .product-result-info{
   flex:1;
-  min-width:0
+  min-width:0;
 }
 
 .product-result-rate{
   text-align:right;
-  white-space:nowrap
+  white-space:nowrap;
 }
+
+
+/* ================= ORDER SEARCH ================= */
 
 .order-search-results{
   margin-top:7px;
   display:grid;
   gap:6px;
   max-height:260px;
-  overflow:auto
+  overflow:auto;
 }
 
 .order-search-result{
@@ -185,18 +296,21 @@ button{cursor:pointer}
   border:1px solid #dfe9e5;
   border-radius:10px;
   background:#fbfdfc;
-  cursor:pointer
+  cursor:pointer;
 }
 
 .order-search-result:hover{
-  background:#eef9f4
+  background:#eef9f4;
 }
+
+
+/* ================= RATE ================= */
 
 .rate-box{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:7px;
-  margin-top:8px
+  margin-top:8px;
 }
 
 .rate-box .selected-rate{
@@ -204,8 +318,11 @@ button{cursor:pointer}
   border-radius:10px;
   padding:9px;
   font-weight:700;
-  color:#087f50
+  color:#087f50;
 }
+
+
+/* ================= MODAL ================= */
 
 .modal{
   position:fixed;
@@ -214,10 +331,12 @@ button{cursor:pointer}
   z-index:50;
   display:none;
   padding:12px;
-  overflow:auto
+  overflow:auto;
 }
 
-.modal.show{display:block}
+.modal.show{
+  display:block;
+}
 
 .modal-box{
   max-width:720px;
@@ -225,48 +344,51 @@ button{cursor:pointer}
   background:#fff;
   border-radius:18px;
   padding:15px;
-  box-shadow:0 10px 40px #0004
+  box-shadow:0 10px 40px #0004;
 }
 
 .modal-head{
   display:flex;
   align-items:center;
   gap:8px;
-  margin-bottom:12px
+  margin-bottom:12px;
 }
 
 .modal-head h3{
   flex:1;
-  margin:0
+  margin:0;
 }
 
 .close{
   border:0;
   background:#eee;
   border-radius:9px;
-  padding:8px 11px
+  padding:8px 11px;
 }
+
+
+/* ================= FORM ================= */
 
 .form-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:9px
+  gap:9px;
 }
 
 .field{
   display:flex;
   flex-direction:column;
-  gap:5px
+  gap:5px;
 }
 
 .field.full{
-  grid-column:1/-1
+  grid-column:1/-1;
 }
 
 .field label{
   font-size:12px;
   font-weight:700;
-  color:#476157
+  color:#476157;
 }
 
 .field input,
@@ -275,41 +397,44 @@ button{cursor:pointer}
   border:1px solid #d8e2de;
   border-radius:10px;
   padding:10px;
-  background:#fff
+  background:#fff;
 }
 
 textarea{
   min-height:75px;
-  resize:vertical
+  resize:vertical;
 }
+
+
+/* ================= ORDER ITEMS ================= */
 
 .order-items{
   margin-top:12px;
   display:grid;
-  gap:8px
+  gap:8px;
 }
 
 .order-item{
   border:1px solid #dfe9e5;
   border-radius:11px;
-  padding:10px
+  padding:10px;
 }
 
 .order-item-top{
   display:flex;
   justify-content:space-between;
-  gap:8px
+  gap:8px;
 }
 
 .order-item-name{
-  font-weight:700
+  font-weight:700;
 }
 
 .qty-row{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:7px;
-  margin-top:8px
+  margin-top:8px;
 }
 
 .total{
@@ -319,19 +444,25 @@ textarea{
   margin:12px 0;
   font-size:18px;
   font-weight:800;
-  color:#075c3a
+  color:#075c3a;
 }
+
+
+/* ================= ACTIONS ================= */
 
 .actions{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
-  margin-top:10px
+  margin-top:10px;
 }
 
 .actions .full{
-  grid-column:1/-1
+  grid-column:1/-1;
 }
+
+
+/* ================= BADGE ================= */
 
 .badge{
   display:inline-block;
@@ -340,63 +471,72 @@ textarea{
   font-size:11px;
   font-weight:700;
   background:#e7f6ee;
-  color:#087f50
+  color:#087f50;
 }
 
 .badge.draft{
   background:#fff4d6;
-  color:#8a6100
+  color:#8a6100;
 }
 
 .badge.sent{
   background:#e8f1ff;
-  color:#2764a5
+  color:#2764a5;
 }
+
+
+/* ================= DRAFT ================= */
 
 .draft-card{
   border:1px solid #f0dfab;
   background:#fffdf5;
   border-radius:12px;
   padding:11px;
-  margin:8px 0
+  margin:8px 0;
 }
 
 .draft-actions{
   display:flex;
   gap:7px;
-  margin-top:9px
+  margin-top:9px;
 }
 
 .draft-actions button{
-  flex:1
+  flex:1;
 }
+
+
+/* ================= HISTORY ================= */
 
 .history-row{
   border-bottom:1px solid #edf1ef;
-  padding:12px 0
+  padding:12px 0;
 }
 
 .history-row:last-child{
-  border-bottom:0
+  border-bottom:0;
 }
 
 .history-head{
   display:flex;
   justify-content:space-between;
-  gap:8px
+  gap:8px;
 }
 
 .history-actions{
   display:flex;
   gap:6px;
-  margin-top:8px
+  margin-top:8px;
 }
 
 .empty{
   text-align:center;
   color:#82918b;
-  padding:20px
+  padding:20px;
 }
+
+
+/* ================= BOTTOM NAV ================= */
 
 .bottom-nav{
   position:fixed;
@@ -407,14 +547,14 @@ textarea{
   background:#fff;
   border-top:1px solid #e2e8e5;
   display:flex;
-  justify-content:center
+  justify-content:center;
 }
 
 .bottom-nav-inner{
   max-width:720px;
   width:100%;
   display:grid;
-  grid-template-columns:repeat(4,1fr)
+  grid-template-columns:repeat(4,1fr);
 }
 
 .nav-btn{
@@ -422,70 +562,87 @@ textarea{
   background:#fff;
   padding:9px 4px;
   color:#567067;
-  font-size:11px
+  font-size:11px;
 }
 
 .nav-btn b{
   display:block;
-  font-size:19px
+  font-size:19px;
 }
 
 .nav-btn.active{
-  color:#087f50
+  color:#087f50;
 }
+
+
+/* ================= STATUS ================= */
 
 .status{
-  font-weight:700
+  font-weight:700;
 }
 
-.online{color:#087f50}
-.offline{color:#b47700}
+.online{
+  color:#087f50;
+}
+
+.offline{
+  color:#b47700;
+}
+
+
+/* ================= NOTIFICATION ================= */
 
 .notification-list{
   max-height:400px;
-  overflow:auto
+  overflow:auto;
 }
 
 .notice{
   padding:10px;
-  border-bottom:1px solid #eee
+  border-bottom:1px solid #eee;
 }
+
+
+/* ================= LIST ================= */
 
 .list-box{
   margin-top:12px;
   display:grid;
-  gap:8px
+  gap:8px;
 }
 
 .list-row{
   border:1px solid #dfe9e5;
   border-radius:11px;
   padding:10px;
-  background:#fbfdfc
+  background:#fbfdfc;
 }
 
 .list-row-head{
   display:flex;
   justify-content:space-between;
   gap:8px;
-  align-items:flex-start
+  align-items:flex-start;
 }
 
 .list-row-actions{
   display:flex;
   gap:6px;
-  margin-top:8px
+  margin-top:8px;
 }
 
 .list-row-actions button{
-  flex:1
+  flex:1;
 }
 
 .select-note{
   font-size:11px;
   color:#6c7c75;
-  margin-top:4px
+  margin-top:4px;
 }
+
+
+/* ================= TOAST ================= */
 
 .toast{
   position:fixed;
@@ -497,25 +654,30 @@ textarea{
   padding:11px 16px;
   border-radius:10px;
   z-index:100;
-  display:none
+  display:none;
 }
 
-/* ===== PDF / PRINT TABLE ===== */
+
+/* =========================================================
+   ORDER MEMO / TABLE
+========================================================= */
 
 .memo-print{
   color:#111;
   background:#fff;
   font-size:13px;
+  width:100%;
 }
 
 .memo-title{
   text-align:center;
-  margin-bottom:4px;
+  margin-bottom:5px;
 }
 
 .memo-title h2{
   margin:0;
   font-size:22px;
+  font-weight:800;
 }
 
 .memo-title .memo-subtitle{
@@ -532,26 +694,32 @@ textarea{
 .memo-info{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:5px 20px;
-  margin-bottom:14px;
+  gap:6px 20px;
+  margin-bottom:15px;
 }
 
 .memo-info div{
-  line-height:1.45;
+  line-height:1.5;
 }
 
 .memo-products-title{
-  font-weight:700;
-  margin:12px 0 7px;
+  font-weight:800;
+  margin:14px 0 8px;
+  font-size:14px;
 }
+
+
+/* ================= TABLE ================= */
 
 .memo-table-wrap{
   width:100%;
   overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
 }
 
 .memo-table{
   width:100%;
+  min-width:720px;
   border-collapse:collapse;
   border:1px solid #222;
   font-size:11px;
@@ -561,23 +729,33 @@ textarea{
 .memo-table th,
 .memo-table td{
   border:1px solid #222;
-  padding:6px 5px;
+  padding:7px 5px;
   vertical-align:middle;
 }
 
 .memo-table th{
-  background:#f0f0f0;
-  font-weight:700;
+  background:#eeeeee;
+  font-weight:800;
   text-align:center;
+  white-space:nowrap;
 }
 
 .memo-table td{
   background:#fff;
 }
 
+.memo-table tbody tr:nth-child(even) td{
+  background:#fafafa;
+}
+
 .memo-table .col-no{
   width:35px;
   text-align:center;
+}
+
+.memo-table .col-product{
+  width:190px;
+  text-align:left;
 }
 
 .memo-table .col-code{
@@ -591,38 +769,43 @@ textarea{
 }
 
 .memo-table .col-qty{
-  width:45px;
-  text-align:center;
-}
-
-.memo-table .col-bonus{
   width:50px;
   text-align:center;
 }
 
+.memo-table .col-bonus{
+  width:55px;
+  text-align:center;
+}
+
 .memo-table .col-rate-type{
-  width:75px;
+  width:70px;
   text-align:center;
 }
 
 .memo-table .col-rate{
-  width:70px;
-  text-align:right;
-}
-
-.memo-table .col-total{
   width:75px;
   text-align:right;
 }
 
-.memo-total-row td{
+.memo-table .col-total{
+  width:85px;
+  text-align:right;
+}
+
+.memo-product-name{
   font-weight:700;
-  background:#f7f7f7;
+  line-height:1.35;
+}
+
+.memo-total-row td{
+  font-weight:800;
+  background:#eeeeee!important;
 }
 
 .memo-grand-total{
   text-align:right;
-  font-size:16px;
+  font-size:17px;
   font-weight:800;
   margin-top:12px;
 }
@@ -632,72 +815,81 @@ textarea{
   font-weight:700;
 }
 
+
+/* ================= MOBILE ================= */
+
 @media(max-width:520px){
 
   .form-grid{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .field.full{
-    grid-column:auto
+    grid-column:auto;
   }
 
   .actions{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .actions .full{
-    grid-column:auto
+    grid-column:auto;
   }
 
   .stats .stat{
-    padding:9px 4px
+    padding:9px 4px;
   }
 
   .stat b{
-    font-size:19px
+    font-size:19px;
   }
 
   .qty-row{
-    grid-template-columns:1fr 1fr
+    grid-template-columns:1fr 1fr;
   }
 
   .qty-row .field:last-child{
-    grid-column:1/-1
+    grid-column:1/-1;
   }
 
   .rate-box{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .memo-info{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
+    gap:5px;
+  }
+
+  .memo-title h2{
+    font-size:19px;
   }
 
   .memo-table{
-    font-size:9px
+    min-width:700px;
+    font-size:10px;
   }
 
   .memo-table th,
   .memo-table td{
-    padding:4px 3px
+    padding:5px 4px;
   }
 
-  .memo-table .col-rate-type{
-    width:62px
-  }
 }
+
+
+/* ================= PRINT ================= */
 
 @media print{
 
   @page{
     size:A4;
-    margin:12mm;
+    margin:10mm;
   }
 
   body{
     background:#fff!important;
-    color:#111!important
+    color:#111!important;
   }
 
   .header,
@@ -705,7 +897,7 @@ textarea{
   .no-print,
   .actions,
   .close{
-    display:none!important
+    display:none!important;
   }
 
   .modal{
@@ -713,7 +905,7 @@ textarea{
     display:block!important;
     background:#fff!important;
     padding:0!important;
-    overflow:visible!important
+    overflow:visible!important;
   }
 
   .modal-box{
@@ -721,125 +913,272 @@ textarea{
     margin:0!important;
     padding:0!important;
     border-radius:0!important;
-    box-shadow:none!important
-  }
-
-  .container{
-    padding:0!important
-  }
-
-  .card{
-    box-shadow:none!important
+    box-shadow:none!important;
   }
 
   #detailModal{
-    display:block!important
+    display:block!important;
+  }
+
+  .memo-print{
+    width:100%!important;
+  }
+
+  .memo-table-wrap{
+    overflow:visible!important;
   }
 
   .memo-table{
-    page-break-inside:auto
+    width:100%!important;
+    min-width:0!important;
+    font-size:9px!important;
+  }
+
+  .memo-table th,
+  .memo-table td{
+    padding:4px 3px!important;
+  }
+
+  .memo-table thead{
+    display:table-header-group;
   }
 
   .memo-table tr{
     page-break-inside:avoid;
-    page-break-after:auto
-  }
-
-  .memo-table thead{
-    display:table-header-group
+    page-break-after:auto;
   }
 
   .memo-table tfoot{
-    display:table-footer-group
+    display:table-footer-group;
   }
+
 }
+
 </style>
+
 </head>
+
 
 <body>
 
+
+<!-- ================= HEADER ================= -->
+
 <header class="header">
+
   <div class="header-title">
-    <strong>কহিনুর কেমিক্যাল পিএলসি</strong>
-    <small>অর্ডার অটোমেশন</small>
+
+    <strong>
+      কহিনুর কেমিক্যাল পিএলসি
+    </strong>
+
+    <small>
+      অর্ডার অটোমেশন
+    </small>
+
   </div>
 
-  <button class="icon-btn" onclick="openNotifications()">🔔</button>
-  <button class="icon-btn" onclick="adminLogout()">🚪</button>
+
+  <button
+    class="icon-btn"
+    onclick="openNotifications()"
+  >
+    🔔
+  </button>
+
+
+  <button
+    class="icon-btn"
+    onclick="adminLogout()"
+  >
+    🚪
+  </button>
+
 </header>
+
+
+<!-- ================= MAIN ================= -->
 
 <main class="container">
 
-  <section class="card" onclick="openProfileModal()" style="cursor:pointer">
+
+  <!-- PROFILE -->
+
+  <section
+    class="card"
+    onclick="openProfileModal()"
+    style="cursor:pointer"
+  >
+
     <div class="profile">
-      <div class="avatar" id="profileAvatar">A</div>
+
+      <div
+        class="avatar"
+        id="profileAvatar"
+      >
+        A
+      </div>
+
       <div>
-        <strong id="profileName">লোড হচ্ছে...</strong>
+
+        <strong id="profileName">
+          লোড হচ্ছে...
+        </strong>
+
       </div>
+
     </div>
+
   </section>
 
+
+  <!-- STATS -->
+
   <section class="card">
+
     <div class="stats">
-      <div class="stat">
-        <b id="dashProducts">0</b>
-        <span>Products</span>
-      </div>
 
       <div class="stat">
-        <b id="dashItems">0</b>
-        <span>Items</span>
+
+        <b id="dashProducts">
+          0
+        </b>
+
+        <span>
+          Products
+        </span>
+
       </div>
 
+
       <div class="stat">
-        <b id="dashOrders">0</b>
-        <span>Sent Orders</span>
+
+        <b id="dashItems">
+          0
+        </b>
+
+        <span>
+          Items
+        </span>
+
       </div>
+
+
+      <div class="stat">
+
+        <b id="dashOrders">
+          0
+        </b>
+
+        <span>
+          Sent Orders
+        </span>
+
+      </div>
+
     </div>
 
-    <div class="small" style="margin-top:10px;text-align:center">
+
+    <div
+      class="small"
+      style="margin-top:10px;text-align:center"
+    >
+
       মোট অর্ডার মূল্য:
-      <b id="dashTotal">৳0.00</b>
+
+      <b id="dashTotal">
+        ৳0.00
+      </b>
+
     </div>
+
   </section>
 
+
+  <!-- QUICK ACTION -->
+
   <section class="card">
-    <h3 style="margin-top:0">⚡ দ্রুত কাজ</h3>
+
+    <h3 style="margin-top:0">
+      ⚡ দ্রুত কাজ
+    </h3>
+
 
     <div class="grid">
-      <button class="btn btn-primary" onclick="openOrderModal()">
+
+      <button
+        class="btn btn-primary"
+        onclick="openOrderModal()"
+      >
         ➕ নতুন অর্ডার
       </button>
 
-      <button class="btn btn-warning" onclick="openHistory()">
+
+      <button
+        class="btn btn-warning"
+        onclick="openHistory()"
+      >
         📝 Draft / History
       </button>
 
-      <button class="btn btn-light" onclick="focusProductSearch()">
+
+      <button
+        class="btn btn-light"
+        onclick="focusProductSearch()"
+      >
         🔎 Product খুঁজুন
       </button>
 
-      <button class="btn btn-light" onclick="openProductManager()">
+
+      <button
+        class="btn btn-light"
+        onclick="openProductManager()"
+      >
         📦 Products
       </button>
 
-      <button class="btn btn-light" onclick="openMarketShopManager()">
+
+      <button
+        class="btn btn-light"
+        onclick="openMarketShopManager()"
+      >
         📍 Market / Shop
       </button>
+
     </div>
+
   </section>
 
-  <section class="card" id="productSearchCard">
 
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+  <!-- PRODUCT SEARCH -->
 
-      <h3 style="margin:0">🔎 Product Search</h3>
+  <section
+    class="card"
+    id="productSearchCard"
+  >
 
-      <span class="small" id="onlineStatus">
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:8px
+      "
+    >
+
+      <h3 style="margin:0">
+        🔎 Product Search
+      </h3>
+
+      <span
+        class="small"
+        id="onlineStatus"
+      >
         লোকাল
       </span>
 
     </div>
+
 
     <input
       id="productSearch"
@@ -849,118 +1188,284 @@ textarea{
       oninput="renderProductResults()"
     >
 
-    <div id="productResults" class="product-results"></div>
+
+    <div
+      id="productResults"
+      class="product-results"
+    ></div>
 
   </section>
 
+
 </main>
+
+
+<!-- ================= BOTTOM NAV ================= -->
 
 <nav class="bottom-nav">
 
   <div class="bottom-nav-inner">
 
-    <button class="nav-btn active" onclick="scrollTopPage()">
-      <b>🏠</b>Home
+
+    <button
+      class="nav-btn active"
+      onclick="scrollTopPage()"
+    >
+
+      <b>🏠</b>
+
+      Home
+
     </button>
 
-    <button class="nav-btn" onclick="openOrderModal()">
-      <b>➕</b>Order
+
+    <button
+      class="nav-btn"
+      onclick="openOrderModal()"
+    >
+
+      <b>➕</b>
+
+      Order
+
     </button>
 
-    <button class="nav-btn" onclick="openHistory()">
-      <b>📋</b>History
+
+    <button
+      class="nav-btn"
+      onclick="openHistory()"
+    >
+
+      <b>📋</b>
+
+      History
+
     </button>
 
-    <button class="nav-btn" onclick="openProductManager()">
-      <b>📦</b>Products
+
+    <button
+      class="nav-btn"
+      onclick="openProductManager()"
+    >
+
+      <b>📦</b>
+
+      Products
+
     </button>
+
 
   </div>
 
 </nav>
 
-<!-- ORDER MODAL -->
 
-<div class="modal" id="orderModal">
+<!-- =====================================================
+     ORDER MODAL
+===================================================== -->
+
+<div
+  class="modal"
+  id="orderModal"
+>
 
   <div class="modal-box">
 
+
     <div class="modal-head">
-      <h3 id="orderModalTitle">➕ নতুন অর্ডার</h3>
-      <button class="close" onclick="closeModal('orderModal')">✕</button>
+
+      <h3 id="orderModalTitle">
+        ➕ নতুন অর্ডার
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('orderModal')"
+      >
+        ✕
+      </button>
+
     </div>
 
-    <div class="small" style="margin-bottom:10px">
+
+    <div
+      class="small"
+      style="margin-bottom:10px"
+    >
+
       প্রথমে <b>Save Draft</b> করুন।
+
       Save করলে অনলাইনে যাবে না।
+
       পরে Draft খুলে Product যোগ/পরিবর্তন করে আবার Save করে
+
       <b>Send Order</b> চাপলে অনলাইনে যাবে।
+
     </div>
+
 
     <div class="form-grid">
 
-      <div class="field">
-        <label>মার্কেট</label>
 
-        <select id="marketSelect" onchange="filterShopList(true)">
-          <option value="">-- মার্কেট নির্বাচন করুন --</option>
+      <div class="field">
+
+        <label>
+          মার্কেট
+        </label>
+
+        <select
+          id="marketSelect"
+          onchange="filterShopList(true)"
+        >
+
+          <option value="">
+            -- মার্কেট নির্বাচন করুন --
+          </option>
+
         </select>
+
       </div>
 
-      <div class="field">
-        <label>দোকানের নাম *</label>
 
-        <select id="shopSelect" onchange="selectSavedShop()">
-          <option value="">-- দোকান নির্বাচন করুন --</option>
+      <div class="field">
+
+        <label>
+          দোকানের নাম *
+        </label>
+
+        <select
+          id="shopSelect"
+          onchange="selectSavedShop()"
+        >
+
+          <option value="">
+            -- দোকান নির্বাচন করুন --
+          </option>
+
         </select>
+
 
         <input
           id="shop"
           placeholder="দোকানের নাম"
           style="margin-top:6px"
         >
+
       </div>
 
-      <div class="field">
-        <label>দোকানের কোড</label>
-        <input id="shopCode" placeholder="দোকানের কোড">
-      </div>
 
       <div class="field">
-        <label>মোবাইল</label>
-        <input id="mobile" placeholder="01XXXXXXXXX">
+
+        <label>
+          দোকানের কোড
+        </label>
+
+        <input
+          id="shopCode"
+          placeholder="দোকানের কোড"
+        >
+
       </div>
+
+
+      <div class="field">
+
+        <label>
+          মোবাইল
+        </label>
+
+        <input
+          id="mobile"
+          placeholder="01XXXXXXXXX"
+        >
+
+      </div>
+
 
       <div class="field full">
-        <label>ঠিকানা</label>
-        <input id="address" placeholder="দোকানের ঠিকানা">
+
+        <label>
+          ঠিকানা
+        </label>
+
+        <input
+          id="address"
+          placeholder="দোকানের ঠিকানা"
+        >
+
       </div>
 
-      <div class="field">
-        <label>Representative</label>
-        <input id="representative" placeholder="প্রতিনিধির নাম">
-      </div>
 
       <div class="field">
-        <label>অর্ডার তারিখ</label>
-        <input id="orderDate" type="date">
+
+        <label>
+          Representative
+        </label>
+
+        <input
+          id="representative"
+          placeholder="প্রতিনিধির নাম"
+        >
+
       </div>
 
+
       <div class="field">
-        <label>ডেলিভারি তারিখ</label>
-        <input id="deliveryDate" type="date">
+
+        <label>
+          অর্ডার তারিখ
+        </label>
+
+        <input
+          id="orderDate"
+          type="date"
+        >
+
       </div>
+
+
+      <div class="field">
+
+        <label>
+          ডেলিভারি তারিখ
+        </label>
+
+        <input
+          id="deliveryDate"
+          type="date"
+        >
+
+      </div>
+
 
       <div class="field full">
-        <label>নোট</label>
-        <textarea id="note" placeholder="প্রয়োজনীয় নোট"></textarea>
+
+        <label>
+          নোট
+        </label>
+
+        <textarea
+          id="note"
+          placeholder="প্রয়োজনীয় নোট"
+        ></textarea>
+
       </div>
+
 
     </div>
 
-    <div class="field" style="margin-top:12px">
 
-      <label>🔎 Order-এর জন্য Product খুঁজুন</label>
+    <!-- PRODUCT SEARCH -->
+
+    <div
+      class="field"
+      style="margin-top:12px"
+    >
+
+      <label>
+        🔎 Order-এর জন্য Product খুঁজুন
+      </label>
+
 
       <input
         id="orderProductSearch"
@@ -970,122 +1475,282 @@ textarea{
         oninput="renderOrderProductResults()"
       >
 
-      <div id="orderProductResults" class="order-search-results"></div>
+
+      <div
+        id="orderProductResults"
+        class="order-search-results"
+      ></div>
 
     </div>
 
-    <div id="orderItems" class="order-items"></div>
+
+    <div
+      id="orderItems"
+      class="order-items"
+    ></div>
+
 
     <div class="total">
+
       মোট:
-      <span id="orderTotal">৳0.00</span>
+
+      <span id="orderTotal">
+        ৳0.00
+      </span>
+
     </div>
+
 
     <div class="actions">
 
-      <button class="btn btn-primary" onclick="saveOrder()">
+
+      <button
+        class="btn btn-primary"
+        onclick="saveOrder()"
+      >
         💾 Save Draft
       </button>
 
-      <button class="btn btn-info" onclick="sendCurrentDraft()">
+
+      <button
+        class="btn btn-info"
+        onclick="sendCurrentDraft()"
+      >
         📤 Send Order
       </button>
 
-      <button class="btn btn-light" onclick="closeModal('orderModal')">
+
+      <button
+        class="btn btn-light"
+        onclick="closeModal('orderModal')"
+      >
         Cancel
       </button>
 
+
     </div>
+
 
   </div>
 
 </div>
 
-<!-- PRODUCT MODAL -->
 
-<div class="modal" id="productModal">
+<!-- =====================================================
+     PRODUCT MODAL
+===================================================== -->
+
+<div
+  class="modal"
+  id="productModal"
+>
 
   <div class="modal-box">
 
+
     <div class="modal-head">
-      <h3>📦 Product Manager</h3>
-      <button class="close" onclick="closeModal('productModal')">✕</button>
+
+      <h3>
+        📦 Product Manager
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('productModal')"
+      >
+        ✕
+      </button>
+
     </div>
 
-    <div class="small" style="margin-bottom:10px">
+
+    <div
+      class="small"
+      style="margin-bottom:10px"
+    >
+
       এখানে <b>মূল রেট</b> হলো সাধারণ বিক্রির রেট,
+
       <b>Carton Rate</b> হলো কার্টন নিলে প্রযোজ্য রেট এবং
+
       <b>MRP</b> পণ্যের জন্য সংরক্ষিত থাকবে।
+
       অর্ডার পাঠানোর সময় MRP পাঠানো হবে না।
+
     </div>
+
 
     <div class="form-grid">
 
-      <div class="field">
-        <label>Code</label>
-        <input id="pCode" placeholder="03227">
-      </div>
 
       <div class="field">
-        <label>Pack</label>
-        <input id="pPack" placeholder="60">
+
+        <label>
+          Code
+        </label>
+
+        <input
+          id="pCode"
+          placeholder="03227"
+        >
+
       </div>
+
+
+      <div class="field">
+
+        <label>
+          Pack
+        </label>
+
+        <input
+          id="pPack"
+          placeholder="60"
+        >
+
+      </div>
+
 
       <div class="field full">
-        <label>Name</label>
-        <input id="pName" placeholder="Product name">
+
+        <label>
+          Name
+        </label>
+
+        <input
+          id="pName"
+          placeholder="Product name"
+        >
+
       </div>
 
-      <div class="field">
-        <label>মূল রেট</label>
-        <input id="pPrice" type="number" step="0.01" placeholder="88">
-      </div>
 
       <div class="field">
-        <label>Carton Rate</label>
-        <input id="pCartonRate" type="number" step="0.01" placeholder="80">
+
+        <label>
+          মূল রেট
+        </label>
+
+        <input
+          id="pPrice"
+          type="number"
+          step="0.01"
+          placeholder="88"
+        >
+
       </div>
 
-      <div class="field">
-        <label>MRP</label>
-        <input id="pMrp" type="number" step="0.01" placeholder="100">
-      </div>
 
       <div class="field">
-        <label>Stock</label>
-        <input id="pStock" type="number" placeholder="100">
+
+        <label>
+          Carton Rate
+        </label>
+
+        <input
+          id="pCartonRate"
+          type="number"
+          step="0.01"
+          placeholder="80"
+        >
+
       </div>
+
+
+      <div class="field">
+
+        <label>
+          MRP
+        </label>
+
+        <input
+          id="pMrp"
+          type="number"
+          step="0.01"
+          placeholder="100"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Stock
+        </label>
+
+        <input
+          id="pStock"
+          type="number"
+          placeholder="100"
+        >
+
+      </div>
+
 
     </div>
+
 
     <div class="actions">
 
-      <button class="btn btn-primary" onclick="saveProduct()">
+
+      <button
+        class="btn btn-primary"
+        onclick="saveProduct()"
+      >
         💾 Save Product
       </button>
 
-      <button class="btn btn-light" onclick="closeModal('productModal')">
+
+      <button
+        class="btn btn-light"
+        onclick="closeModal('productModal')"
+      >
         Cancel
       </button>
 
+
     </div>
 
-    <div id="productManagerList" style="margin-top:14px"></div>
+
+    <div
+      id="productManagerList"
+      style="margin-top:14px"
+    ></div>
+
 
   </div>
 
 </div>
 
-<!-- HISTORY MODAL -->
 
-<div class="modal" id="historyModal">
+<!-- =====================================================
+     HISTORY MODAL
+===================================================== -->
+
+<div
+  class="modal"
+  id="historyModal"
+>
 
   <div class="modal-box">
 
+
     <div class="modal-head">
-      <h3>📋 Draft & Order History</h3>
-      <button class="close" onclick="closeModal('historyModal')">✕</button>
+
+      <h3>
+        📋 Draft & Order History
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('historyModal')"
+      >
+        ✕
+      </button>
+
     </div>
+
 
     <input
       id="historySearch"
@@ -1094,73 +1759,148 @@ textarea{
       oninput="renderHistory()"
     >
 
-    <div id="draftList" style="margin-top:12px"></div>
 
-    <hr style="border:0;border-top:1px solid #eee;margin:14px 0">
+    <div
+      id="draftList"
+      style="margin-top:12px"
+    ></div>
 
-    <h4 style="margin:0 0 5px">📤 Sent Orders</h4>
+
+    <hr
+      style="
+        border:0;
+        border-top:1px solid #eee;
+        margin:14px 0
+      "
+    >
+
+
+    <h4 style="margin:0 0 5px">
+      📤 Sent Orders
+    </h4>
+
 
     <div id="historyList"></div>
 
+
   </div>
 
 </div>
 
-<!-- DETAIL MODAL -->
 
-<div class="modal" id="detailModal">
+<!-- =====================================================
+     DETAIL MODAL
+===================================================== -->
+
+<div
+  class="modal"
+  id="detailModal"
+>
 
   <div class="modal-box">
 
+
     <div class="modal-head">
-      <h3>অর্ডার বিস্তারিত</h3>
-      <button class="close" onclick="closeModal('detailModal')">✕</button>
+
+      <h3>
+        অর্ডার বিস্তারিত
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('detailModal')"
+      >
+        ✕
+      </button>
+
     </div>
+
 
     <div id="detailContent"></div>
 
+
     <div class="actions no-print">
 
-      <button class="btn btn-light" onclick="window.print()">
+
+      <button
+        class="btn btn-light"
+        onclick="window.print()"
+      >
         🖨 Print / PDF
       </button>
 
-      <button class="btn btn-light" onclick="closeModal('detailModal')">
+
+      <button
+        class="btn btn-light"
+        onclick="closeModal('detailModal')"
+      >
         Close
       </button>
 
+
     </div>
+
 
   </div>
 
 </div>
 
-<!-- PROFILE MODAL -->
 
-<div class="modal" id="profileModal">
+<!-- =====================================================
+     PROFILE MODAL
+===================================================== -->
+
+<div
+  class="modal"
+  id="profileModal"
+>
 
   <div class="modal-box">
 
+
     <div class="modal-head">
-      <h3>👤 Profile</h3>
-      <button class="close" onclick="closeModal('profileModal')">✕</button>
+
+      <h3>
+        👤 Profile
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('profileModal')"
+      >
+        ✕
+      </button>
+
     </div>
 
+
     <div style="text-align:center">
+
 
       <div
         class="avatar"
         id="profileModalAvatar"
-        style="margin:auto;width:100px;height:100px;font-size:30px"
+        style="
+          margin:auto;
+          width:100px;
+          height:100px;
+          font-size:30px
+        "
       >
         A
       </div>
 
+
       <label
         class="btn btn-light"
-        style="display:inline-block;margin-top:12px"
+        style="
+          display:inline-block;
+          margin-top:12px
+        "
       >
+
         📷 ছবি পরিবর্তন
+
 
         <input
           id="profilePhotoInput"
@@ -1169,93 +1909,210 @@ textarea{
           onchange="uploadProfilePhoto(event)"
           style="display:none"
         >
+
       </label>
 
+
     </div>
 
-    <div class="field full" style="margin-top:16px">
-      <label>Username</label>
-      <input id="profileUsername" placeholder="আপনার User Name">
+
+    <div
+      class="field full"
+      style="margin-top:16px"
+    >
+
+      <label>
+        Username
+      </label>
+
+      <input
+        id="profileUsername"
+        placeholder="আপনার User Name"
+      >
+
     </div>
+
 
     <div class="actions">
 
-      <button class="btn btn-primary" onclick="saveProfileInfo()">
+
+      <button
+        class="btn btn-primary"
+        onclick="saveProfileInfo()"
+      >
         💾 Save Profile
       </button>
 
-      <button class="btn btn-light" onclick="closeModal('profileModal')">
+
+      <button
+        class="btn btn-light"
+        onclick="closeModal('profileModal')"
+      >
         Close
       </button>
 
+
     </div>
+
 
   </div>
 
 </div>
 
-<!-- MARKET & SHOP MANAGER MODAL -->
 
-<div class="modal" id="marketShopModal">
+<!-- =====================================================
+     MARKET & SHOP MANAGER
+===================================================== -->
+
+<div
+  class="modal"
+  id="marketShopModal"
+>
 
   <div class="modal-box">
 
+
     <div class="modal-head">
-      <h3>📍 Market & Shop List</h3>
-      <button class="close" onclick="closeModal('marketShopModal')">✕</button>
+
+      <h3>
+        📍 Market & Shop List
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('marketShopModal')"
+      >
+        ✕
+      </button>
+
     </div>
 
-    <div class="small" style="margin-bottom:10px">
+
+    <div
+      class="small"
+      style="margin-bottom:10px"
+    >
+
       এখানে নতুন মার্কেট ও দোকানের নাম/ঠিকানা যোগ করতে পারবেন।
+
       যেকোনো পুরোনো তথ্য Edit বা Delete করা যাবে।
+
       তথ্য এই ডিভাইসে সংরক্ষিত থাকবে।
+
     </div>
+
 
     <div class="form-grid">
 
-      <div class="field">
-        <label>মার্কেটের নাম *</label>
-        <input id="msMarket" placeholder="যেমন: মিরপুর মার্কেট">
-      </div>
 
       <div class="field">
-        <label>দোকানের নাম *</label>
-        <input id="msShop" placeholder="যেমন: রহিম স্টোর">
+
+        <label>
+          মার্কেটের নাম *
+        </label>
+
+        <input
+          id="msMarket"
+          placeholder="যেমন: মিরপুর মার্কেট"
+        >
+
       </div>
 
+
       <div class="field">
-        <label>দোকানের কোড</label>
-        <input id="msShopCode" placeholder="যেমন: S-001">
+
+        <label>
+          দোকানের নাম *
+        </label>
+
+        <input
+          id="msShop"
+          placeholder="যেমন: রহিম স্টোর"
+        >
+
       </div>
+
+
+      <div class="field">
+
+        <label>
+          দোকানের কোড
+        </label>
+
+        <input
+          id="msShopCode"
+          placeholder="যেমন: S-001"
+        >
+
+      </div>
+
 
       <div class="field full">
-        <label>ঠিকানা</label>
-        <input id="msAddress" placeholder="দোকানের ঠিকানা">
+
+        <label>
+          ঠিকানা
+        </label>
+
+        <input
+          id="msAddress"
+          placeholder="দোকানের ঠিকানা"
+        >
+
       </div>
 
-      <div class="field">
-        <label>মোবাইল</label>
-        <input id="msMobile" placeholder="01XXXXXXXXX">
-      </div>
 
       <div class="field">
-        <label>Representative</label>
-        <input id="msRepresentative" placeholder="প্রতিনিধির নাম">
+
+        <label>
+          মোবাইল
+        </label>
+
+        <input
+          id="msMobile"
+          placeholder="01XXXXXXXXX"
+        >
+
       </div>
+
+
+      <div class="field">
+
+        <label>
+          Representative
+        </label>
+
+        <input
+          id="msRepresentative"
+          placeholder="প্রতিনিধির নাম"
+        >
+
+      </div>
+
 
     </div>
+
 
     <div class="actions">
 
-      <button class="btn btn-primary" onclick="saveMarketShop()">
+
+      <button
+        class="btn btn-primary"
+        onclick="saveMarketShop()"
+      >
         💾 Save
       </button>
 
-      <button class="btn btn-light" onclick="clearMarketShopForm()">
+
+      <button
+        class="btn btn-light"
+        onclick="clearMarketShopForm()"
+      >
         ✚ নতুন
       </button>
 
+
     </div>
+
 
     <input
       id="marketShopSearch"
@@ -1265,92 +2122,158 @@ textarea{
       oninput="renderMarketShopList()"
     >
 
-    <div id="marketShopList" class="list-box"></div>
+
+    <div
+      id="marketShopList"
+      class="list-box"
+    ></div>
+
 
   </div>
 
 </div>
 
-<!-- NOTIFICATION MODAL -->
 
-<div class="modal" id="notificationModal">
+<!-- =====================================================
+     NOTIFICATION
+===================================================== -->
+
+<div
+  class="modal"
+  id="notificationModal"
+>
 
   <div class="modal-box">
 
+
     <div class="modal-head">
-      <h3>🔔 Notifications</h3>
-      <button class="close" onclick="closeModal('notificationModal')">✕</button>
+
+      <h3>
+        🔔 Notifications
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeModal('notificationModal')"
+      >
+        ✕
+      </button>
+
     </div>
 
-    <div id="notificationList" class="notification-list"></div>
+
+    <div
+      id="notificationList"
+      class="notification-list"
+    ></div>
+
 
   </div>
 
 </div>
 
-<div id="toast" class="toast"></div>
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
 
 <script>
 
-/* ===== PWA SERVICE WORKER ===== */
+
+/* =====================================================
+   PWA SERVICE WORKER
+   Version changed so browser can detect new code
+===================================================== */
 
 if("serviceWorker" in navigator){
 
-  window.addEventListener("load",()=>{
+  window.addEventListener(
+    "load",
+    ()=>{
 
-    navigator.serviceWorker
-      .register("./sw.js",{scope:"./"})
-      .catch(err=>{
-        console.error("PWA service worker error:",err);
-      });
+      navigator.serviceWorker
+        .register(
+          "./sw.js?v=20260919-2",
+          {
+            scope:"./"
+          }
+        )
+        .catch(
+          err=>{
+            console.error(
+              "PWA service worker error:",
+              err
+            );
+          }
+        );
 
-  });
+    }
+  );
 
 }
 
 
-/* ===== SUPABASE ===== */
+/* =====================================================
+   SUPABASE
+===================================================== */
 
-const SUPABASE_URL =
+const SUPABASE_URL=
   "https://utzkpsohkoiawvuupgeb.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
+const SUPABASE_PUBLISHABLE_KEY=
   "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
-const supabaseClient =
+const supabaseClient=
   window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
   );
 
 
-/* ===== LOCAL STORAGE ===== */
+/* =====================================================
+   LOCAL STORAGE
+===================================================== */
 
-const DRAFTS_KEY =
+const DRAFTS_KEY=
   "kohinoor_order_drafts_v3";
 
-const LOCAL_NOTICES_KEY =
+const LOCAL_NOTICES_KEY=
   "kohinoor_notifications_v3";
 
-const LOCAL_PRODUCTS_KEY =
+const LOCAL_PRODUCTS_KEY=
   "kohinoor_products_cache_v3";
 
 
-/* ===== VARIABLES ===== */
+/* =====================================================
+   VARIABLES
+===================================================== */
 
-let currentUser = null;
-let products = [];
-let orders = [];
-let draftOrders = [];
-let notifications = [];
-let currentOrderItems = [];
-let editingDraftId = null;
-let realtimeChannel = null;
-let pollingTimer = null;
-let editingProductId = null;
+let currentUser=null;
+
+let products=[];
+
+let orders=[];
+
+let draftOrders=[];
+
+let notifications=[];
+
+let currentOrderItems=[];
+
+let editingDraftId=null;
+
+let realtimeChannel=null;
+
+let pollingTimer=null;
+
+let editingProductId=null;
 
 
-/* ===== START ===== */
+/* =====================================================
+   START
+===================================================== */
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -1359,9 +2282,11 @@ document.addEventListener(
     setTodayDates();
 
     loadDrafts();
+
     loadNotifications();
 
-    const ok = await checkAdmin();
+    const ok=
+      await checkAdmin();
 
     if(!ok)return;
 
@@ -1383,31 +2308,48 @@ document.addEventListener(
 );
 
 
-/* ===== ADMIN ===== */
+/* =====================================================
+   ADMIN
+===================================================== */
 
 async function checkAdmin(){
 
   try{
 
-    const {data,error} =
-      await supabaseClient.auth.getSession();
+    const {
+      data,
+      error
+    }=
+      await supabaseClient
+        .auth
+        .getSession();
 
-    if(error || !data.session){
+    if(
+      error ||
+      !data.session
+    ){
 
-      window.location.replace("signin.html");
+      window.location.replace(
+        "signin.html"
+      );
 
       return false;
     }
 
-    currentUser=data.session.user;
+    currentUser=
+      data.session.user;
 
-    await loadUserProfile(currentUser);
+    await loadUserProfile(
+      currentUser
+    );
 
     return true;
 
   }catch(e){
 
-    window.location.replace("signin.html");
+    window.location.replace(
+      "signin.html"
+    );
 
     return false;
 
@@ -1418,18 +2360,26 @@ async function checkAdmin(){
 
 async function adminLogout(){
 
-  await supabaseClient.auth.signOut();
+  await supabaseClient
+    .auth
+    .signOut();
 
-  window.location.replace("signin.html");
+  window.location.replace(
+    "signin.html"
+  );
 
 }
 
 
-/* ===== UTILITIES ===== */
+/* =====================================================
+   UTILITIES
+===================================================== */
 
 function escapeHtml(value){
 
-  return String(value ?? "").replace(
+  return String(
+    value ?? ""
+  ).replace(
     /[&<>"']/g,
     m=>({
       "&":"&amp;",
@@ -1445,38 +2395,51 @@ function escapeHtml(value){
 
 function money(n){
 
-  return "৳"+Number(n||0).toFixed(2);
+  return "৳"+
+    Number(n||0)
+      .toFixed(2);
 
 }
 
 
 function mainRate(p){
 
-  return Number(p?.price||0);
+  return Number(
+    p?.price||0
+  );
 
 }
 
 
 function cartonRate(p){
 
-  return Number(p?.carton_rate||0);
+  return Number(
+    p?.carton_rate||0
+  );
 
 }
 
 
 function showToast(msg){
 
-  const el=document.getElementById("toast");
+  const el=
+    document.getElementById(
+      "toast"
+    );
 
   el.textContent=msg;
 
   el.style.display="block";
 
-  clearTimeout(showToast.t);
+  clearTimeout(
+    showToast.t
+  );
 
   showToast.t=
     setTimeout(
-      ()=>el.style.display="none",
+      ()=>{
+        el.style.display="none";
+      },
       2500
     );
 
@@ -1514,75 +2477,111 @@ function scrollTopPage(){
 function focusProductSearch(){
 
   document
-    .getElementById("productSearchCard")
+    .getElementById(
+      "productSearchCard"
+    )
     .scrollIntoView({
       behavior:"smooth"
     });
 
   setTimeout(
-    ()=>document.getElementById("productSearch").focus(),
+    ()=>{
+      document
+        .getElementById(
+          "productSearch"
+        )
+        .focus();
+    },
     250
   );
 
 }
 
 
-/* ===== DATE ===== */
+/* =====================================================
+   DATE
+===================================================== */
 
 function setTodayDates(){
 
-  const d=new Date();
+  const d=
+    new Date();
 
   const today=
     new Date(
       d.getTime() -
-      d.getTimezoneOffset()*60000
+      d.getTimezoneOffset()*
+      60000
     )
-    .toISOString()
-    .slice(0,10);
+      .toISOString()
+      .slice(0,10);
 
   const od=
-    document.getElementById("orderDate");
+    document.getElementById(
+      "orderDate"
+    );
 
   const dd=
-    document.getElementById("deliveryDate");
+    document.getElementById(
+      "deliveryDate"
+    );
 
-  if(od)od.value=today;
+  if(od)
+    od.value=today;
 
-  if(dd)dd.value=today;
+  if(dd)
+    dd.value=today;
 
 }
 
 
-/* ===== PROFILE ===== */
+/* =====================================================
+   PROFILE
+===================================================== */
 
 async function loadUserProfile(user){
 
   const fallbackName=
-    user.email?.split("@")[0] || "User";
+    user.email?.split("@")[0] ||
+    "User";
 
   try{
 
-    const {data,error}=
+    const {
+      data,
+      error
+    }=
       await supabaseClient
         .from("user_profiles")
-        .select("username,avatar_url")
-        .eq("id",user.id)
+        .select(
+          "username,avatar_url"
+        )
+        .eq(
+          "id",
+          user.id
+        )
         .maybeSingle();
 
-    if(error)throw error;
+    if(error)
+      throw error;
 
-    const p=data||{};
+    const p=
+      data||{};
 
     const name=
-      p.username||fallbackName;
+      p.username ||
+      fallbackName;
 
     document
-      .getElementById("profileName")
+      .getElementById(
+        "profileName"
+      )
       .textContent=name;
 
     setProfileAvatar(
-      document.getElementById("profileAvatar"),
+      document.getElementById(
+        "profileAvatar"
+      ),
       p.avatar_url,
       name
     );
@@ -1590,11 +2589,16 @@ async function loadUserProfile(user){
   }catch(e){
 
     document
-      .getElementById("profileName")
-      .textContent=fallbackName;
+      .getElementById(
+        "profileName"
+      )
+      .textContent=
+        fallbackName;
 
     setProfileAvatar(
-      document.getElementById("profileAvatar"),
+      document.getElementById(
+        "profileAvatar"
+      ),
       "",
       fallbackName
     );
@@ -1604,7 +2608,11 @@ async function loadUserProfile(user){
 }
 
 
-function setProfileAvatar(el,url,name){
+function setProfileAvatar(
+  el,
+  url,
+  name
+){
 
   if(!el)return;
 
@@ -1618,10 +2626,13 @@ function setProfileAvatar(el,url,name){
   }else{
 
     el.textContent=
-      (name||"A")
+      (
+        name||"A"
+      )
       .trim()
       .charAt(0)
-      .toUpperCase() || "A";
+      .toUpperCase() ||
+      "A";
 
   }
 
@@ -1634,28 +2645,43 @@ async function openProfileModal(){
 
   try{
 
-    const {data,error}=
+    const {
+      data,
+      error
+    }=
       await supabaseClient
         .from("user_profiles")
-        .select("username,avatar_url")
-        .eq("id",currentUser.id)
+        .select(
+          "username,avatar_url"
+        )
+        .eq(
+          "id",
+          currentUser.id
+        )
         .maybeSingle();
 
-    if(error)throw error;
+    if(error)
+      throw error;
 
-    const p=data||{};
+    const p=
+      data||{};
 
     const name=
       p.username ||
-      currentUser.email?.split("@")[0] ||
+      currentUser.email
+        ?.split("@")[0] ||
       "User";
 
     document
-      .getElementById("profileUsername")
+      .getElementById(
+        "profileUsername"
+      )
       .value=name;
 
     setProfileAvatar(
-      document.getElementById("profileModalAvatar"),
+      document.getElementById(
+        "profileModalAvatar"
+      ),
       p.avatar_url,
       name
     );
@@ -1663,22 +2689,29 @@ async function openProfileModal(){
   }catch(e){
 
     const name=
-      currentUser.email?.split("@")[0] ||
+      currentUser.email
+        ?.split("@")[0] ||
       "User";
 
     document
-      .getElementById("profileUsername")
+      .getElementById(
+        "profileUsername"
+      )
       .value=name;
 
     setProfileAvatar(
-      document.getElementById("profileModalAvatar"),
+      document.getElementById(
+        "profileModalAvatar"
+      ),
       "",
       name
     );
 
   }
 
-  openModal("profileModal");
+  openModal(
+    "profileModal"
+  );
 
 }
 
@@ -1697,13 +2730,17 @@ async function saveProfileInfo(){
 
   const username=
     document
-      .getElementById("profileUsername")
+      .getElementById(
+        "profileUsername"
+      )
       .value
       .trim();
 
   if(!username){
 
-    alert("Username দিন");
+    alert(
+      "Username দিন"
+    );
 
     return;
 
@@ -1711,24 +2748,39 @@ async function saveProfileInfo(){
 
   try{
 
-    const {data:existing,error:readError}=
+    const {
+      data:existing,
+      error:readError
+    }=
       await supabaseClient
         .from("user_profiles")
-        .select("id,avatar_url")
-        .eq("id",currentUser.id)
+        .select(
+          "id,avatar_url"
+        )
+        .eq(
+          "id",
+          currentUser.id
+        )
         .maybeSingle();
 
-    if(readError)throw readError;
+    if(readError)
+      throw readError;
 
     if(existing){
 
       const {error}=
         await supabaseClient
           .from("user_profiles")
-          .update({username})
-          .eq("id",currentUser.id);
+          .update({
+            username
+          })
+          .eq(
+            "id",
+            currentUser.id
+          );
 
-      if(error)throw error;
+      if(error)
+        throw error;
 
     }else{
 
@@ -1740,19 +2792,26 @@ async function saveProfileInfo(){
             username
           });
 
-      if(error)throw error;
+      if(error)
+        throw error;
 
     }
 
-    await loadUserProfile(currentUser);
+    await loadUserProfile(
+      currentUser
+    );
 
     setProfileAvatar(
-      document.getElementById("profileModalAvatar"),
+      document.getElementById(
+        "profileModalAvatar"
+      ),
       existing?.avatar_url||"",
       username
     );
 
-    closeModal("profileModal");
+    closeModal(
+      "profileModal"
+    );
 
     showToast(
       "✅ Username সফলভাবে পরিবর্তন হয়েছে"
@@ -1775,7 +2834,9 @@ async function saveProfileInfo(){
 }
 
 
-/* ===== PROFILE PHOTO ===== */
+/* =====================================================
+   PROFILE PHOTO
+===================================================== */
 
 function resizeImageToDataUrl(
   file,
@@ -1786,18 +2847,26 @@ function resizeImageToDataUrl(
   return new Promise(
     (resolve,reject)=>{
 
-      const reader=new FileReader();
+      const reader=
+        new FileReader();
 
       reader.onload=()=>{
 
-        const img=new Image();
+        const img=
+          new Image();
 
         img.onload=()=>{
 
-          let w=img.width;
-          let h=img.height;
+          let w=
+            img.width;
 
-          if(w>maxSize||h>maxSize){
+          let h=
+            img.height;
+
+          if(
+            w>maxSize ||
+            h>maxSize
+          ){
 
             const r=
               Math.min(
@@ -1805,20 +2874,36 @@ function resizeImageToDataUrl(
                 maxSize/h
               );
 
-            w=Math.round(w*r);
-            h=Math.round(h*r);
+            w=
+              Math.round(
+                w*r
+              );
+
+            h=
+              Math.round(
+                h*r
+              );
 
           }
 
           const c=
-            document.createElement("canvas");
+            document.createElement(
+              "canvas"
+            );
 
           c.width=w;
+
           c.height=h;
 
           c
             .getContext("2d")
-            .drawImage(img,0,0,w,h);
+            .drawImage(
+              img,
+              0,
+              0,
+              w,
+              h
+            );
 
           resolve(
             c.toDataURL(
@@ -1831,13 +2916,16 @@ function resizeImageToDataUrl(
 
         img.onerror=reject;
 
-        img.src=reader.result;
+        img.src=
+          reader.result;
 
       };
 
       reader.onerror=reject;
 
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(
+        file
+      );
 
     }
   );
@@ -1845,28 +2933,43 @@ function resizeImageToDataUrl(
 }
 
 
-async function uploadProfilePhoto(event){
+async function uploadProfilePhoto(
+  event
+){
 
   const file=
     event.target.files?.[0];
 
-  if(!file||!currentUser)return;
+  if(
+    !file ||
+    !currentUser
+  )return;
 
   try{
 
     const dataUrl=
-      await resizeImageToDataUrl(file);
+      await resizeImageToDataUrl(
+        file
+      );
 
-    const {data:existing}=
+    const {
+      data:existing
+    }=
       await supabaseClient
         .from("user_profiles")
-        .select("username,status")
-        .eq("id",currentUser.id)
+        .select(
+          "username,status"
+        )
+        .eq(
+          "id",
+          currentUser.id
+        )
         .maybeSingle();
 
     const username=
       existing?.username ||
-      currentUser.email?.split("@")[0] ||
+      currentUser.email
+        ?.split("@")[0] ||
       "User";
 
     const {error}=
@@ -1877,7 +2980,9 @@ async function uploadProfilePhoto(event){
             id:currentUser.id,
             email:currentUser.email,
             username,
-            status:existing?.status||"Active",
+            status:
+              existing?.status ||
+              "Active",
             avatar_url:dataUrl
           },
           {
@@ -1885,12 +2990,17 @@ async function uploadProfilePhoto(event){
           }
         );
 
-    if(error)throw error;
+    if(error)
+      throw error;
 
-    await loadUserProfile(currentUser);
+    await loadUserProfile(
+      currentUser
+    );
 
     setProfileAvatar(
-      document.getElementById("profileModalAvatar"),
+      document.getElementById(
+        "profileModalAvatar"
+      ),
       dataUrl,
       username
     );
@@ -1913,15 +3023,25 @@ async function uploadProfilePhoto(event){
 }
 
 
-/* ===== PRODUCTS ===== */
+/* =====================================================
+   PRODUCTS
+===================================================== */
 
 async function loadProducts(){
 
-  const {data,error}=
+  const {
+    data,
+    error
+  }=
     await supabaseClient
       .from("products")
       .select("*")
-      .order("name",{ascending:true});
+      .order(
+        "name",
+        {
+          ascending:true
+        }
+      );
 
   if(error){
 
@@ -1950,7 +3070,8 @@ async function loadProducts(){
 
   }
 
-  products=data||[];
+  products=
+    data||[];
 
   localStorage.setItem(
     LOCAL_PRODUCTS_KEY,
@@ -1968,13 +3089,17 @@ function renderProductResults(){
 
   const q=
     document
-      .getElementById("productSearch")
+      .getElementById(
+        "productSearch"
+      )
       .value
       .trim()
       .toLowerCase();
 
   const box=
-    document.getElementById("productResults");
+    document.getElementById(
+      "productResults"
+    );
 
   const list=
     products
@@ -1988,42 +3113,63 @@ function renderProductResults(){
             .toLowerCase()
             .includes(q)
       )
-      .slice(0,30);
+      .slice(
+        0,
+        30
+      );
 
   box.innerHTML=
-    list.length ?
-      list.map(
-        p=>`
-        <div class="product-result">
+    list.length
+      ?
+      list
+        .map(
+          p=>`
 
-          <div class="product-result-info">
+          <div class="product-result">
 
-            <b>${escapeHtml(p.name)}</b>
+            <div class="product-result-info">
 
-            <div class="small">
-              ${escapeHtml(p.code||"")}
-              · Pack ${escapeHtml(p.pack||"")}
-              · Stock ${Number(p.stock||0)}
+              <b>
+                ${escapeHtml(p.name)}
+              </b>
+
+              <div class="small">
+
+                ${escapeHtml(p.code||"")}
+
+                · Pack
+                ${escapeHtml(p.pack||"")}
+
+                · Stock
+                ${Number(p.stock||0)}
+
+              </div>
+
+            </div>
+
+
+            <div class="product-result-rate">
+
+              <div>
+                <b>
+                  মূল ${money(mainRate(p))}
+                </b>
+              </div>
+
+              <div class="small">
+                Carton ${money(cartonRate(p))}
+              </div>
+
             </div>
 
           </div>
 
-          <div class="product-result-rate">
+          `
+        )
+        .join("")
 
-            <div>
-              <b>মূল ${money(mainRate(p))}</b>
-            </div>
-
-            <div class="small">
-              Carton ${money(cartonRate(p))}
-            </div>
-
-          </div>
-
-        </div>
-        `
-      ).join("")
       :
+
       '<div class="empty">Product পাওয়া যায়নি</div>';
 
 }
@@ -2048,7 +3194,10 @@ function renderOrderProductResults(){
       "orderProductResults"
     );
 
-  if(!input||!box)return;
+  if(
+    !input ||
+    !box
+  )return;
 
   const q=
     input.value
@@ -2073,61 +3222,77 @@ function renderOrderProductResults(){
     list=list.slice(0,50);
 
   box.innerHTML=
-    list.length ?
-      list.map(
-        p=>`
-
-        <div
-          class="order-search-result"
-          onclick="addProductById('${escapeHtml(String(p.id))}')"
-        >
+    list.length
+      ?
+      list
+        .map(
+          p=>`
 
           <div
-            style="
-              display:flex;
-              justify-content:space-between;
-              gap:8px
-            "
+            class="order-search-result"
+            onclick="addProductById('${escapeHtml(String(p.id))}')"
           >
-
-            <div style="flex:1">
-
-              <b>
-                ${escapeHtml(p.code||"")}
-                —
-                ${escapeHtml(p.name||"")}
-              </b>
-
-              <div class="small">
-                Pack ${escapeHtml(p.pack||"")}
-                · Stock ${Number(p.stock||0)}
-              </div>
-
-            </div>
 
             <div
               style="
-                text-align:right;
-                white-space:nowrap
+                display:flex;
+                justify-content:space-between;
+                gap:8px
               "
             >
 
-              <b>
-                মূল ${money(mainRate(p))}
-              </b>
+              <div style="flex:1">
 
-              <div class="small">
-                Carton ${money(cartonRate(p))}
+                <b>
+
+                  ${escapeHtml(p.code||"")}
+
+                  —
+
+                  ${escapeHtml(p.name||"")}
+
+                </b>
+
+                <div class="small">
+
+                  Pack
+                  ${escapeHtml(p.pack||"")}
+
+                  · Stock
+                  ${Number(p.stock||0)}
+
+                </div>
+
+              </div>
+
+
+              <div
+                style="
+                  text-align:right;
+                  white-space:nowrap
+                "
+              >
+
+                <b>
+                  মূল ${money(mainRate(p))}
+                </b>
+
+                <div class="small">
+                  Carton ${money(cartonRate(p))}
+                </div>
+
               </div>
 
             </div>
 
           </div>
 
-        </div>
-        `
-      ).join("")
+          `
+        )
+        .join("")
+
       :
+
       '<div class="empty" style="padding:12px">Product পাওয়া যায়নি</div>';
 
 }
@@ -2137,7 +3302,9 @@ function addProductById(id){
 
   const p=
     products.find(
-      x=>String(x.id)===String(id)
+      x=>
+        String(x.id)===
+        String(id)
     );
 
   if(!p)return;
@@ -2145,7 +3312,9 @@ function addProductById(id){
   addProductToOrder(p);
 
   document
-    .getElementById("orderProductSearch")
+    .getElementById(
+      "orderProductSearch"
+    )
     .value="";
 
   renderOrderProductResults();
@@ -2158,8 +3327,12 @@ function addProductToOrder(p){
   const existing=
     currentOrderItems.find(
       x=>
-        String(x.product_id||"")===
-        String(p.id||"") ||
+        String(
+          x.product_id||""
+        )===
+        String(
+          p.id||""
+        ) ||
         (
           x.code &&
           p.code &&
@@ -2170,7 +3343,9 @@ function addProductToOrder(p){
   if(existing){
 
     existing.quantity=
-      Number(existing.quantity||0)+1;
+      Number(
+        existing.quantity||0
+      )+1;
 
   }else{
 
@@ -2188,7 +3363,8 @@ function addProductToOrder(p){
 
       base_price:mainRate(p),
 
-      carton_rate:cartonRate(p),
+      carton_rate:
+        cartonRate(p),
 
       rate_type:"main",
 
@@ -2209,7 +3385,9 @@ function addProductToOrder(p){
 }
 
 
-/* ===== ORDER ITEMS ===== */
+/* =====================================================
+   ORDER ITEMS
+===================================================== */
 
 function renderOrderItems(){
 
@@ -2218,7 +3396,9 @@ function renderOrderItems(){
       "orderItems"
     );
 
-  if(!currentOrderItems.length){
+  if(
+    !currentOrderItems.length
+  ){
 
     box.innerHTML=
       '<div class="empty">এখনো কোনো Product যোগ করা হয়নি</div>';
@@ -2226,149 +3406,199 @@ function renderOrderItems(){
   }else{
 
     box.innerHTML=
-      currentOrderItems.map(
-        (item,i)=>{
+      currentOrderItems
+        .map(
+          (item,i)=>{
 
-          const type=
-            item.rate_type||"main";
+            const type=
+              item.rate_type ||
+              "main";
 
-          const selectedRate=
-            type==="carton"
-              ?Number(item.carton_rate||0)
-              :Number(item.price||0);
+            const selectedRate=
+              type==="carton"
+                ?Number(
+                    item.carton_rate||0
+                  )
+                :Number(
+                    item.price||0
+                  );
 
-          return `
+            return `
 
-          <div class="order-item">
+            <div class="order-item">
 
-            <div class="order-item-top">
 
-              <div>
+              <div class="order-item-top">
 
-                <div class="order-item-name">
-                  ${escapeHtml(item.name)}
+                <div>
+
+                  <div class="order-item-name">
+                    ${escapeHtml(item.name)}
+                  </div>
+
+                  <div class="small">
+
+                    ${escapeHtml(item.code)}
+
+                    · Pack
+                    ${escapeHtml(item.pack)}
+
+                  </div>
+
                 </div>
 
-                <div class="small">
-                  ${escapeHtml(item.code)}
-                  · Pack ${escapeHtml(item.pack)}
-                </div>
+
+                <button
+                  class="btn btn-danger"
+                  style="padding:7px 9px"
+                  onclick="removeOrderItem(${i})"
+                >
+                  ✕
+                </button>
 
               </div>
 
-              <button
-                class="btn btn-danger"
-                style="padding:7px 9px"
-                onclick="removeOrderItem(${i})"
+
+              <div class="rate-box">
+
+
+                <div class="field">
+
+                  <label>
+                    Rate Type
+                  </label>
+
+
+                  <select
+                    onchange="changeItemRateType(${i},this.value)"
+                  >
+
+                    <option
+                      value="main"
+                      ${type==="main"?"selected":""}
+                    >
+                      মূল রেট
+                    </option>
+
+
+                    <option
+                      value="carton"
+                      ${type==="carton"?"selected":""}
+                    >
+                      Carton Rate
+                    </option>
+
+                  </select>
+
+                </div>
+
+
+                <div class="selected-rate">
+
+                  <div class="small">
+                    এই অর্ডারে প্রযোজ্য রেট
+                  </div>
+
+                  ${
+                    type==="carton"
+                      ?"Carton Rate"
+                      :"মূল রেট"
+                  }:
+
+                  ${money(selectedRate)}
+
+                </div>
+
+
+              </div>
+
+
+              <div
+                class="small"
+                style="margin-top:7px"
               >
-                ✕
-              </button>
 
-            </div>
+                মূল রেট:
+                ${money(
+                  item.base_price ??
+                  item.price
+                )}
 
-            <div class="rate-box">
-
-              <div class="field">
-
-                <label>Rate Type</label>
-
-                <select
-                  onchange="changeItemRateType(${i},this.value)"
-                >
-
-                  <option
-                    value="main"
-                    ${type==="main"?"selected":""}
-                  >
-                    মূল রেট
-                  </option>
-
-                  <option
-                    value="carton"
-                    ${type==="carton"?"selected":""}
-                  >
-                    Carton Rate
-                  </option>
-
-                </select>
+                · Carton Rate:
+                ${money(
+                  item.carton_rate
+                )}
 
               </div>
 
-              <div class="selected-rate">
 
-                <div class="small">
-                  এই অর্ডারে প্রযোজ্য রেট
+              <div class="qty-row">
+
+
+                <div class="field">
+
+                  <label>
+                    Qty
+                  </label>
+
+                  <input
+                    type="number"
+                    min="1"
+                    value="${Number(item.quantity||0)}"
+                    onchange="changeItemQty(${i},this.value)"
+                  >
+
                 </div>
 
-                ${type==="carton"?"Carton Rate":"মূল রেট"}:
-                ${money(selectedRate)}
+
+                <div class="field">
+
+                  <label>
+                    Bonus
+                  </label>
+
+                  <input
+                    type="number"
+                    min="0"
+                    value="${Number(item.bonus||0)}"
+                    onchange="changeItemBonus(${i},this.value)"
+                  >
+
+                </div>
+
+
+                <div class="field">
+
+                  <label>
+                    Value
+                  </label>
+
+                  <input
+                    readonly
+                    value="${money(
+                      selectedRate*
+                      Number(
+                        item.quantity||0
+                      )
+                    )}"
+                  >
+
+                </div>
+
 
               </div>
+
 
             </div>
 
-            <div
-              class="small"
-              style="margin-top:7px"
-            >
-              মূল রেট:
-              ${money(item.base_price??item.price)}
-              · Carton Rate:
-              ${money(item.carton_rate)}
-            </div>
+            `;
 
-            <div class="qty-row">
-
-              <div class="field">
-
-                <label>Qty</label>
-
-                <input
-                  type="number"
-                  min="1"
-                  value="${Number(item.quantity||0)}"
-                  onchange="changeItemQty(${i},this.value)"
-                >
-
-              </div>
-
-              <div class="field">
-
-                <label>Bonus</label>
-
-                <input
-                  type="number"
-                  min="0"
-                  value="${Number(item.bonus||0)}"
-                  onchange="changeItemBonus(${i},this.value)"
-                >
-
-              </div>
-
-              <div class="field">
-
-                <label>Value</label>
-
-                <input
-                  readonly
-                  value="${money(
-                    selectedRate*
-                    Number(item.quantity||0)
-                  )}"
-                >
-
-              </div>
-
-            </div>
-
-          </div>
-
-          `;
-
-        }
-      ).join("");
+          }
+        )
+        .join("");
 
   }
+
 
   const total=
     currentOrderItems.reduce(
@@ -2376,54 +3606,78 @@ function renderOrderItems(){
         s+
         (
           x.rate_type==="carton"
-            ?Number(x.carton_rate||0)
-            :Number(x.price||0)
+            ?Number(
+                x.carton_rate||0
+              )
+            :Number(
+                x.price||0
+              )
         )*
-        Number(x.quantity||0),
+        Number(
+          x.quantity||0
+        ),
       0
     );
 
+
   document
-    .getElementById("orderTotal")
-    .textContent=money(total);
+    .getElementById(
+      "orderTotal"
+    )
+    .textContent=
+      money(total);
 
 }
 
 
-function changeItemRateType(i,type){
+function changeItemRateType(
+  i,
+  type
+){
 
-  if(!currentOrderItems[i])return;
+  if(
+    !currentOrderItems[i]
+  )return;
 
-  currentOrderItems[i].rate_type=
-    type==="carton"
-      ?"carton"
-      :"main";
+  currentOrderItems[i]
+    .rate_type=
+      type==="carton"
+        ?"carton"
+        :"main";
 
   renderOrderItems();
 
 }
 
 
-function changeItemQty(i,v){
+function changeItemQty(
+  i,
+  v
+){
 
-  currentOrderItems[i].quantity=
-    Math.max(
-      1,
-      Number(v||1)
-    );
+  currentOrderItems[i]
+    .quantity=
+      Math.max(
+        1,
+        Number(v||1)
+      );
 
   renderOrderItems();
 
 }
 
 
-function changeItemBonus(i,v){
+function changeItemBonus(
+  i,
+  v
+){
 
-  currentOrderItems[i].bonus=
-    Math.max(
-      0,
-      Number(v||0)
-    );
+  currentOrderItems[i]
+    .bonus=
+      Math.max(
+        0,
+        Number(v||0)
+      );
 
   renderOrderItems();
 
@@ -2432,32 +3686,43 @@ function changeItemBonus(i,v){
 
 function removeOrderItem(i){
 
-  currentOrderItems.splice(i,1);
+  currentOrderItems.splice(
+    i,
+    1
+  );
 
   renderOrderItems();
 
 }
 
 
-/* ===== ORDER FORM ===== */
+/* =====================================================
+   ORDER FORM
+===================================================== */
 
 function getOrderFormData(){
 
   const shop=
     document
-      .getElementById("shop")
+      .getElementById(
+        "shop"
+      )
       .value
       .trim();
 
   if(!shop){
 
-    alert("দোকানের নাম দিন");
+    alert(
+      "দোকানের নাম দিন"
+    );
 
     return null;
 
   }
 
-  if(!currentOrderItems.length){
+  if(
+    !currentOrderItems.length
+  ){
 
     alert(
       "কমপক্ষে ১টি Product যোগ করুন"
@@ -2466,6 +3731,7 @@ function getOrderFormData(){
     return null;
 
   }
+
 
   const productsForOrder=
     currentOrderItems.map(
@@ -2478,62 +3744,87 @@ function getOrderFormData(){
 
         const selectedRate=
           rateType==="carton"
-            ?Number(item.carton_rate||0)
-            :Number(item.price||0);
+            ?Number(
+                item.carton_rate||0
+              )
+            :Number(
+                item.price||0
+              );
 
         return {
 
-          product_id:item.product_id||null,
+          product_id:
+            item.product_id ||
+            null,
 
-          code:item.code||"",
+          code:
+            item.code||"",
 
-          name:item.name||"",
+          name:
+            item.name||"",
 
-          pack:item.pack||"",
+          pack:
+            item.pack||"",
 
-          base_price:Number(
-            item.price||0
-          ),
+          base_price:
+            Number(
+              item.price||0
+            ),
 
-          price:selectedRate,
+          price:
+            selectedRate,
 
-          carton_rate:Number(
-            item.carton_rate||0
-          ),
+          carton_rate:
+            Number(
+              item.carton_rate||0
+            ),
 
-          rate_type:rateType,
+          rate_type:
+            rateType,
 
-          rate:selectedRate,
+          rate:
+            selectedRate,
 
-          quantity:Number(
-            item.quantity||0
-          ),
+          quantity:
+            Number(
+              item.quantity||0
+            ),
 
-          bonus:Number(
-            item.bonus||0
-          ),
+          bonus:
+            Number(
+              item.bonus||0
+            ),
 
           value:
             selectedRate*
-            Number(item.quantity||0)
+            Number(
+              item.quantity||0
+            )
 
         };
 
       }
     );
 
+
   const total=
     productsForOrder.reduce(
       (s,x)=>
-        s+Number(x.value||0),
+        s+
+        Number(
+          x.value||0
+        ),
       0
     );
+
 
   return {
 
     market:
       document
-        .getElementById("marketSelect")
+        .getElementById(
+          "marketSelect"
+        )
         ?.value
         .trim()||"",
 
@@ -2541,45 +3832,60 @@ function getOrderFormData(){
 
     shop_code:
       document
-        .getElementById("shopCode")
+        .getElementById(
+          "shopCode"
+        )
         ?.value
         .trim()||"",
 
     address:
       document
-        .getElementById("address")
+        .getElementById(
+          "address"
+        )
         .value
         .trim(),
 
     mobile:
       document
-        .getElementById("mobile")
+        .getElementById(
+          "mobile"
+        )
         .value
         .trim(),
 
     representative:
       document
-        .getElementById("representative")
+        .getElementById(
+          "representative"
+        )
         .value
         .trim(),
 
     order_date:
       document
-        .getElementById("orderDate")
+        .getElementById(
+          "orderDate"
+        )
         .value,
 
     delivery_date:
       document
-        .getElementById("deliveryDate")
+        .getElementById(
+          "deliveryDate"
+        )
         .value,
 
     note:
       document
-        .getElementById("note")
+        .getElementById(
+          "note"
+        )
         .value
         .trim(),
 
-    products:productsForOrder,
+    products:
+      productsForOrder,
 
     total
 
@@ -2588,13 +3894,17 @@ function getOrderFormData(){
 }
 
 
-/* ===== DRAFT ===== */
+/* =====================================================
+   DRAFT
+===================================================== */
 
 function saveDrafts(){
 
   localStorage.setItem(
     DRAFTS_KEY,
-    JSON.stringify(draftOrders)
+    JSON.stringify(
+      draftOrders
+    )
   );
 
 }
@@ -2620,24 +3930,35 @@ function loadDrafts(){
 }
 
 
-/* ===== OPEN ORDER ===== */
+/* =====================================================
+   OPEN ORDER
+===================================================== */
 
-function openOrderModal(draftId=null){
+function openOrderModal(
+  draftId=null
+){
 
-  editingDraftId=draftId;
+  editingDraftId=
+    draftId;
 
   currentOrderItems=[];
 
   document
-    .getElementById("orderModalTitle")
+    .getElementById(
+      "orderModalTitle"
+    )
     .textContent=
       draftId
         ?"✏️ Draft Edit"
         :"➕ নতুন অর্ডার";
 
+
   document
-    .getElementById("orderProductSearch")
+    .getElementById(
+      "orderProductSearch"
+    )
     .value="";
+
 
   if(draftId){
 
@@ -2648,15 +3969,19 @@ function openOrderModal(draftId=null){
 
     if(!d){
 
-      alert("Draft পাওয়া যায়নি");
+      alert(
+        "Draft পাওয়া যায়নি"
+      );
 
       return;
 
     }
 
+
     populateMarketSelect(
       d.market||""
     );
+
 
     populateShopSelect(
       findSavedShopId(
@@ -2666,122 +3991,206 @@ function openOrderModal(draftId=null){
       )
     );
 
-    document.getElementById("shop").value=
-      d.shop||"";
 
-    document.getElementById("shopCode").value=
-      d.shop_code||"";
+    document
+      .getElementById(
+        "shop"
+      )
+      .value=
+        d.shop||"";
 
-    document.getElementById("address").value=
-      d.address||"";
 
-    document.getElementById("mobile").value=
-      d.mobile||"";
+    document
+      .getElementById(
+        "shopCode"
+      )
+      .value=
+        d.shop_code||"";
 
-    document.getElementById("representative").value=
-      d.representative||"";
 
-    document.getElementById("orderDate").value=
-      d.order_date||"";
+    document
+      .getElementById(
+        "address"
+      )
+      .value=
+        d.address||"";
 
-    document.getElementById("deliveryDate").value=
-      d.delivery_date||"";
 
-    document.getElementById("note").value=
-      d.note||"";
+    document
+      .getElementById(
+        "mobile"
+      )
+      .value=
+        d.mobile||"";
+
+
+    document
+      .getElementById(
+        "representative"
+      )
+      .value=
+        d.representative||"";
+
+
+    document
+      .getElementById(
+        "orderDate"
+      )
+      .value=
+        d.order_date||"";
+
+
+    document
+      .getElementById(
+        "deliveryDate"
+      )
+      .value=
+        d.delivery_date||"";
+
+
+    document
+      .getElementById(
+        "note"
+      )
+      .value=
+        d.note||"";
+
 
     currentOrderItems=
-      (d.products||[]).map(
-        x=>({
+      (d.products||[])
+        .map(
+          x=>({
 
-          ...x,
+            ...x,
 
-          price:Number(
-            x.base_price??
-            x.price??
-            0
-          ),
+            price:
+              Number(
+                x.base_price ??
+                x.price ??
+                0
+              ),
 
-          base_price:Number(
-            x.base_price??
-            x.price??
-            0
-          ),
+            base_price:
+              Number(
+                x.base_price ??
+                x.price ??
+                0
+              ),
 
-          carton_rate:Number(
-            x.carton_rate||0
-          ),
+            carton_rate:
+              Number(
+                x.carton_rate||0
+              ),
 
-          rate_type:
-            x.rate_type||"main",
+            rate_type:
+              x.rate_type ||
+              "main",
 
-          rate:Number(
-            x.rate||
-            (
-              x.rate_type==="carton"
-                ?Number(x.carton_rate||0)
-                :Number(x.price||0)
-            )
-          ),
+            rate:
+              Number(
+                x.rate ||
+                (
+                  x.rate_type==="carton"
+                    ?Number(
+                        x.carton_rate||0
+                      )
+                    :Number(
+                        x.price||0
+                      )
+                )
+              ),
 
-          quantity:Number(
-            x.quantity||0
-          ),
+            quantity:
+              Number(
+                x.quantity||0
+              ),
 
-          bonus:Number(
-            x.bonus||0
-          )
+            bonus:
+              Number(
+                x.bonus||0
+              )
 
-        })
-      );
+          })
+        );
 
   }else{
 
     document
-      .getElementById("marketSelect")
+      .getElementById(
+        "marketSelect"
+      )
       .value="";
 
     document
-      .getElementById("shopSelect")
+      .getElementById(
+        "shopSelect"
+      )
       .value="";
 
     document
-      .getElementById("shop")
+      .getElementById(
+        "shop"
+      )
       .value="";
 
     document
-      .getElementById("shopCode")
+      .getElementById(
+        "shopCode"
+      )
       .value="";
 
-    populateMarketSelect("",true);
 
-    populateShopSelect("",true);
+    populateMarketSelect(
+      "",
+      true
+    );
+
+    populateShopSelect(
+      "",
+      true
+    );
+
 
     document
-      .getElementById("address")
+      .getElementById(
+        "address"
+      )
       .value="";
 
-    document
-      .getElementById("mobile")
-      .value="";
 
     document
-      .getElementById("representative")
+      .getElementById(
+        "mobile"
+      )
       .value="";
 
+
     document
-      .getElementById("note")
+      .getElementById(
+        "representative"
+      )
       .value="";
+
+
+    document
+      .getElementById(
+        "note"
+      )
+      .value="";
+
 
     setTodayDates();
 
   }
 
+
   renderOrderProductResults();
 
   renderOrderItems();
 
-  openModal("orderModal");
+  openModal(
+    "orderModal"
+  );
 
 }
 
@@ -2792,6 +4201,7 @@ function resetOrderForm(){
 
   currentOrderItems=[];
 
+
   [
     "shop",
     "shopCode",
@@ -2799,24 +4209,38 @@ function resetOrderForm(){
     "mobile",
     "representative",
     "note"
-  ].forEach(
+  ]
+  .forEach(
     id=>
-      document.getElementById(id).value=""
+      document
+        .getElementById(id)
+        .value=""
   );
 
+
   document
-    .getElementById("marketSelect")
+    .getElementById(
+      "marketSelect"
+    )
     .value="";
+
 
   populateShopSelect();
 
-  document
-    .getElementById("shopSelect")
-    .value="";
 
   document
-    .getElementById("orderProductSearch")
+    .getElementById(
+      "shopSelect"
+    )
     .value="";
+
+
+  document
+    .getElementById(
+      "orderProductSearch"
+    )
+    .value="";
+
 
   setTodayDates();
 
@@ -2827,31 +4251,41 @@ function resetOrderForm(){
 }
 
 
-/* ===== SAVE ORDER ===== */
+/* =====================================================
+   SAVE ORDER
+===================================================== */
 
 function saveOrder(){
 
-  const data=getOrderFormData();
+  const data=
+    getOrderFormData();
 
   if(!data)return;
 
   const now=
-    new Date().toISOString();
+    new Date()
+      .toISOString();
+
 
   if(editingDraftId){
 
     const i=
       draftOrders.findIndex(
-        x=>x.id===editingDraftId
+        x=>
+          x.id===
+          editingDraftId
       );
 
     if(i<0){
 
-      alert("Draft পাওয়া যায়নি");
+      alert(
+        "Draft পাওয়া যায়নি"
+      );
 
       return;
 
     }
+
 
     draftOrders[i]={
       ...draftOrders[i],
@@ -2859,6 +4293,7 @@ function saveOrder(){
       updated_at:now,
       status:"draft"
     };
+
 
     showToast(
       "✅ Draft আপডেট হয়েছে"
@@ -2886,9 +4321,14 @@ function saveOrder(){
 
     };
 
-    draftOrders.unshift(draft);
 
-    editingDraftId=draft.id;
+    draftOrders.unshift(
+      draft
+    );
+
+    editingDraftId=
+      draft.id;
+
 
     showToast(
       "✅ Draft Save হয়েছে — এখনো Send হয়নি"
@@ -2896,18 +4336,23 @@ function saveOrder(){
 
   }
 
+
   saveDrafts();
 
   updateDashboard();
 
   renderHistory();
 
-  closeModal("orderModal");
+  closeModal(
+    "orderModal"
+  );
 
 }
 
 
-/* ===== SEND ===== */
+/* =====================================================
+   SEND
+===================================================== */
 
 async function sendCurrentDraft(){
 
@@ -2921,31 +4366,43 @@ async function sendCurrentDraft(){
 
   }
 
-  const data=getOrderFormData();
+
+  const data=
+    getOrderFormData();
 
   if(!data)return;
 
+
   const i=
     draftOrders.findIndex(
-      x=>x.id===editingDraftId
+      x=>
+        x.id===
+        editingDraftId
     );
+
 
   if(i<0){
 
-    alert("Draft পাওয়া যায়নি");
+    alert(
+      "Draft পাওয়া যায়নি"
+    );
 
     return;
 
   }
 
+
   draftOrders[i]={
     ...draftOrders[i],
     ...data,
     updated_at:
-      new Date().toISOString()
+      new Date()
+        .toISOString()
   };
 
+
   saveDrafts();
+
 
   await sendDraftOrder(
     editingDraftId
@@ -2954,20 +4411,28 @@ async function sendCurrentDraft(){
 }
 
 
-async function sendDraftOrder(draftId){
+async function sendDraftOrder(
+  draftId
+){
 
   const draft=
     draftOrders.find(
-      x=>x.id===draftId
+      x=>
+        x.id===
+        draftId
     );
+
 
   if(!draft){
 
-    alert("Draft পাওয়া যায়নি");
+    alert(
+      "Draft পাওয়া যায়নি"
+    );
 
     return;
 
   }
+
 
   if(
     !confirm(
@@ -2975,122 +4440,164 @@ async function sendDraftOrder(draftId){
     )
   )return;
 
+
   const payload={
 
-    market:draft.market||"",
+    market:
+      draft.market||"",
 
-    shop:draft.shop,
+    shop:
+      draft.shop,
 
-    shop_code:draft.shop_code||"",
+    shop_code:
+      draft.shop_code||"",
 
-    address:draft.address,
+    address:
+      draft.address,
 
-    mobile:draft.mobile,
+    mobile:
+      draft.mobile,
 
-    representative:draft.representative,
+    representative:
+      draft.representative,
 
-    order_date:draft.order_date,
+    order_date:
+      draft.order_date,
 
-    delivery_date:draft.delivery_date,
+    delivery_date:
+      draft.delivery_date,
 
-    note:draft.note,
+    note:
+      draft.note,
 
     products:
-      (draft.products||[]).map(
-        p=>{
+      (draft.products||[])
+        .map(
+          p=>{
 
-          const rateType=
-            p.rate_type==="carton"
-              ?"carton"
-              :"main";
+            const rateType=
+              p.rate_type==="carton"
+                ?"carton"
+                :"main";
 
-          const selectedRate=
-            rateType==="carton"
-              ?Number(p.carton_rate||0)
-              :Number(
-                p.base_price??
-                p.price??
-                0
+
+            const selectedRate=
+              rateType==="carton"
+                ?Number(
+                    p.carton_rate||0
+                  )
+                :Number(
+                    p.base_price ??
+                    p.price ??
+                    0
+                  );
+
+
+            const quantity=
+              Number(
+                p.quantity||0
               );
 
-          const quantity=
-            Number(p.quantity||0);
 
-          return {
+            return {
 
-            product_id:p.product_id||null,
+              product_id:
+                p.product_id ||
+                null,
 
-            code:p.code||"",
+              code:
+                p.code||"",
 
-            name:p.name||"",
+              name:
+                p.name||"",
 
-            pack:p.pack||"",
+              pack:
+                p.pack||"",
 
-            base_price:Number(
-              p.base_price??
-              p.price??
-              0
-            ),
+              base_price:
+                Number(
+                  p.base_price ??
+                  p.price ??
+                  0
+                ),
 
-            price:selectedRate,
+              price:
+                selectedRate,
 
-            carton_rate:Number(
-              p.carton_rate||0
-            ),
+              carton_rate:
+                Number(
+                  p.carton_rate||0
+                ),
 
-            rate_type:rateType,
+              rate_type:
+                rateType,
 
-            rate:selectedRate,
+              rate:
+                selectedRate,
 
-            quantity,
+              quantity,
 
-            bonus:Number(
-              p.bonus||0
-            ),
+              bonus:
+                Number(
+                  p.bonus||0
+                ),
 
-            value:
-              selectedRate*
-              quantity
+              value:
+                selectedRate*
+                quantity
 
-          };
+            };
 
-        }
-      ),
+          }
+        ),
+
 
     total:
-      (draft.products||[]).reduce(
-        (sum,p)=>{
+      (draft.products||[])
+        .reduce(
+          (sum,p)=>{
 
-          const rateType=
-            p.rate_type==="carton"
-              ?"carton"
-              :"main";
+            const rateType=
+              p.rate_type==="carton"
+                ?"carton"
+                :"main";
 
-          const selectedRate=
-            rateType==="carton"
-              ?Number(p.carton_rate||0)
-              :Number(
-                p.base_price??
-                p.price??
-                0
+
+            const selectedRate=
+              rateType==="carton"
+                ?Number(
+                    p.carton_rate||0
+                  )
+                :Number(
+                    p.base_price ??
+                    p.price ??
+                    0
+                  );
+
+
+            return sum+
+              selectedRate*
+              Number(
+                p.quantity||0
               );
 
-          return sum+
-            selectedRate*
-            Number(p.quantity||0);
-
-        },
-        0
-      )
+          },
+          0
+        )
 
   };
 
-  const {data,error}=
+
+  const {
+    data,
+    error
+  }=
     await supabaseClient
       .from("orders")
       .insert(payload)
       .select()
       .single();
+
 
   if(error){
 
@@ -3103,26 +4610,35 @@ async function sendDraftOrder(draftId){
 
   }
 
+
   draftOrders=
     draftOrders.filter(
-      x=>x.id!==draftId
+      x=>
+        x.id!==draftId
     );
+
 
   saveDrafts();
 
+
   if(data)
     orders.unshift(data);
+
 
   addNotification(
     "অর্ডার Sent",
     `${draft.shop} এর অর্ডার Online-এ পাঠানো হয়েছে।`
   );
 
+
   updateDashboard();
 
   renderHistory();
 
-  closeModal("orderModal");
+  closeModal(
+    "orderModal"
+  );
+
 
   showToast(
     "✅ অর্ডার সফলভাবে Online-এ Send হয়েছে"
@@ -3131,18 +4647,26 @@ async function sendDraftOrder(draftId){
 }
 
 
-/* ===== LOAD ORDERS ===== */
+/* =====================================================
+   LOAD ORDERS
+===================================================== */
 
 async function loadOrdersFromSupabase(){
 
-  const {data,error}=
+  const {
+    data,
+    error
+  }=
     await supabaseClient
       .from("orders")
       .select("*")
       .order(
         "created_at",
-        {ascending:false}
+        {
+          ascending:false
+        }
       );
+
 
   if(error){
 
@@ -3152,7 +4676,9 @@ async function loadOrdersFromSupabase(){
 
   }
 
-  orders=data||[];
+
+  orders=
+    data||[];
 
   updateDashboard();
 
@@ -3161,35 +4687,51 @@ async function loadOrdersFromSupabase(){
 }
 
 
-/* ===== DASHBOARD ===== */
+/* =====================================================
+   DASHBOARD
+===================================================== */
 
 function updateDashboard(){
 
   document
-    .getElementById("dashProducts")
-    .textContent=products.length;
+    .getElementById(
+      "dashProducts"
+    )
+    .textContent=
+      products.length;
+
 
   document
-    .getElementById("dashOrders")
-    .textContent=orders.length;
+    .getElementById(
+      "dashOrders"
+    )
+    .textContent=
+      orders.length;
+
 
   let items=0;
+
   let total=0;
+
 
   orders.forEach(
     o=>{
 
       (
-        Array.isArray(o.products)
+        Array.isArray(
+          o.products
+        )
           ?o.products
           :[]
-      ).forEach(
+      )
+      .forEach(
         p=>{
 
           items+=
             Number(
               p.quantity||0
             );
+
 
           total+=
             Number(
@@ -3210,24 +4752,36 @@ function updateDashboard(){
     }
   );
 
-  document
-    .getElementById("dashItems")
-    .textContent=items;
 
   document
-    .getElementById("dashTotal")
-    .textContent=money(total);
+    .getElementById(
+      "dashItems"
+    )
+    .textContent=
+      items;
+
+
+  document
+    .getElementById(
+      "dashTotal"
+    )
+    .textContent=
+      money(total);
 
 }
 
 
-/* ===== HISTORY ===== */
+/* =====================================================
+   HISTORY
+===================================================== */
 
 function openHistory(){
 
   renderHistory();
 
-  openModal("historyModal");
+  openModal(
+    "historyModal"
+  );
 
 }
 
@@ -3237,86 +4791,116 @@ function renderHistory(){
   const q=
     (
       document
-        .getElementById("historySearch")
-        ?.value||""
+        .getElementById(
+          "historySearch"
+        )
+        ?.value||
+      ""
     )
     .trim()
     .toLowerCase();
+
 
   const drafts=
     draftOrders.filter(
       d=>
         !q ||
-        String(d.shop||"")
-          .toLowerCase()
-          .includes(q) ||
-        String(d.mobile||"")
-          .toLowerCase()
-          .includes(q)
+        String(
+          d.shop||""
+        )
+        .toLowerCase()
+        .includes(q) ||
+        String(
+          d.mobile||""
+        )
+        .toLowerCase()
+        .includes(q)
     );
 
+
   document
-    .getElementById("draftList")
+    .getElementById(
+      "draftList"
+    )
     .innerHTML=
+
       '<h4 style="margin:0 0 5px">📝 Saved Drafts ('+
       drafts.length+
       ')</h4>'+
+
       (
         drafts.length
           ?
-          drafts.map(
-            d=>`
 
-            <div class="draft-card">
+          drafts
+            .map(
+              d=>`
 
-              <div class="history-head">
+              <div class="draft-card">
 
-                <b>
-                  ${escapeHtml(d.shop)}
-                </b>
+                <div class="history-head">
 
-                <span class="badge draft">
-                  DRAFT
-                </span>
+                  <b>
+                    ${escapeHtml(d.shop)}
+                  </b>
+
+                  <span class="badge draft">
+                    DRAFT
+                  </span>
+
+                </div>
+
+
+                <div class="small">
+
+                  ${escapeHtml(d.mobile||"")}
+
+                  ·
+
+                  ${escapeHtml(d.order_date||"")}
+
+                  ·
+
+                  ${d.products?.length||0}
+
+                  Product
+
+                  ·
+
+                  ${money(d.total)}
+
+                </div>
+
+
+                <div class="draft-actions">
+
+
+                  <button
+                    class="btn btn-light"
+                    onclick="openOrderModal('${escapeHtml(d.id)}')"
+                  >
+                    ✏️ Edit / Add
+                  </button>
+
+
+                  <button
+                    class="btn btn-primary"
+                    onclick="sendDraftOrder('${escapeHtml(d.id)}')"
+                  >
+                    📤 Send
+                  </button>
+
+
+                </div>
 
               </div>
 
-              <div class="small">
+              `
+            )
+            .join("")
 
-                ${escapeHtml(d.mobile||"")}
-                ·
-                ${escapeHtml(d.order_date||"")}
-                ·
-                ${d.products?.length||0}
-                Product
-                ·
-                ${money(d.total)}
-
-              </div>
-
-              <div class="draft-actions">
-
-                <button
-                  class="btn btn-light"
-                  onclick="openOrderModal('${escapeHtml(d.id)}')"
-                >
-                  ✏️ Edit / Add
-                </button>
-
-                <button
-                  class="btn btn-primary"
-                  onclick="sendDraftOrder('${escapeHtml(d.id)}')"
-                >
-                  📤 Send
-                </button>
-
-              </div>
-
-            </div>
-
-            `
-          ).join("")
           :
+
           '<div class="empty">কোনো Saved Draft নেই</div>'
       );
 
@@ -3325,96 +4909,129 @@ function renderHistory(){
     orders.filter(
       o=>
         !q ||
-        String(o.shop||"")
-          .toLowerCase()
-          .includes(q) ||
-        String(o.mobile||"")
-          .toLowerCase()
-          .includes(q)
+        String(
+          o.shop||""
+        )
+        .toLowerCase()
+        .includes(q) ||
+
+        String(
+          o.mobile||""
+        )
+        .toLowerCase()
+        .includes(q)
     );
 
 
   document
-    .getElementById("historyList")
+    .getElementById(
+      "historyList"
+    )
     .innerHTML=
+
       sent.length
+
         ?
-        sent.map(
-          (o,i)=>`
 
-          <div class="history-row">
+        sent
+          .map(
+            (o,i)=>`
 
-            <div class="history-head">
+            <div class="history-row">
 
-              <div>
 
-                <b>
-                  ${escapeHtml(o.shop||"")}
-                </b>
+              <div class="history-head">
 
-                <div class="small">
-                  ${escapeHtml(o.mobile||"")}
-                  ·
-                  ${escapeHtml(o.order_date||"")}
+                <div>
+
+                  <b>
+                    ${escapeHtml(o.shop||"")}
+                  </b>
+
+                  <div class="small">
+
+                    ${escapeHtml(o.mobile||"")}
+
+                    ·
+
+                    ${escapeHtml(o.order_date||"")}
+
+                  </div>
+
                 </div>
+
+
+                <span class="badge sent">
+                  SENT
+                </span>
+
 
               </div>
 
-              <span class="badge sent">
-                SENT
-              </span>
+
+              <div style="margin-top:5px">
+
+                ${(o.products||[]).length}
+
+                Product ·
+
+                <b>
+                  ${money(o.total)}
+                </b>
+
+              </div>
+
+
+              <div class="history-actions">
+
+
+                <button
+                  class="btn btn-light"
+                  onclick="showOrderDetail(${i})"
+                >
+                  👁 বিস্তারিত
+                </button>
+
+
+              </div>
+
 
             </div>
 
-            <div style="margin-top:5px">
+            `
+          )
+          .join("")
 
-              ${(o.products||[]).length}
-              Product ·
-
-              <b>
-                ${money(o.total)}
-              </b>
-
-            </div>
-
-            <div class="history-actions">
-
-              <button
-                class="btn btn-light"
-                onclick="showOrderDetail(${i})"
-              >
-                👁 বিস্তারিত
-              </button>
-
-            </div>
-
-          </div>
-
-          `
-        ).join("")
         :
+
         '<div class="empty">কোনো Sent Order নেই</div>';
 
 }
 
 
 /* =====================================================
-   ORDER DETAIL / PDF
-   এখানে Product list টেবিল আকারে তৈরি হচ্ছে
+   ORDER DETAIL
+   PRODUCT TABLE FORMAT
 ===================================================== */
 
 function showOrderDetail(index){
 
-  const o=orders[index];
+  const o=
+    orders[index];
 
   if(!o)return;
 
+
   const items=
-    Array.isArray(o.products)
+    Array.isArray(
+      o.products
+    )
       ?o.products
       :[];
 
+
   let rows="";
+
 
   items.forEach(
     (p,i)=>{
@@ -3424,76 +5041,114 @@ function showOrderDetail(index){
           ?"carton"
           :"main";
 
+
       const rate=
         Number(
-          p.rate||
+          p.rate ??
+          p.price ??
           (
             type==="carton"
               ?p.carton_rate
-              :p.price
-          )||
+              :p.base_price
+          ) ??
           0
         );
+
 
       const quantity=
         Number(
           p.quantity||0
         );
 
+
       const bonus=
         Number(
           p.bonus||0
         );
 
+
       const value=
         Number(
-          p.value||
+          p.value ??
           rate*quantity
         );
+
 
       rows+=`
 
         <tr>
 
+
           <td class="col-no">
             ${i+1}
           </td>
 
-          <td>
-            <b>
-              ${escapeHtml(p.name||"")}
-            </b>
+
+          <td class="col-product">
+
+            <div class="memo-product-name">
+
+              ${escapeHtml(
+                p.name||""
+              )}
+
+            </div>
+
           </td>
+
 
           <td class="col-code">
-            ${escapeHtml(p.code||"")}
+
+            ${escapeHtml(
+              p.code||""
+            )}
+
           </td>
 
+
           <td class="col-pack">
-            ${escapeHtml(p.pack||"")}
+
+            ${escapeHtml(
+              p.pack||""
+            )}
+
           </td>
+
 
           <td class="col-qty">
             ${quantity}
           </td>
 
+
           <td class="col-bonus">
             ${bonus}
           </td>
 
+
           <td class="col-rate-type">
-            ${type==="carton"
-              ?"Carton"
-              :"মূল"}
+
+            ${
+              type==="carton"
+                ?"Carton"
+                :"মূল"
+            }
+
           </td>
+
 
           <td class="col-rate">
+
             ${money(rate)}
+
           </td>
 
+
           <td class="col-total">
+
             ${money(value)}
+
           </td>
+
 
         </tr>
 
@@ -3503,11 +5158,53 @@ function showOrderDetail(index){
   );
 
 
+  const total=
+    Number(
+      o.total ||
+      items.reduce(
+        (sum,p)=>{
+
+          const type=
+            p.rate_type==="carton"
+              ?"carton"
+              :"main";
+
+
+          const rate=
+            Number(
+              p.rate ??
+              p.price ??
+              (
+                type==="carton"
+                  ?p.carton_rate
+                  :p.base_price
+              ) ??
+              0
+            );
+
+
+          return sum+
+            rate*
+            Number(
+              p.quantity||0
+            );
+
+        },
+        0
+      )
+    );
+
+
   document
-    .getElementById("detailContent")
+    .getElementById(
+      "detailContent"
+    )
     .innerHTML=`
 
       <div class="memo-print">
+
+
+        <!-- TITLE -->
 
         <div class="memo-title">
 
@@ -3525,185 +5222,355 @@ function showOrderDetail(index){
         <hr class="memo-line">
 
 
-        <div style="font-weight:700;margin-bottom:10px">
+        <!-- ORDER NUMBER -->
+
+        <div
+          style="
+            font-weight:800;
+            margin-bottom:12px;
+            font-size:14px
+          "
+        >
+
           📦 অর্ডার #${index+1}
+
         </div>
 
+
+        <!-- INFORMATION -->
 
         <div class="memo-info">
 
-          <div>
-            <b>অর্ডার ID:</b>
-            ${escapeHtml(o.id||"")}
-          </div>
 
           <div>
-            <b>অর্ডার তারিখ:</b>
-            ${escapeHtml(o.order_date||"")}
+
+            <b>
+              অর্ডার ID:
+            </b>
+
+            ${escapeHtml(
+              o.id||""
+            )}
+
           </div>
 
-          <div>
-            <b>দোকান:</b>
-            ${escapeHtml(o.shop||"")}
-          </div>
 
           <div>
-            <b>দোকানের কোড:</b>
-            ${escapeHtml(o.shop_code||"")}
+
+            <b>
+              অর্ডার তারিখ:
+            </b>
+
+            ${escapeHtml(
+              o.order_date||""
+            )}
+
           </div>
 
-          <div>
-            <b>মার্কেট:</b>
-            ${escapeHtml(o.market||"")}
-          </div>
 
           <div>
-            <b>মোবাইল:</b>
-            ${escapeHtml(o.mobile||"")}
+
+            <b>
+              মার্কেট:
+            </b>
+
+            ${escapeHtml(
+              o.market||""
+            )}
+
           </div>
 
-          <div>
-            <b>ঠিকানা:</b>
-            ${escapeHtml(o.address||"")}
-          </div>
 
           <div>
-            <b>প্রতিনিধি:</b>
-            ${escapeHtml(o.representative||"")}
+
+            <b>
+              দোকান:
+            </b>
+
+            ${escapeHtml(
+              o.shop||""
+            )}
+
           </div>
 
+
           <div>
-            <b>ডেলিভারি তারিখ:</b>
-            ${escapeHtml(o.delivery_date||"")}
+
+            <b>
+              দোকানের কোড:
+            </b>
+
+            ${escapeHtml(
+              o.shop_code||""
+            )}
+
           </div>
+
+
+          <div>
+
+            <b>
+              মোবাইল:
+            </b>
+
+            ${escapeHtml(
+              o.mobile||""
+            )}
+
+          </div>
+
+
+          <div>
+
+            <b>
+              ঠিকানা:
+            </b>
+
+            ${escapeHtml(
+              o.address||""
+            )}
+
+          </div>
+
+
+          <div>
+
+            <b>
+              প্রতিনিধি:
+            </b>
+
+            ${escapeHtml(
+              o.representative||""
+            )}
+
+          </div>
+
+
+          <div>
+
+            <b>
+              ডেলিভারি তারিখ:
+            </b>
+
+            ${escapeHtml(
+              o.delivery_date||""
+            )}
+
+          </div>
+
 
         </div>
 
+
+        <!-- PRODUCT TITLE -->
 
         <div class="memo-products-title">
+
           🛒 পণ্যসমূহ
+
         </div>
 
+
+        <!-- TABLE -->
 
         <div class="memo-table-wrap">
 
+
           <table class="memo-table">
+
 
             <thead>
 
               <tr>
 
+
                 <th class="col-no">
                   #
                 </th>
 
-                <th>
+
+                <th class="col-product">
                   Product
                 </th>
+
 
                 <th class="col-code">
                   Code
                 </th>
 
+
                 <th class="col-pack">
                   Pack
                 </th>
+
 
                 <th class="col-qty">
                   Qty
                 </th>
 
+
                 <th class="col-bonus">
                   Bonus
                 </th>
+
 
                 <th class="col-rate-type">
                   Rate Type
                 </th>
 
+
                 <th class="col-rate">
                   Rate
                 </th>
+
 
                 <th class="col-total">
                   মোট
                 </th>
 
+
               </tr>
 
             </thead>
 
+
             <tbody>
+
 
               ${
                 rows ||
+
                 `
+
                 <tr>
-                  <td colspan="9" style="text-align:center">
+
+                  <td
+                    colspan="9"
+                    style="
+                      text-align:center;
+                      padding:15px
+                    "
+                  >
+
                     কোনো Product নেই
+
                   </td>
+
                 </tr>
+
                 `
               }
+
 
             </tbody>
 
 
             <tfoot>
 
+
               <tr class="memo-total-row">
 
-                <td colspan="8" style="text-align:right">
+
+                <td
+                  colspan="8"
+                  style="
+                    text-align:right
+                  "
+                >
+
                   মোট অর্ডার:
+
                 </td>
 
+
                 <td class="col-total">
-                  ${money(o.total)}
+
+                  ${money(total)}
+
                 </td>
+
 
               </tr>
 
+
             </tfoot>
+
 
           </table>
 
+
         </div>
 
+
+        <!-- GRAND TOTAL -->
 
         <div class="memo-grand-total">
-          মোট অর্ডার: ${money(o.total)}
+
+          মোট অর্ডার:
+          ${money(total)}
+
         </div>
 
+
+        <!-- NOTE -->
 
         ${
           o.note
+
             ?
+
             `
-            <div style="margin-top:12px">
-              <b>নোট:</b>
-              ${escapeHtml(o.note)}
+
+            <div
+              style="
+                margin-top:12px;
+                padding:9px;
+                border:1px solid #ddd
+              "
+            >
+
+              <b>
+                নোট:
+              </b>
+
+              ${escapeHtml(
+                o.note
+              )}
+
             </div>
+
             `
+
             :
+
             ""
         }
 
 
+        <!-- STATUS -->
+
         <div class="memo-status">
+
           📌 Status: SENT
+
         </div>
+
 
       </div>
 
     `;
 
 
-  openModal("detailModal");
+  openModal(
+    "detailModal"
+  );
 
 }
 
 
-/* ===== PRODUCT MANAGER ===== */
+/* =====================================================
+   PRODUCT MANAGER
+===================================================== */
 
 function openProductManager(){
 
@@ -3713,7 +5580,9 @@ function openProductManager(){
 
   renderProductManagerList();
 
-  openModal("productModal");
+  openModal(
+    "productModal"
+  );
 
 }
 
@@ -3728,7 +5597,8 @@ function clearProductForm(){
     "pCartonRate",
     "pMrp",
     "pStock"
-  ].forEach(
+  ]
+  .forEach(
     id=>
       document
         .getElementById(id)
@@ -3742,35 +5612,76 @@ function editProduct(id){
 
   const p=
     products.find(
-      x=>String(x.id)===String(id)
+      x=>
+        String(x.id)===
+        String(id)
     );
 
   if(!p)return;
 
+
   editingProductId=id;
 
-  document.getElementById("pCode").value=
-    p.code||"";
 
-  document.getElementById("pName").value=
-    p.name||"";
+  document
+    .getElementById(
+      "pCode"
+    )
+    .value=
+      p.code||"";
 
-  document.getElementById("pPack").value=
-    p.pack||"";
 
-  document.getElementById("pPrice").value=
-    p.price||0;
+  document
+    .getElementById(
+      "pName"
+    )
+    .value=
+      p.name||"";
 
-  document.getElementById("pCartonRate").value=
-    p.carton_rate||0;
 
-  document.getElementById("pMrp").value=
-    p.mrp||0;
+  document
+    .getElementById(
+      "pPack"
+    )
+    .value=
+      p.pack||"";
 
-  document.getElementById("pStock").value=
-    p.stock||0;
 
-  openModal("productModal");
+  document
+    .getElementById(
+      "pPrice"
+    )
+    .value=
+      p.price||0;
+
+
+  document
+    .getElementById(
+      "pCartonRate"
+    )
+    .value=
+      p.carton_rate||0;
+
+
+  document
+    .getElementById(
+      "pMrp"
+    )
+    .value=
+      p.mrp||0;
+
+
+  document
+    .getElementById(
+      "pStock"
+    )
+    .value=
+      p.stock||0;
+
+
+  openModal(
+    "productModal"
+  );
 
 }
 
@@ -3781,47 +5692,61 @@ async function saveProduct(){
 
     code:
       document
-        .getElementById("pCode")
+        .getElementById(
+          "pCode"
+        )
         .value
         .trim(),
 
     name:
       document
-        .getElementById("pName")
+        .getElementById(
+          "pName"
+        )
         .value
         .trim(),
 
     pack:
       document
-        .getElementById("pPack")
+        .getElementById(
+          "pPack"
+        )
         .value
         .trim(),
 
     price:
       Number(
         document
-          .getElementById("pPrice")
+          .getElementById(
+            "pPrice"
+          )
           .value||0
       ),
 
     carton_rate:
       Number(
         document
-          .getElementById("pCartonRate")
+          .getElementById(
+            "pCartonRate"
+          )
           .value||0
       ),
 
     mrp:
       Number(
         document
-          .getElementById("pMrp")
+          .getElementById(
+            "pMrp"
+          )
           .value||0
       ),
 
     stock:
       Number(
         document
-          .getElementById("pStock")
+          .getElementById(
+            "pStock"
+          )
           .value||0
       )
 
@@ -3830,7 +5755,9 @@ async function saveProduct(){
 
   if(!payload.name){
 
-    alert("Product name দিন");
+    alert(
+      "Product name দিন"
+    );
 
     return;
 
@@ -3839,13 +5766,17 @@ async function saveProduct(){
 
   let result;
 
+
   if(editingProductId){
 
     result=
       await supabaseClient
         .from("products")
         .update(payload)
-        .eq("id",editingProductId);
+        .eq(
+          "id",
+          editingProductId
+        );
 
   }else{
 
@@ -3878,6 +5809,7 @@ async function saveProduct(){
 
   editingProductId=null;
 
+
   showToast(
     "✅ Product Save হয়েছে"
   );
@@ -3889,10 +5821,13 @@ async function deleteProduct(id){
 
   const p=
     products.find(
-      x=>String(x.id)===String(id)
+      x=>
+        String(x.id)===
+        String(id)
     );
 
   if(!p)return;
+
 
   if(
     !confirm(
@@ -3900,11 +5835,16 @@ async function deleteProduct(id){
     )
   )return;
 
+
   const {error}=
     await supabaseClient
       .from("products")
       .delete()
-      .eq("id",id);
+      .eq(
+        "id",
+        id
+      );
+
 
   if(error){
 
@@ -3917,9 +5857,11 @@ async function deleteProduct(id){
 
   }
 
+
   await loadProducts();
 
   renderProductManagerList();
+
 
   showToast(
     "✅ Product Delete হয়েছে"
@@ -3935,6 +5877,7 @@ function renderProductManagerList(){
       "productManagerList"
     );
 
+
   if(!products.length){
 
     box.innerHTML=
@@ -3944,13 +5887,18 @@ function renderProductManagerList(){
 
   }
 
+
   box.innerHTML=
     products
-      .slice(0,150)
+      .slice(
+        0,
+        150
+      )
       .map(
         p=>`
 
         <div class="history-row">
+
 
           <div class="history-head">
 
@@ -3960,22 +5908,37 @@ function renderProductManagerList(){
                 ${escapeHtml(p.name)}
               </b>
 
+
               <div class="small">
 
                 ${escapeHtml(p.code||"")}
-                · Pack ${escapeHtml(p.pack||"")}
-                · মূল ${money(mainRate(p))}
-                · Carton ${money(cartonRate(p))}
-                · MRP ${money(p.mrp)}
-                · Stock ${Number(p.stock||0)}
+
+                · Pack
+                ${escapeHtml(p.pack||"")}
+
+                · মূল
+                ${money(mainRate(p))}
+
+                · Carton
+                ${money(cartonRate(p))}
+
+                · MRP
+                ${money(p.mrp)}
+
+                · Stock
+                ${Number(p.stock||0)}
 
               </div>
 
+
             </div>
+
 
           </div>
 
+
           <div class="history-actions">
+
 
             <button
               class="btn btn-light"
@@ -3984,6 +5947,7 @@ function renderProductManagerList(){
               ✏️ Edit
             </button>
 
+
             <button
               class="btn btn-danger"
               onclick="deleteProduct('${escapeHtml(String(p.id))}')"
@@ -3991,7 +5955,9 @@ function renderProductManagerList(){
               🗑 Delete
             </button>
 
+
           </div>
+
 
         </div>
 
@@ -4002,9 +5968,14 @@ function renderProductManagerList(){
 }
 
 
-/* ===== NOTIFICATIONS ===== */
+/* =====================================================
+   NOTIFICATIONS
+===================================================== */
 
-function addNotification(title,text){
+function addNotification(
+  title,
+  text
+){
 
   notifications.unshift({
 
@@ -4015,17 +5986,26 @@ function addNotification(title,text){
     text,
 
     created_at:
-      new Date().toISOString()
+      new Date()
+        .toISOString()
 
   });
 
+
   notifications=
-    notifications.slice(0,50);
+    notifications.slice(
+      0,
+      50
+    );
+
 
   localStorage.setItem(
     LOCAL_NOTICES_KEY,
-    JSON.stringify(notifications)
+    JSON.stringify(
+      notifications
+    )
   );
+
 
   renderNotifications();
 
@@ -4059,27 +6039,36 @@ function renderNotifications(){
       "notificationList"
     );
 
+
   box.innerHTML=
     notifications.length
+
       ?
-      notifications.map(
-        n=>`
 
-        <div class="notice">
+      notifications
+        .map(
+          n=>`
 
-          <b>
-            ${escapeHtml(n.title)}
-          </b>
+          <div class="notice">
 
-          <div class="small">
-            ${escapeHtml(n.text)}
+            <b>
+              ${escapeHtml(n.title)}
+            </b>
+
+            <div class="small">
+
+              ${escapeHtml(n.text)}
+
+            </div>
+
           </div>
 
-        </div>
+          `
+        )
+        .join("")
 
-        `
-      ).join("")
       :
+
       '<div class="empty">কোনো Notification নেই</div>';
 
 }
@@ -4096,19 +6085,23 @@ function openNotifications(){
 }
 
 
-/* ===== MARKET / SHOP ===== */
+/* =====================================================
+   MARKET / SHOP
+===================================================== */
 
 const MARKET_SHOPS_KEY=
   "kohinoor_market_shop_list_v2_user_";
 
 let marketShops=[];
+
 let editingMarketShopId=null;
 
 
 function getMarketShopsKey(){
 
   return currentUser?.id
-    ?MARKET_SHOPS_KEY+currentUser.id
+    ?MARKET_SHOPS_KEY+
+      currentUser.id
     :null;
 
 }
@@ -4118,6 +6111,7 @@ function loadMarketShops(){
 
   const key=
     getMarketShopsKey();
+
 
   if(!key){
 
@@ -4131,14 +6125,22 @@ function loadMarketShops(){
 
   }
 
+
   try{
 
     marketShops=
       JSON.parse(
-        localStorage.getItem(key)||"[]"
+        localStorage.getItem(
+          key
+        )||"[]"
       );
 
-    if(!Array.isArray(marketShops))
+
+    if(
+      !Array.isArray(
+        marketShops
+      )
+    )
       marketShops=[];
 
   }catch{
@@ -4146,6 +6148,7 @@ function loadMarketShops(){
     marketShops=[];
 
   }
+
 
   populateMarketSelect();
 
@@ -4159,6 +6162,7 @@ function saveMarketShops(){
   const key=
     getMarketShopsKey();
 
+
   if(!key){
 
     alert(
@@ -4169,10 +6173,14 @@ function saveMarketShops(){
 
   }
 
+
   localStorage.setItem(
     key,
-    JSON.stringify(marketShops)
+    JSON.stringify(
+      marketShops
+    )
   );
+
 
   populateMarketSelect();
 
@@ -4189,7 +6197,9 @@ function openMarketShopManager(){
 
   renderMarketShopList();
 
-  openModal("marketShopModal");
+  openModal(
+    "marketShopModal"
+  );
 
 }
 
@@ -4198,6 +6208,7 @@ function clearMarketShopForm(){
 
   editingMarketShopId=null;
 
+
   [
     "msMarket",
     "msShop",
@@ -4205,7 +6216,8 @@ function clearMarketShopForm(){
     "msAddress",
     "msMobile",
     "msRepresentative"
-  ].forEach(
+  ]
+  .forEach(
     id=>
       document
         .getElementById(id)
@@ -4219,36 +6231,49 @@ function saveMarketShop(){
 
   const market=
     document
-      .getElementById("msMarket")
+      .getElementById(
+        "msMarket"
+      )
       .value
       .trim();
+
 
   const shop=
     document
-      .getElementById("msShop")
+      .getElementById(
+        "msShop"
+      )
       .value
       .trim();
 
+
   if(!market){
 
-    alert("মার্কেটের নাম দিন");
+    alert(
+      "মার্কেটের নাম দিন"
+    );
 
     return;
 
   }
+
 
   if(!shop){
 
-    alert("দোকানের নাম দিন");
+    alert(
+      "দোকানের নাম দিন"
+    );
 
     return;
 
   }
+
 
   const item={
 
     id:
       editingMarketShopId ||
+
       (
         "ms-"+
         Date.now()+
@@ -4264,30 +6289,39 @@ function saveMarketShop(){
 
     shop_code:
       document
-        .getElementById("msShopCode")
+        .getElementById(
+          "msShopCode"
+        )
         .value
         .trim(),
 
     address:
       document
-        .getElementById("msAddress")
+        .getElementById(
+          "msAddress"
+        )
         .value
         .trim(),
 
     mobile:
       document
-        .getElementById("msMobile")
+        .getElementById(
+          "msMobile"
+        )
         .value
         .trim(),
 
     representative:
       document
-        .getElementById("msRepresentative")
+        .getElementById(
+          "msRepresentative"
+        )
         .value
         .trim(),
 
     updated_at:
-      new Date().toISOString()
+      new Date()
+        .toISOString()
 
   };
 
@@ -4296,8 +6330,11 @@ function saveMarketShop(){
 
     const i=
       marketShops.findIndex(
-        x=>x.id===editingMarketShopId
+        x=>
+          x.id===
+          editingMarketShopId
       );
+
 
     if(i>=0){
 
@@ -4310,7 +6347,9 @@ function saveMarketShop(){
 
   }else{
 
-    marketShops.unshift(item);
+    marketShops.unshift(
+      item
+    );
 
   }
 
@@ -4320,6 +6359,7 @@ function saveMarketShop(){
   renderMarketShopList();
 
   clearMarketShopForm();
+
 
   showToast(
     "✅ Market/Shop Save হয়েছে"
@@ -4332,33 +6372,71 @@ function editMarketShop(id){
 
   const x=
     marketShops.find(
-      v=>String(v.id)===String(id)
+      v=>
+        String(v.id)===
+        String(id)
     );
+
 
   if(!x)return;
 
-  editingMarketShopId=x.id;
 
-  document.getElementById("msMarket").value=
-    x.market||"";
+  editingMarketShopId=
+    x.id;
 
-  document.getElementById("msShop").value=
-    x.shop||"";
-
-  document.getElementById("msShopCode").value=
-    x.shop_code||"";
-
-  document.getElementById("msAddress").value=
-    x.address||"";
-
-  document.getElementById("msMobile").value=
-    x.mobile||"";
-
-  document.getElementById("msRepresentative").value=
-    x.representative||"";
 
   document
-    .getElementById("msMarket")
+    .getElementById(
+      "msMarket"
+    )
+    .value=
+      x.market||"";
+
+
+  document
+    .getElementById(
+      "msShop"
+    )
+    .value=
+      x.shop||"";
+
+
+  document
+    .getElementById(
+      "msShopCode"
+    )
+    .value=
+      x.shop_code||"";
+
+
+  document
+    .getElementById(
+      "msAddress"
+    )
+    .value=
+      x.address||"";
+
+
+  document
+    .getElementById(
+      "msMobile"
+    )
+    .value=
+      x.mobile||"";
+
+
+  document
+    .getElementById(
+      "msRepresentative"
+    )
+    .value=
+      x.representative||"";
+
+
+  document
+    .getElementById(
+      "msMarket"
+    )
     .focus();
 
 }
@@ -4368,10 +6446,14 @@ function deleteMarketShop(id){
 
   const x=
     marketShops.find(
-      v=>String(v.id)===String(id)
+      v=>
+        String(v.id)===
+        String(id)
     );
 
+
   if(!x)return;
+
 
   if(
     !confirm(
@@ -4379,16 +6461,21 @@ function deleteMarketShop(id){
     )
   )return;
 
+
   marketShops=
     marketShops.filter(
-      v=>String(v.id)!==String(id)
+      v=>
+        String(v.id)!==
+        String(id)
     );
+
 
   saveMarketShops();
 
   renderMarketShopList();
 
   clearMarketShopForm();
+
 
   showToast(
     "🗑️ তথ্য Delete হয়েছে"
@@ -4404,7 +6491,9 @@ function renderMarketShopList(){
       "marketShopList"
     );
 
+
   if(!box)return;
+
 
   const q=
     (
@@ -4412,22 +6501,26 @@ function renderMarketShopList(){
         .getElementById(
           "marketShopSearch"
         )
-        ?.value||""
+        ?.value||
+      ""
     )
     .trim()
     .toLowerCase();
+
 
   const list=
     marketShops.filter(
       x=>
         !q ||
+
         [
           x.market,
           x.shop,
           x.shop_code,
           x.address,
           x.mobile
-        ].some(
+        ]
+        .some(
           v=>
             String(v||"")
               .toLowerCase()
@@ -4438,82 +6531,124 @@ function renderMarketShopList(){
 
   box.innerHTML=
     list.length
+
       ?
-      list.map(
-        x=>`
 
-        <div class="list-row">
+      list
+        .map(
+          x=>`
 
-          <div class="list-row-head">
+          <div class="list-row">
 
-            <div>
 
-              <b>
-                ${escapeHtml(x.shop)}
-              </b>
+            <div class="list-row-head">
 
-              <div class="small">
-                📍 ${escapeHtml(x.market)}
+              <div>
+
+                <b>
+                  ${escapeHtml(x.shop)}
+                </b>
+
+
+                <div class="small">
+                  📍 ${escapeHtml(x.market)}
+                </div>
+
+
+                ${
+                  x.shop_code
+                    ?
+
+                    `
+                    <div class="small">
+
+                      🏷️ কোড:
+
+                      ${escapeHtml(
+                        x.shop_code
+                      )}
+
+                    </div>
+                    `
+
+                    :
+
+                    ""
+                }
+
+
+                <div class="small">
+
+                  ${escapeHtml(
+                    x.address||""
+                  )}
+
+                </div>
+
+
+                ${
+                  x.mobile
+
+                    ?
+
+                    `
+                    <div class="small">
+
+                      📞
+                      ${escapeHtml(
+                        x.mobile
+                      )}
+
+                    </div>
+                    `
+
+                    :
+
+                    ""
+                }
+
+
               </div>
 
-              ${
-                x.shop_code
-                  ?
-                  `
-                  <div class="small">
-                    🏷️ কোড:
-                    ${escapeHtml(x.shop_code)}
-                  </div>
-                  `
-                  :""
-              }
 
-              <div class="small">
-                ${escapeHtml(x.address||"")}
-              </div>
+              <span class="badge">
+                Saved
+              </span>
 
-              ${
-                x.mobile
-                  ?
-                  `
-                  <div class="small">
-                    📞 ${escapeHtml(x.mobile)}
-                  </div>
-                  `
-                  :""
-              }
 
             </div>
 
-            <span class="badge">
-              Saved
-            </span>
+
+            <div class="list-row-actions">
+
+
+              <button
+                class="btn btn-light"
+                onclick="editMarketShop('${escapeHtml(String(x.id))}')"
+              >
+                ✏️ Edit
+              </button>
+
+
+              <button
+                class="btn btn-danger"
+                onclick="deleteMarketShop('${escapeHtml(String(x.id))}')"
+              >
+                🗑 Delete
+              </button>
+
+
+            </div>
+
 
           </div>
 
-          <div class="list-row-actions">
+          `
+        )
+        .join("")
 
-            <button
-              class="btn btn-light"
-              onclick="editMarketShop('${escapeHtml(String(x.id))}')"
-            >
-              ✏️ Edit
-            </button>
-
-            <button
-              class="btn btn-danger"
-              onclick="deleteMarketShop('${escapeHtml(String(x.id))}')"
-            >
-              🗑 Delete
-            </button>
-
-          </div>
-
-        </div>
-
-        `
-      ).join("")
       :
+
       '<div class="empty">কোনো Market/Shop তালিকা নেই</div>';
 
 }
@@ -4529,33 +6664,46 @@ function populateMarketSelect(
       "marketSelect"
     );
 
+
   if(!s)return;
+
 
   const markets=
     [
       ...new Set(
         marketShops
-          .map(x=>x.market)
+          .map(
+            x=>x.market
+          )
           .filter(Boolean)
       )
     ]
     .sort(
       (a,b)=>
-        a.localeCompare(b,"bn")
+        a.localeCompare(
+          b,
+          "bn"
+        )
     );
+
 
   s.innerHTML=
     '<option value="">-- মার্কেট নির্বাচন করুন --</option>'+
+
     markets
       .map(
-        m=>
-          `
-          <option value="${escapeHtml(m)}">
-            ${escapeHtml(m)}
-          </option>
-          `
+        m=>`
+
+        <option value="${escapeHtml(m)}">
+
+          ${escapeHtml(m)}
+
+        </option>
+
+        `
       )
       .join("");
+
 
   if(selected){
 
@@ -4566,7 +6714,8 @@ function populateMarketSelect(
     markets.length===1
   ){
 
-    s.value=markets[0];
+    s.value=
+      markets[0];
 
   }
 
@@ -4583,12 +6732,18 @@ function populateShopSelect(
       "shopSelect"
     );
 
+
   if(!s)return;
 
+
   const market=
-    document.getElementById(
-      "marketSelect"
-    )?.value||"";
+    document
+      .getElementById(
+        "marketSelect"
+      )
+      ?.value||
+      "";
+
 
   const list=
     marketShops.filter(
@@ -4597,32 +6752,47 @@ function populateShopSelect(
         x.market===market
     );
 
+
   s.innerHTML=
     '<option value="">-- দোকান নির্বাচন করুন --</option>'+
+
     list
       .map(
-        x=>
-          `
-          <option value="${escapeHtml(String(x.id))}">
-            ${escapeHtml(x.shop)}
-            ${
-              x.shop_code
-                ?" — "+escapeHtml(x.shop_code)
-                :""
-            }
-          </option>
-          `
+        x=>`
+
+        <option value="${escapeHtml(String(x.id))}">
+
+          ${escapeHtml(x.shop)}
+
+          ${
+            x.shop_code
+              ?" — "+
+                escapeHtml(
+                  x.shop_code
+                )
+              :""
+          }
+
+        </option>
+
+        `
       )
       .join("");
 
+
   if(selected)
     s.value=selected;
+
 
   else if(
     autoSelect &&
     list.length===1
   )
-    s.value=String(list[0].id);
+    s.value=
+      String(
+        list[0].id
+      );
+
 
   if(
     autoSelect &&
@@ -4649,41 +6819,72 @@ function selectSavedShop(){
 
   const id=
     document
-      .getElementById("shopSelect")
+      .getElementById(
+        "shopSelect"
+      )
       ?.value;
+
 
   if(!id)return;
 
+
   const x=
     marketShops.find(
-      v=>String(v.id)===String(id)
+      v=>
+        String(v.id)===
+        String(id)
     );
+
 
   if(!x)return;
 
-  document
-    .getElementById("marketSelect")
-    .value=x.market||"";
 
   document
-    .getElementById("shop")
-    .value=x.shop||"";
+    .getElementById(
+      "marketSelect"
+    )
+    .value=
+      x.market||"";
+
 
   document
-    .getElementById("shopCode")
-    .value=x.shop_code||"";
+    .getElementById(
+      "shop"
+    )
+    .value=
+      x.shop||"";
+
 
   document
-    .getElementById("address")
-    .value=x.address||"";
+    .getElementById(
+      "shopCode"
+    )
+    .value=
+      x.shop_code||"";
+
 
   document
-    .getElementById("mobile")
-    .value=x.mobile||"";
+    .getElementById(
+      "address"
+    )
+    .value=
+      x.address||"";
+
 
   document
-    .getElementById("representative")
-    .value=x.representative||"";
+    .getElementById(
+      "mobile"
+    )
+    .value=
+      x.mobile||"";
+
+
+  document
+    .getElementById(
+      "representative"
+    )
+    .value=
+      x.representative||"";
 
 }
 
@@ -4698,24 +6899,33 @@ function findSavedShopId(
     marketShops.find(
       v=>
         v.shop===shop &&
-        (!market||v.market===market) &&
-        (!address||v.address===address)
+        (!market ||
+          v.market===market) &&
+        (!address ||
+          v.address===address)
     );
+
 
   return x?.id||"";
 
 }
 
 
-/* ===== REALTIME ===== */
+/* =====================================================
+   REALTIME
+===================================================== */
 
 function setupRealtime(){
 
-  if(realtimeChannel)return;
+  if(realtimeChannel)
+    return;
+
 
   realtimeChannel=
     supabaseClient
-      .channel("orders-live")
+      .channel(
+        "orders-live"
+      )
       .on(
         "postgres_changes",
         {
@@ -4725,7 +6935,9 @@ function setupRealtime(){
         },
         payload=>{
 
-          const row=payload.new;
+          const row=
+            payload.new;
+
 
           if(
             !orders.some(
@@ -4735,11 +6947,15 @@ function setupRealtime(){
             )
           ){
 
-            orders.unshift(row);
+            orders.unshift(
+              row
+            );
+
 
             updateDashboard();
 
             renderHistory();
+
 
             addNotification(
               "নতুন Online Order",
@@ -4758,20 +6974,24 @@ function setupRealtime(){
               "onlineStatus"
             );
 
+
           if(
             status==="SUBSCRIBED"
           ){
 
-            el.textContent="অনলাইন";
+            el.textContent=
+              "অনলাইন";
 
-            el.className="online";
+            el.className=
+              "online";
 
           }else{
 
             el.textContent=
               "অনলাইন সংযোগ অপেক্ষায়";
 
-            el.className="offline";
+            el.className=
+              "offline";
 
           }
 
@@ -4787,6 +7007,7 @@ function startPolling(){
     pollingTimer
   );
 
+
   pollingTimer=
     setInterval(
       loadOrdersFromSupabase,
@@ -4799,15 +7020,22 @@ function startPolling(){
 window.addEventListener(
   "beforeunload",
   ()=>{
-    if(realtimeChannel)
+
+    if(realtimeChannel){
+
       supabaseClient
         .removeChannel(
           realtimeChannel
         );
+
+    }
+
   }
 );
 
 </script>
 
+
 </body>
+
 </html>

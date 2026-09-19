@@ -27,10 +27,10 @@
     .signup-box {
       width: 100%;
       max-width: 420px;
-      background: #fff;
+      background: #ffffff;
       padding: 30px 25px;
       border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     }
 
     h2 {
@@ -45,6 +45,7 @@
       color: #666;
       margin-bottom: 22px;
       font-size: 15px;
+      line-height: 1.6;
     }
 
     label {
@@ -66,7 +67,7 @@
 
     input:focus {
       border-color: #0b6b45;
-      box-shadow: 0 0 0 2px rgba(11,107,69,0.10);
+      box-shadow: 0 0 0 2px rgba(11, 107, 69, 0.10);
     }
 
     button {
@@ -98,7 +99,8 @@
       border-radius: 9px;
       text-align: center;
       font-size: 14px;
-      line-height: 1.6;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
     }
 
     .success {
@@ -126,10 +128,15 @@
       text-decoration: none;
     }
 
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
     .hint {
       margin-top: 5px;
       color: #777;
       font-size: 12px;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -204,7 +211,7 @@
         Sign Up
       </button>
 
-      <div id="message"></div>
+      <div id="message" role="alert"></div>
 
     </form>
 
@@ -217,387 +224,447 @@
   </div>
 
 
-<script>
+  <script>
+    /* =========================================
+       SUPABASE CONFIG
+    ========================================= */
 
-/* =========================================
-   SUPABASE CONFIG
-   ========================================= */
+    const SUPABASE_URL =
+      "https://utzkpsohkoiawvuupgeb.supabase.co";
 
-const SUPABASE_URL =
-  "https://utzkpsohkoiawvuupgeb.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
-
-
-/* =========================================
-   SUPABASE CLIENT
-   ========================================= */
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
 
-/* =========================================
-   ELEMENTS
-   ========================================= */
+    /* =========================================
+       EMAIL REDIRECT URL
+    ========================================= */
 
-const form =
-  document.getElementById("signupForm");
-
-const usernameInput =
-  document.getElementById("username");
-
-const emailInput =
-  document.getElementById("email");
-
-const passwordInput =
-  document.getElementById("password");
-
-const confirmPasswordInput =
-  document.getElementById("confirmPassword");
-
-const signupButton =
-  document.getElementById("signupButton");
-
-const message =
-  document.getElementById("message");
+    const EMAIL_REDIRECT_URL =
+      "https://asif2559059.github.io/Kohinoor-Automation/signin.html";
 
 
-/* =========================================
-   MESSAGE
-   ========================================= */
+    /* =========================================
+       SUPABASE CLIENT
+    ========================================= */
 
-function showMessage(text, type) {
-
-  message.textContent = text;
-  message.className = type;
-  message.style.display = "block";
-
-}
-
-
-/* =========================================
-   ERROR MESSAGE
-   ========================================= */
-
-function translateError(errorMessage) {
-
-  const text =
-    String(errorMessage || "").toLowerCase();
-
-
-  if (
-    text.includes("user already registered") ||
-    text.includes("already registered")
-  ) {
-    return "এই Email দিয়ে আগে থেকেই Account আছে। Login করুন।";
-  }
-
-
-  if (
-    text.includes("email rate limit") ||
-    text.includes("rate limit")
-  ) {
-    return "অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
-  }
-
-
-  if (
-    text.includes("password should be at least") ||
-    text.includes("password must be at least")
-  ) {
-    return "Password কমপক্ষে ৬ অক্ষরের হতে হবে।";
-  }
-
-
-  if (text.includes("invalid email")) {
-    return "সঠিক Email Address দিন।";
-  }
-
-
-  if (text.includes("email not confirmed")) {
-    return "আপনার Email এখনো Confirm করা হয়নি। Email Inbox চেক করুন।";
-  }
-
-
-  if (
-    text.includes("row-level security") ||
-    text.includes("permission denied")
-  ) {
-    return "Database Permission সমস্যার কারণে Account তৈরি করা যাচ্ছে না।";
-  }
-
-
-  if (text.includes("duplicate")) {
-    return "এই তথ্য আগে থেকেই ব্যবহার করা হয়েছে।";
-  }
-
-
-  return errorMessage ||
-    "Account তৈরি করা যায়নি। আবার চেষ্টা করুন.";
-
-}
-
-
-/* =========================================
-   SIGNUP
-   ========================================= */
-
-form.addEventListener(
-  "submit",
-  async function(event) {
-
-    event.preventDefault();
-
-
-    const username =
-      usernameInput.value.trim();
-
-    const email =
-      emailInput.value.trim().toLowerCase();
-
-    const password =
-      passwordInput.value;
-
-    const confirmPassword =
-      confirmPasswordInput.value;
-
-
-    /* USERNAME */
-
-    if (username.length < 3) {
-
-      showMessage(
-        "User ID কমপক্ষে ৩ অক্ষরের হতে হবে।",
-        "error"
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
       );
 
-      usernameInput.focus();
 
-      return;
+    /* =========================================
+       ELEMENTS
+    ========================================= */
+
+    const form =
+      document.getElementById("signupForm");
+
+    const usernameInput =
+      document.getElementById("username");
+
+    const emailInput =
+      document.getElementById("email");
+
+    const passwordInput =
+      document.getElementById("password");
+
+    const confirmPasswordInput =
+      document.getElementById("confirmPassword");
+
+    const signupButton =
+      document.getElementById("signupButton");
+
+    const message =
+      document.getElementById("message");
+
+
+    /* =========================================
+       SHOW MESSAGE
+    ========================================= */
+
+    function showMessage(text, type) {
+
+      message.textContent = text;
+      message.className = type;
+      message.style.display = "block";
+
     }
 
 
-    if (username.length > 30) {
+    /* =========================================
+       HIDE MESSAGE
+    ========================================= */
 
-      showMessage(
-        "User ID সর্বোচ্চ ৩০ অক্ষরের হতে হবে।",
-        "error"
-      );
+    function hideMessage() {
 
-      usernameInput.focus();
+      message.textContent = "";
+      message.className = "";
+      message.style.display = "none";
 
-      return;
     }
 
 
-    if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+    /* =========================================
+       TRANSLATE SUPABASE ERROR
+    ========================================= */
 
-      showMessage(
-        "User ID-তে শুধু English অক্ষর, সংখ্যা, ., _ এবং - ব্যবহার করুন।",
-        "error"
-      );
+    function translateError(errorMessage) {
 
-      usernameInput.focus();
-
-      return;
-    }
+      const text =
+        String(errorMessage || "").toLowerCase();
 
 
-    /* PASSWORD */
-
-    if (password.length < 6) {
-
-      showMessage(
-        "Password কমপক্ষে ৬ অক্ষরের হতে হবে।",
-        "error"
-      );
-
-      passwordInput.focus();
-
-      return;
-    }
-
-
-    /* CONFIRM PASSWORD */
-
-    if (password !== confirmPassword) {
-
-      showMessage(
-        "Password এবং Confirm Password মিলছে না।",
-        "error"
-      );
-
-      confirmPasswordInput.focus();
-
-      return;
-    }
-
-
-    /* LOADING */
-
-    signupButton.disabled = true;
-    signupButton.textContent =
-      "Account তৈরি হচ্ছে...";
-
-    message.style.display = "none";
-
-
-    try {
-
-      /* =====================================
-         CHECK USERNAME
-         ===================================== */
-
-      const {
-        data: existingUser,
-        error: usernameError
-      } = await supabaseClient
-        .from("profiles")
-        .select("id")
-        .eq("username", username)
-        .maybeSingle();
-
-
-      if (usernameError) {
-
-        console.error(
-          "Username Error:",
-          usernameError
-        );
-
-        throw usernameError;
+      if (
+        text.includes("user already registered") ||
+        text.includes("already registered")
+      ) {
+        return "এই Email দিয়ে আগে থেকেই Account আছে। Login করুন।";
       }
 
 
-      if (existingUser) {
-
-        showMessage(
-          "এই User ID আগে থেকেই ব্যবহার করা হয়েছে। অন্য User ID দিন।",
-          "error"
-        );
-
-        signupButton.disabled = false;
-        signupButton.textContent = "Sign Up";
-
-        return;
+      if (
+        text.includes("email rate limit") ||
+        text.includes("rate limit")
+      ) {
+        return "অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
       }
 
 
-      /* =====================================
-         CREATE AUTH USER
-         ===================================== */
+      if (
+        text.includes("password should be at least") ||
+        text.includes("password must be at least") ||
+        text.includes("password should contain")
+      ) {
+        return "Password আরও শক্তিশালী দিন। কমপক্ষে ৬ অক্ষর ব্যবহার করুন।";
+      }
 
-      const {
-        data,
-        error
-      } = await supabaseClient.auth.signUp({
 
-        email: email,
+      if (
+        text.includes("invalid email") ||
+        text.includes("unable to validate email")
+      ) {
+        return "সঠিক Email Address দিন।";
+      }
 
-        password: password,
 
-        options: {
+      if (text.includes("email not confirmed")) {
+        return "আপনার Email এখনো Confirm করা হয়নি। Email Inbox চেক করুন।";
+      }
 
-          emailRedirectTo:
-            "https://asif2559059.github.io/Kohinoor-Automation/signin.html",
 
-          data: {
+      if (
+        text.includes("row-level security") ||
+        text.includes("permission denied")
+      ) {
+        return "Database Permission সমস্যার কারণে Account তৈরি করা যাচ্ছে না।";
+      }
 
-            username: username,
 
-            role: "user"
+      if (
+        text.includes("duplicate") ||
+        text.includes("already exists")
+      ) {
+        return "এই তথ্য আগে থেকেই ব্যবহার করা হয়েছে।";
+      }
+
+
+      if (text.includes("network")) {
+        return "Internet Connection পরীক্ষা করে আবার চেষ্টা করুন।";
+      }
+
+
+      return errorMessage ||
+        "Account তৈরি করা যায়নি। আবার চেষ্টা করুন।";
+
+    }
+
+
+    /* =========================================
+       SIGNUP FORM SUBMIT
+    ========================================= */
+
+    form.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+        hideMessage();
+
+
+        const username =
+          usernameInput.value.trim();
+
+        const email =
+          emailInput.value.trim().toLowerCase();
+
+        const password =
+          passwordInput.value;
+
+        const confirmPassword =
+          confirmPasswordInput.value;
+
+
+        /* =====================================
+           USERNAME VALIDATION
+        ===================================== */
+
+        if (username.length < 3) {
+
+          showMessage(
+            "User ID কমপক্ষে ৩ অক্ষরের হতে হবে।",
+            "error"
+          );
+
+          usernameInput.focus();
+
+          return;
+        }
+
+
+        if (username.length > 30) {
+
+          showMessage(
+            "User ID সর্বোচ্চ ৩০ অক্ষরের হতে হবে।",
+            "error"
+          );
+
+          usernameInput.focus();
+
+          return;
+        }
+
+
+        if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+
+          showMessage(
+            "User ID-তে শুধু English অক্ষর, সংখ্যা, ., _ এবং - ব্যবহার করুন।",
+            "error"
+          );
+
+          usernameInput.focus();
+
+          return;
+        }
+
+
+        /* =====================================
+           EMAIL VALIDATION
+        ===================================== */
+
+        if (!emailInput.checkValidity()) {
+
+          showMessage(
+            "সঠিক Email Address দিন।",
+            "error"
+          );
+
+          emailInput.focus();
+
+          return;
+        }
+
+
+        /* =====================================
+           PASSWORD VALIDATION
+        ===================================== */
+
+        if (password.length < 6) {
+
+          showMessage(
+            "Password কমপক্ষে ৬ অক্ষরের হতে হবে।",
+            "error"
+          );
+
+          passwordInput.focus();
+
+          return;
+        }
+
+
+        /* =====================================
+           CONFIRM PASSWORD VALIDATION
+        ===================================== */
+
+        if (password !== confirmPassword) {
+
+          showMessage(
+            "Password এবং Confirm Password মিলছে না।",
+            "error"
+          );
+
+          confirmPasswordInput.focus();
+
+          return;
+        }
+
+
+        /* =====================================
+           LOADING START
+        ===================================== */
+
+        signupButton.disabled = true;
+        signupButton.textContent =
+          "Account তৈরি হচ্ছে...";
+
+
+        try {
+
+          /* ===================================
+             CHECK USERNAME IN user_profiles
+          =================================== */
+
+          const {
+            data: existingUser,
+            error: usernameError
+          } = await supabaseClient
+            .from("user_profiles")
+            .select("id")
+            .eq("username", username)
+            .maybeSingle();
+
+
+          if (usernameError) {
+
+            console.error(
+              "Username Check Error:",
+              usernameError
+            );
+
+            throw new Error(
+              "User ID যাচাই করা যাচ্ছে না। Database Permission পরীক্ষা করুন।"
+            );
 
           }
 
+
+          if (existingUser) {
+
+            showMessage(
+              "এই User ID আগে থেকেই ব্যবহার করা হয়েছে। অন্য User ID দিন।",
+              "error"
+            );
+
+            return;
+
+          }
+
+
+          /* ===================================
+             CREATE SUPABASE AUTH USER
+          =================================== */
+
+          const {
+            data,
+            error
+          } = await supabaseClient.auth.signUp({
+
+            email: email,
+
+            password: password,
+
+            options: {
+
+              emailRedirectTo:
+                EMAIL_REDIRECT_URL,
+
+              data: {
+
+                username: username,
+
+                role: "user"
+
+              }
+
+            }
+
+          });
+
+
+          if (error) {
+
+            console.error(
+              "Supabase Auth Error:",
+              error
+            );
+
+            throw error;
+
+          }
+
+
+          if (!data || !data.user) {
+
+            throw new Error(
+              "Supabase User তৈরি করতে পারেনি।"
+            );
+
+          }
+
+
+          console.log(
+            "New User ID:",
+            data.user.id
+          );
+
+
+          /* ===================================
+             SIGNUP SUCCESS
+          =================================== */
+
+          showMessage(
+            "✅ Account সফলভাবে তৈরি হয়েছে। আপনার Email Inbox থেকে Email Confirm করুন। এরপর Admin Approval-এর জন্য অপেক্ষা করুন।",
+            "success"
+          );
+
+
+          form.reset();
+
+
+          /* ===================================
+             CLEAR SESSION IF CREATED
+          =================================== */
+
+          if (data.session) {
+
+            await supabaseClient.auth.signOut();
+
+          }
+
+
+        } catch (error) {
+
+          console.error(
+            "SIGNUP ERROR:",
+            error
+          );
+
+          showMessage(
+            "❌ " + translateError(error.message),
+            "error"
+          );
+
+        } finally {
+
+          signupButton.disabled = false;
+          signupButton.textContent =
+            "Sign Up";
+
         }
 
-      });
-
-
-      if (error) {
-
-        console.error(
-          "Auth Error:",
-          error
-        );
-
-        throw error;
       }
-
-
-      /* =====================================
-         USER CREATED CHECK
-         ===================================== */
-
-      if (!data || !data.user) {
-
-        throw new Error(
-          "Supabase User তৈরি করতে পারেনি।"
-        );
-      }
-
-
-      console.log(
-        "New User:",
-        data.user
-      );
-
-
-      /* =====================================
-         SUCCESS
-         ===================================== */
-
-      showMessage(
-        "✅ Account সফলভাবে তৈরি হয়েছে। Admin Approval-এর জন্য অপেক্ষা করুন।",
-        "success"
-      );
-
-
-      form.reset();
-
-
-      /* =====================================
-         IF SESSION EXISTS
-         ===================================== */
-
-      if (data.session) {
-
-        await supabaseClient.auth.signOut();
-
-      }
-
-
-    } catch (error) {
-
-      console.error(
-        "SIGNUP ERROR:",
-        error
-      );
-
-      showMessage(
-        "❌ " + translateError(error.message),
-        "error"
-      );
-
-    }
-
-
-    /* RESET BUTTON */
-
-    signupButton.disabled = false;
-
-    signupButton.textContent =
-      "Sign Up";
-
-  }
-);
-
-</script>
+    );
+  </script>
 
 </body>
 </html>

@@ -4,8 +4,70 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#087f50">
+<meta name="application-name" content="কহিনুর কেমিক্যাল অর্ডার">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="কহিনুর অর্ডার">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
 <title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+window.addEventListener("beforeunload",()=>{if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel)});
+
+// ===== PWA: Install + Service Worker =====
+let deferredInstallPrompt = null;
+
+function updateInstallButton(){
+  const btn=document.getElementById("installAppBtn");
+  const hint=document.getElementById("installHint");
+  if(!btn) return;
+  if(deferredInstallPrompt){
+    btn.style.display="block";
+    if(hint) hint.textContent="📲 এই ফোনে অ্যাপ হিসেবে Install করা যাবে।";
+  }else if(window.matchMedia && window.matchMedia("(display-mode: standalone)").matches){
+    btn.style.display="none";
+    if(hint) hint.textContent="✅ অ্যাপটি ইতিমধ্যে ইনস্টল করা আছে।";
+  }
+}
+
+window.addEventListener("beforeinstallprompt",(event)=>{
+  event.preventDefault();
+  deferredInstallPrompt=event;
+  updateInstallButton();
+});
+
+async function installPWA(){
+  if(!deferredInstallPrompt){
+    showToast("Chrome-এর Menu থেকে Add to Home screen / Install app নির্বাচন করুন");
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  const result=await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt=null;
+  updateInstallButton();
+  if(result.outcome==="accepted") showToast("✅ অ্যাপ Install করার প্রক্রিয়া শুরু হয়েছে");
+}
+
+window.addEventListener("appinstalled",()=>{
+  deferredInstallPrompt=null;
+  updateInstallButton();
+  showToast("✅ কহিনুর অর্ডার অ্যাপ Install হয়েছে");
+});
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js",{scope:"./"})
+      .then(()=>{
+        const hint=document.getElementById("installHint");
+        if(hint && !deferredInstallPrompt) hint.textContent="PWA প্রস্তুত। Chrome Menu থেকে Install app/Add to Home screen-ও ব্যবহার করতে পারবেন।";
+      })
+      .catch(err=>console.error("PWA service worker error:",err));
+  });
+}
+
+updateInstallButton();
+</script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f4f7f6;color:#18352a}
@@ -117,6 +179,15 @@ textarea{min-height:75px;resize:vertical}
       <button class="btn btn-light" onclick="openProductManager()">📦 Products</button>
       <button class="btn btn-light" onclick="openMarketShopManager()">📍 Market / Shop</button>
     </div>
+  </section>
+
+  <section class="card no-print" id="appToolsCard">
+    <h3 style="margin-top:0">📲 অ্যাপ</h3>
+    <div class="grid">
+      <button id="installAppBtn" class="btn btn-primary" onclick="installPWA()" style="display:none">📲 অ্যাপ ইনস্টল করুন</button>
+      <a class="btn btn-light" href="./index.html" download="kohinoor-order.html" style="text-decoration:none;text-align:center">⬇️ HTML ডাউনলোড</a>
+    </div>
+    <div id="installHint" class="small" style="margin-top:8px;text-align:center">Android/Chrome-এ Install অপশন পাওয়া গেলে এখানে দেখাবে।</div>
   </section>
 
   <section class="card" id="productSearchCard">

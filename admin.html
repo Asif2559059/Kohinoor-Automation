@@ -4,104 +4,2483 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#087f50">
+
 <title>Kohinoor Admin Panel</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f4f7f6;color:#26332e;font-family:system-ui,"Noto Sans Bengali",sans-serif}
-header{background:#087f50;color:#fff;padding:18px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px #0002}
-header h1{margin:0;font-size:23px}header p{margin:5px 0}nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}
-button{border:0;border-radius:8px;padding:10px 14px;font-size:15px;font-weight:600;cursor:pointer}
-nav button{background:#fff;color:#087f50}main{max-width:900px;margin:auto;padding:14px}.card,.order,.user-card{background:#fff;border-radius:12px;padding:15px;margin-bottom:14px;box-shadow:0 2px 8px #00000012}
-h2,h3{margin-top:0}.hidden{display:none!important}input,select{width:100%;padding:11px;border:1px solid #ccc;border-radius:8px;font-size:15px;background:#fff}
-.search{margin-bottom:12px}.statusbox{padding:12px;border-radius:8px;margin-bottom:12px}.success{background:#d4edda;color:#155724}.error{background:#f8d7da;color:#721c24}.loading{text-align:center;color:#666;padding:25px}
-.order{border-left:5px solid #087f50}.order h3{color:#087f50}.info{line-height:1.85}.item{background:#f4f7f6;padding:10px;border-radius:8px;margin-top:8px;line-height:1.8}
-.total{margin-top:10px;background:#e8f5ee;padding:11px;border-radius:8px;text-align:right;font-weight:bold}.call{display:inline-block;background:#1565c0;color:#fff;text-decoration:none;border-radius:8px;padding:9px 13px;margin-top:9px}
-.print{background:#333;color:#fff;width:100%;margin-top:9px}.delete{background:#dc3545;color:#fff;width:100%;margin-top:8px}.user-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.user-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.save{background:#087f50;color:#fff}.reject{background:#dc3545;color:#fff}
-.badge{display:inline-block;padding:4px 9px;border-radius:20px;font-size:12px;font-weight:700}.pending{background:#fff3cd;color:#856404}.approved{background:#d4edda;color:#155724}.rejected{background:#f8d7da;color:#721c24}.inactive{background:#eee;color:#555}
-.muted{color:#666;font-size:13px}.count{background:#087f50;color:#fff;border-radius:20px;padding:3px 8px;font-size:12px}
-@media(max-width:600px){nav{grid-template-columns:1fr 1fr}.user-grid{grid-template-columns:1fr}}
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#f4f7f6;
+  color:#26332e;
+  font-family:system-ui,"Noto Sans Bengali",sans-serif;
+}
+
+header{
+  background:#087f50;
+  color:#fff;
+  padding:18px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  box-shadow:0 2px 8px #0002;
+}
+
+header h1{
+  margin:0;
+  font-size:23px;
+}
+
+header p{
+  margin:5px 0;
+}
+
+nav{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:13px;
+}
+
+button{
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+nav button{
+  background:#fff;
+  color:#087f50;
+}
+
+main{
+  max-width:1200px;
+  margin:auto;
+  padding:14px;
+}
+
+.card,
+.order,
+.user-card{
+  background:#fff;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:14px;
+  box-shadow:0 2px 8px #00000012;
+}
+
+h2,
+h3{
+  margin-top:0;
+}
+
+.hidden{
+  display:none!important;
+}
+
+input,
+select{
+  width:100%;
+  padding:11px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  font-size:15px;
+  background:#fff;
+}
+
+.search{
+  margin-bottom:12px;
+}
+
+.statusbox{
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:12px;
+}
+
+.success{
+  background:#d4edda;
+  color:#155724;
+}
+
+.error{
+  background:#f8d7da;
+  color:#721c24;
+}
+
+.loading{
+  text-align:center;
+  color:#666;
+  padding:25px;
+}
+
+/* =========================
+   ORDER TABLE
+========================= */
+
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 2px 8px #00000012;
+}
+
+.order-table{
+  width:100%;
+  min-width:1050px;
+  border-collapse:collapse;
+  background:#fff;
+}
+
+.order-table th{
+  background:#087f50;
+  color:#fff;
+  padding:13px 10px;
+  text-align:left;
+  font-size:14px;
+  white-space:nowrap;
+}
+
+.order-table td{
+  padding:12px 10px;
+  border-bottom:1px solid #e5e5e5;
+  vertical-align:middle;
+  font-size:14px;
+}
+
+.order-table tbody tr:hover{
+  background:#f5faf7;
+}
+
+.order-table tbody tr:last-child td{
+  border-bottom:0;
+}
+
+.order-number{
+  font-weight:700;
+  color:#087f50;
+}
+
+.shop-name{
+  font-weight:700;
+}
+
+.mobile-link{
+  color:#1565c0;
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.total-money{
+  font-weight:700;
+  color:#087f50;
+  white-space:nowrap;
+}
+
+.table-actions{
+  display:flex;
+  gap:6px;
+  min-width:210px;
+}
+
+.table-actions button{
+  padding:8px 10px;
+  font-size:13px;
+}
+
+.view-btn{
+  background:#087f50;
+  color:#fff;
+}
+
+.print-btn{
+  background:#333;
+  color:#fff;
+}
+
+.delete-btn{
+  background:#dc3545;
+  color:#fff;
+}
+
+.status-select{
+  min-width:130px;
+  padding:8px;
+  font-size:13px;
+}
+
+/* =========================
+   ORDER DETAIL
+========================= */
+
+.order-detail{
+  background:#fff;
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px #00000012;
+}
+
+.order-detail-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
+  flex-wrap:wrap;
+}
+
+.order-detail-head h3{
+  margin:0;
+  color:#087f50;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  background:#f4f7f6;
+  padding:12px;
+  border-radius:9px;
+  margin-bottom:15px;
+}
+
+.info-box{
+  line-height:1.7;
+}
+
+.product-table-wrap{
+  overflow-x:auto;
+  margin-top:10px;
+}
+
+.product-table{
+  width:100%;
+  min-width:650px;
+  border-collapse:collapse;
+}
+
+.product-table th{
+  background:#e8f5ee;
+  color:#087f50;
+  padding:10px;
+  border:1px solid #cfe4d8;
+  text-align:left;
+}
+
+.product-table td{
+  padding:10px;
+  border:1px solid #ddd;
+}
+
+.order-total{
+  margin-top:12px;
+  background:#e8f5ee;
+  padding:13px;
+  border-radius:8px;
+  text-align:right;
+  font-weight:bold;
+  font-size:17px;
+}
+
+.note-box{
+  margin-top:12px;
+  padding:12px;
+  background:#fff8e1;
+  border-radius:8px;
+}
+
+/* =========================
+   USER
+========================= */
+
+.user-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.user-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
+
+.save{
+  background:#087f50;
+  color:#fff;
+}
+
+.reject{
+  background:#dc3545;
+  color:#fff;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.pending{
+  background:#fff3cd;
+  color:#856404;
+}
+
+.approved{
+  background:#d4edda;
+  color:#155724;
+}
+
+.rejected{
+  background:#f8d7da;
+  color:#721c24;
+}
+
+.inactive{
+  background:#eee;
+  color:#555;
+}
+
+.processing{
+  background:#cfe8ff;
+  color:#07549a;
+}
+
+.delivery{
+  background:#e5d5ff;
+  color:#6530a5;
+}
+
+.completed{
+  background:#d4edda;
+  color:#155724;
+}
+
+.muted{
+  color:#666;
+  font-size:13px;
+}
+
+.count{
+  background:#087f50;
+  color:#fff;
+  border-radius:20px;
+  padding:3px 8px;
+  font-size:12px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:#0008;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  z-index:1000;
+}
+
+.modal-box{
+  background:#fff;
+  width:100%;
+  max-width:900px;
+  max-height:90vh;
+  overflow:auto;
+  border-radius:14px;
+  padding:18px;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.modal-head h2{
+  margin:0;
+}
+
+.close-btn{
+  background:#dc3545;
+  color:#fff;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+  nav{
+    grid-template-columns:1fr 1fr;
+  }
+
+  nav button:last-child{
+    grid-column:span 2;
+  }
+
+  .user-grid{
+    grid-template-columns:1fr;
+  }
+
+  .info-grid{
+    grid-template-columns:1fr;
+  }
+
+  main{
+    padding:10px;
+  }
+
+  .card{
+    padding:12px;
+  }
+
+  .table-wrap{
+    border-radius:8px;
+  }
+
+  .order-table{
+    min-width:1050px;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <header>
-<h1>কহিনুর কেমিক্যাল পিএলসি</h1><p>অর্ডার ও User Management Admin Panel</p>
-<nav><button onclick="showOrders()">📦 অর্ডার</button><button onclick="showUsers()">👥 User <span id="pendingCount" class="count">0</span></button><button onclick="adminLogout()">🚪 Logout</button></nav>
+
+<h1>কহিনুর কেমিক্যাল পিএলসি</h1>
+
+<p>অর্ডার ও User Management Admin Panel</p>
+
+<nav>
+<button onclick="showOrders()">📦 অর্ডার</button>
+
+<button onclick="showUsers()">
+👥 User
+<span id="pendingCount" class="count">0</span>
+</button>
+
+<button onclick="adminLogout()">🚪 Logout</button>
+</nav>
+
 </header>
+
+
 <main id="adminContent" class="hidden">
+
+<!-- =========================
+     ORDER SECTION
+========================= -->
+
 <section id="orderSection">
-<div class="card"><button style="width:100%;background:#087f50;color:#fff" onclick="loadOrders()">🔄 অর্ডার Refresh</button><div id="orderStatus" class="loading">অর্ডার লোড হচ্ছে...</div></div>
+
+<div class="card">
+
+<button
+style="width:100%;background:#087f50;color:#fff"
+onclick="loadOrders()">
+🔄 অর্ডার Refresh
+</button>
+
+<div id="orderStatus" class="loading">
+অর্ডার লোড হচ্ছে...
+</div>
+
+</div>
+
 <div id="ordersBox"></div>
+
 </section>
+
+
+<!-- =========================
+     USER SECTION
+========================= -->
+
 <section id="userSection" class="hidden">
-<div class="card"><h2>👥 User Management</h2><p>Username, Role এবং Account Status এখান থেকে পরিবর্তন করতে পারবেন।</p>
-<input id="userSearch" class="search" placeholder="🔎 Username বা Email দিয়ে Search করুন" oninput="renderUsers()">
-<div id="userMessage" class="statusbox hidden"></div><button style="background:#087f50;color:#fff;width:100%" onclick="loadUsers()">🔄 User Refresh</button></div>
-<div id="usersBox"><div class="loading">User লোড হচ্ছে...</div></div>
+
+<div class="card">
+
+<h2>👥 User Management</h2>
+
+<p>
+Username, Role এবং Account Status এখান থেকে পরিবর্তন করতে পারবেন।
+</p>
+
+<input
+id="userSearch"
+class="search"
+placeholder="🔎 Username বা Email দিয়ে Search করুন"
+oninput="renderUsers()"
+>
+
+<div id="userMessage" class="statusbox hidden"></div>
+
+<button
+style="background:#087f50;color:#fff;width:100%"
+onclick="loadUsers()">
+🔄 User Refresh
+</button>
+
+</div>
+
+<div id="usersBox">
+<div class="loading">
+User লোড হচ্ছে...
+</div>
+</div>
+
 </section>
+
 </main>
+
+
+<!-- =========================
+     ORDER DETAIL MODAL
+========================= -->
+
+<div id="orderModal" class="modal hidden">
+
+<div class="modal-box">
+
+<div class="modal-head">
+
+<h2>📦 অর্ডার বিস্তারিত</h2>
+
+<button
+class="close-btn"
+onclick="closeOrderModal()">
+✕ বন্ধ
+</button>
+
+</div>
+
+<div id="orderModalContent"></div>
+
+</div>
+
+</div>
+
+
 <script>
-const SUPABASE_URL="https://utzkpsohkoiawvuupgeb.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+/*
+  এখানে আপনার আগের Supabase URL এবং Publishable/Anon Key বসান।
+*/
+
+const SUPABASE_URL="YOUR_SUPABASE_URL";
+
+const SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY";
+
 const ADMIN_EMAIL="mdyeamin10288@gmail.com";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+const supabaseClient=
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
 let allUsers=[];
-function esc(v){if(v===null||v===undefined)return "";return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
-function dateText(v){if(!v)return "-";const d=new Date(v);return isNaN(d)?esc(v):d.toLocaleString("bn-BD",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"})}
-function money(v){return Number(v||0).toLocaleString("bn-BD",{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+let allOrders=[];
+
+
+/* =========================================================
+   HELPER
+========================================================= */
+
+function esc(v){
+
+  if(v===null || v===undefined) return "";
+
+  return String(v)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function dateText(v){
+
+  if(!v) return "-";
+
+  const d=new Date(v);
+
+  if(isNaN(d)) return esc(v);
+
+  return d.toLocaleString(
+    "bn-BD",
+    {
+      year:"numeric",
+      month:"2-digit",
+      day:"2-digit",
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+
+}
+
+
+function money(v){
+
+  return Number(v||0).toLocaleString(
+    "bn-BD",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
+
+}
+
+
+function productsOf(order){
+
+  let p=order.products;
+
+  if(!p) return [];
+
+  if(typeof p==="string"){
+
+    try{
+
+      p=JSON.parse(p);
+
+    }catch(e){
+
+      return [];
+
+    }
+
+  }
+
+  return Array.isArray(p) ? p : [];
+
+}
+
+
+function getProductQuantity(p){
+
+  return p.quantity ??
+         p.qty ??
+         0;
+
+}
+
+
+function getProductPrice(p){
+
+  return p.price ??
+         p.rate ??
+         0;
+
+}
+
+
+function getProductSubtotal(p){
+
+  const q=getProductQuantity(p);
+
+  const price=getProductPrice(p);
+
+  return p.subtotal ??
+         p.total ??
+         Number(q)*Number(price);
+
+}
+
+
+/* =========================================================
+   ADMIN CHECK
+========================================================= */
+
 async function checkAdmin(){
- const {data:{session},error}=await supabaseClient.auth.getSession();
- if(error||!session){location.href="login.html";return false}
- if((session.user.email||"").toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await supabaseClient.auth.signOut();alert("শুধুমাত্র Admin Account ব্যবহার করতে পারবেন।");location.href="login.html";return false}
- const {data,error:ae}=await supabaseClient.from("app_admins").select("user_id").eq("user_id",session.user.id).maybeSingle();
- if(ae){alert("Admin permission check error:\n\n"+ae.message);return false}
- if(!data){await supabaseClient.auth.signOut();alert("এই Account-এ Admin permission নেই।");location.href="login.html";return false}
- document.getElementById("adminContent").classList.remove("hidden");return true
+
+  const {
+    data:{session},
+    error
+  }=await supabaseClient.auth.getSession();
+
+  if(error || !session){
+
+    location.href="login.html";
+
+    return false;
+
+  }
+
+
+  if(
+    (session.user.email||"").toLowerCase()
+    !==
+    ADMIN_EMAIL.toLowerCase()
+  ){
+
+    await supabaseClient.auth.signOut();
+
+    alert(
+      "শুধুমাত্র Admin Account ব্যবহার করতে পারবেন।"
+    );
+
+    location.href="login.html";
+
+    return false;
+
+  }
+
+
+  const {
+    data,
+    error:ae
+  }=
+  await supabaseClient
+    .from("app_admins")
+    .select("user_id")
+    .eq("user_id",session.user.id)
+    .maybeSingle();
+
+
+  if(ae){
+
+    alert(
+      "Admin permission check error:\n\n"+
+      ae.message
+    );
+
+    return false;
+
+  }
+
+
+  if(!data){
+
+    await supabaseClient.auth.signOut();
+
+    alert(
+      "এই Account-এ Admin permission নেই।"
+    );
+
+    location.href="login.html";
+
+    return false;
+
+  }
+
+
+  document
+    .getElementById("adminContent")
+    .classList.remove("hidden");
+
+  return true;
+
 }
-function showOrders(){document.getElementById("orderSection").classList.remove("hidden");document.getElementById("userSection").classList.add("hidden");loadOrders()}
-function showUsers(){document.getElementById("orderSection").classList.add("hidden");document.getElementById("userSection").classList.remove("hidden");loadUsers()}
-async function adminLogout(){await supabaseClient.auth.signOut();location.href="login.html"}
-function productsOf(order){let p=order.products;if(!p)return[];if(typeof p==="string"){try{p=JSON.parse(p)}catch(e){return[]}}return Array.isArray(p)?p:[]}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showOrders(){
+
+  document
+    .getElementById("orderSection")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("userSection")
+    .classList.add("hidden");
+
+  loadOrders();
+
+}
+
+
+function showUsers(){
+
+  document
+    .getElementById("orderSection")
+    .classList.add("hidden");
+
+  document
+    .getElementById("userSection")
+    .classList.remove("hidden");
+
+  loadUsers();
+
+}
+
+
+async function adminLogout(){
+
+  await supabaseClient.auth.signOut();
+
+  location.href="login.html";
+
+}
+
+
+/* =========================================================
+   LOAD ORDERS
+========================================================= */
+
 async function loadOrders(){
- const s=document.getElementById("orderStatus"),box=document.getElementById("ordersBox");s.className="loading";s.textContent="Supabase থেকে অর্ডার লোড হচ্ছে...";box.innerHTML="";
- const {data:orders,error}=await supabaseClient.from("orders").select("*").order("created_at",{ascending:false});
- if(error){s.className="statusbox error";s.textContent="অর্ডার লোড করা যায়নি: "+error.message;return}
- if(!orders?.length){s.className="statusbox success";s.textContent="কোনো অর্ডার পাওয়া যায়নি।";return}
- s.className="statusbox success";s.textContent="✅ "+orders.length+" টি অর্ডার পাওয়া গেছে";orders.forEach((o,i)=>renderOrder(o,i))
+
+  const status=
+    document.getElementById("orderStatus");
+
+  const box=
+    document.getElementById("ordersBox");
+
+
+  status.className="loading";
+
+  status.textContent=
+    "Supabase থেকে অর্ডার লোড হচ্ছে...";
+
+  box.innerHTML="";
+
+
+  const {
+    data:orders,
+    error
+  }=
+  await supabaseClient
+    .from("orders")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    status.className=
+      "statusbox error";
+
+    status.textContent=
+      "অর্ডার লোড করা যায়নি: "+
+      error.message;
+
+    return;
+
+  }
+
+
+  allOrders=orders || [];
+
+
+  if(!allOrders.length){
+
+    status.className=
+      "statusbox success";
+
+    status.textContent=
+      "কোনো অর্ডার পাওয়া যায়নি।";
+
+    return;
+
+  }
+
+
+  status.className=
+    "statusbox success";
+
+  status.textContent=
+    "✅ "+
+    allOrders.length+
+    " টি অর্ডার পাওয়া গেছে";
+
+
+  renderOrdersTable();
+
 }
-function renderOrder(o,i){
- const box=document.getElementById("ordersBox"),products=productsOf(o);let ph=products.map(p=>{const q=p.quantity??p.qty??0,price=p.price??0,sub=p.subtotal??p.total??Number(q)*Number(price);return `<div class="item"><b>${esc(p.name||p.product_name||"-")}</b><br>পরিমাণ: <b>${esc(q)}</b>${price?`<br>মূল্য: ৳${money(price)}`:""}<br>মোট: <b>৳${money(sub)}</b></div>`}).join("");if(!ph)ph='<div class="item">কোনো পণ্যের তথ্য পাওয়া যায়নি।</div>';
- const id=String(o.id),div=document.createElement("div");div.className="order";div.id="order_"+id;
- const mobile=String(o.mobile||"").replace(/[^0-9+]/g,"");
- div.innerHTML=`<h3>📦 অর্ডার #${i+1}</h3><div class="info"><b>অর্ডার ID:</b> ${esc(id)}<br><b>সময়:</b> ${dateText(o.created_at)}<br><b>অর্ডার তারিখ:</b> ${dateText(o.order_date)}<br><b>ডেলিভারি:</b> ${dateText(o.delivery_date)}<br><br><b>🏪 দোকান:</b> ${esc(o.shop)}<br><b>📍 ঠিকানা:</b> ${esc(o.address)}<br><b>📞 মোবাইল:</b> ${esc(o.mobile)}<br><b>👤 প্রতিনিধি:</b> ${esc(o.representative)}</div>${mobile?`<a class="call" href="tel:${mobile}">📞 কল করুন</a>`:""}<h4>🛒 পণ্যসমূহ</h4>${ph}<div class="total">মোট অর্ডার: ৳${money(o.total)}</div>${o.note?`<div class="item"><b>📝 মন্তব্য:</b><br>${esc(o.note)}</div>`:""}<div style="margin-top:12px"><label><b>📌 Status</b></label><select onchange="updateOrderStatus('${esc(id)}',this.value)">${["pending","processing","delivery","completed","rejected"].map(x=>`<option value="${x}" ${o.status===x?"selected":""}>${x}</option>`).join("")}</select></div><button class="print" onclick="printOrder('${esc(id)}')">🖨️ মেমো প্রিন্ট</button><button class="delete" onclick="deleteOrder('${esc(id)}')">🗑️ অর্ডার Delete</button>`;
- box.appendChild(div)
+
+
+/* =========================================================
+   RENDER ORDER TABLE
+========================================================= */
+
+function renderOrdersTable(){
+
+  const box=
+    document.getElementById("ordersBox");
+
+
+  if(!allOrders.length){
+
+    box.innerHTML=
+      '<div class="card loading">কোনো অর্ডার পাওয়া যায়নি।</div>';
+
+    return;
+
+  }
+
+
+  let rows="";
+
+
+  allOrders.forEach((o,i)=>{
+
+    const id=String(o.id);
+
+    const mobile=
+      String(o.mobile||"")
+      .replace(/[^0-9+]/g,"");
+
+
+    const status=
+      o.status || "pending";
+
+
+    rows+=`
+
+      <tr>
+
+        <td>
+          <span class="order-number">
+            #${i+1}
+          </span>
+        </td>
+
+
+        <td>
+          <b>${esc(id)}</b>
+        </td>
+
+
+        <td>
+          ${dateText(o.created_at)}
+        </td>
+
+
+        <td>
+          <div class="shop-name">
+            ${esc(o.shop||"-")}
+          </div>
+
+          ${
+            o.address
+            ?
+            `<div class="muted">
+              ${esc(o.address)}
+            </div>`
+            :
+            ""
+          }
+        </td>
+
+
+        <td>
+
+          ${
+            mobile
+            ?
+            `<a
+              class="mobile-link"
+              href="tel:${esc(mobile)}">
+              📞 ${esc(o.mobile)}
+            </a>`
+            :
+            esc(o.mobile||"-")
+          }
+
+        </td>
+
+
+        <td>
+          ${esc(o.representative||"-")}
+        </td>
+
+
+        <td>
+          <span class="total-money">
+            ৳${money(o.total)}
+          </span>
+        </td>
+
+
+        <td>
+
+          <select
+            class="status-select"
+            onchange="updateOrderStatus('${esc(id)}',this.value)">
+
+            ${
+              [
+                "pending",
+                "processing",
+                "delivery",
+                "completed",
+                "rejected"
+              ]
+              .map(x=>`
+
+                <option
+                  value="${x}"
+                  ${status===x?"selected":""}>
+
+                  ${x}
+
+                </option>
+
+              `)
+              .join("")
+            }
+
+          </select>
+
+        </td>
+
+
+        <td>
+
+          <div class="table-actions">
+
+            <button
+              class="view-btn"
+              onclick="showOrderDetail('${esc(id)}')">
+
+              👁️ দেখুন
+
+            </button>
+
+
+            <button
+              class="print-btn"
+              onclick="printOrder('${esc(id)}')">
+
+              🖨️ Print
+
+            </button>
+
+
+            <button
+              class="delete-btn"
+              onclick="deleteOrder('${esc(id)}')">
+
+              🗑️ Delete
+
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+
+    `;
+
+  });
+
+
+  box.innerHTML=`
+
+    <div class="table-wrap">
+
+      <table class="order-table">
+
+        <thead>
+
+          <tr>
+
+            <th>#</th>
+
+            <th>Order ID</th>
+
+            <th>সময়</th>
+
+            <th>🏪 দোকান / ঠিকানা</th>
+
+            <th>📞 মোবাইল</th>
+
+            <th>👤 প্রতিনিধি</th>
+
+            <th>💰 মোট</th>
+
+            <th>📌 Status</th>
+
+            <th>⚙️ Action</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${rows}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
 }
-async function updateOrderStatus(id,status){const {error}=await supabaseClient.from("orders").update({status,updated_at:new Date().toISOString()}).eq("id",id);if(error){alert("Status পরিবর্তন করা যায়নি:\n\n"+error.message);return}alert("Status পরিবর্তন হয়েছে।");loadOrders()}
-async function deleteOrder(id){if(!confirm("এই অর্ডারটি Delete করতে চান?"))return;const {error}=await supabaseClient.from("orders").delete().eq("id",id);if(error){alert("Delete করা যায়নি:\n\n"+error.message);return}alert("অর্ডার Delete হয়েছে।");loadOrders()}
-function printOrder(id){const el=document.getElementById("order_"+id);if(!el){alert("অর্ডার পাওয়া যায়নি");return}const w=window.open("","_blank","width=800,height=900");if(!w){alert("Popup blocked হয়েছে");return}w.document.write(`<html lang="bn"><head><meta charset="utf-8"><title>অর্ডার মেমো</title><style>body{font-family:Arial,"Noto Sans Bengali",sans-serif;padding:25px}.memo{max-width:700px;margin:auto}.company{text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:18px}.company h1{margin:0}.item{background:#f4f4f4;padding:10px;margin-top:8px}.total{text-align:right;font-weight:bold;margin-top:20px}button,select,.call{display:none!important}</style></head><body><div class="memo"><div class="company"><h1>কহিনুর কেমিক্যাল পিএলসি</h1><p>অর্ডার মেমো</p></div>${el.innerHTML}</div><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
+
+
+/* =========================================================
+   ORDER DETAIL
+========================================================= */
+
+function showOrderDetail(id){
+
+  const order=
+    allOrders.find(
+      o=>String(o.id)===String(id)
+    );
+
+
+  if(!order){
+
+    alert("অর্ডার পাওয়া যায়নি।");
+
+    return;
+
+  }
+
+
+  const products=
+    productsOf(order);
+
+
+  let productRows="";
+
+
+  products.forEach((p,i)=>{
+
+    const q=
+      getProductQuantity(p);
+
+    const price=
+      getProductPrice(p);
+
+    const subtotal=
+      getProductSubtotal(p);
+
+
+    productRows+=`
+
+      <tr>
+
+        <td>${i+1}</td>
+
+        <td>
+          ${esc(
+            p.name ||
+            p.product_name ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${esc(
+            p.code ||
+            p.product_code ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${esc(
+            p.pack ||
+            p.pack_size ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${esc(q)}
+        </td>
+
+        <td>
+          ${esc(
+            p.bonus ||
+            0
+          )}
+        </td>
+
+        <td>
+          ${esc(
+            p.rate_type ||
+            p.rateType ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ৳${money(price)}
+        </td>
+
+        <td>
+          ৳${money(subtotal)}
+        </td>
+
+      </tr>
+
+    `;
+
+  });
+
+
+  if(!productRows){
+
+    productRows=`
+
+      <tr>
+
+        <td
+          colspan="9"
+          style="text-align:center">
+
+          কোনো পণ্যের তথ্য পাওয়া যায়নি।
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+
+  const mobile=
+    String(order.mobile||"")
+    .replace(/[^0-9+]/g,"");
+
+
+  document.getElementById(
+    "orderModalContent"
+  ).innerHTML=`
+
+    <div class="order-detail">
+
+
+      <div class="order-detail-head">
+
+        <h3>
+          📦 অর্ডার #${esc(order.id)}
+        </h3>
+
+        <span class="badge ${esc(order.status||"pending")}">
+          ${esc(order.status||"pending")}
+        </span>
+
+      </div>
+
+
+      <div class="info-grid">
+
+
+        <div class="info-box">
+
+          <b>অর্ডার ID:</b><br>
+          ${esc(order.id)}
+
+        </div>
+
+
+        <div class="info-box">
+
+          <b>অর্ডার তৈরি:</b><br>
+          ${dateText(order.created_at)}
+
+        </div>
+
+
+        <div class="info-box">
+
+          <b>অর্ডার তারিখ:</b><br>
+          ${dateText(order.order_date)}
+
+        </div>
+
+
+        <div class="info-box">
+
+          <b>ডেলিভারি তারিখ:</b><br>
+          ${dateText(order.delivery_date)}
+
+        </div>
+
+
+        <div class="info-box">
+
+          <b>🏪 দোকান:</b><br>
+          ${esc(order.shop||"-")}
+
+        </div>
+
+
+        <div class="info-box">
+
+          <b>📍 ঠিকানা:</b><br>
+          ${esc(order.address||"-")}
+
+        </div>
+
+
+        <div class="info-box">
+
+          <b>📞 মোবাইল:</b><br>
+
+          ${
+            mobile
+            ?
+            `<a
+              class="mobile-link"
+              href="tel:${esc(mobile)}">
+
+              ${esc(order.mobile)}
+
+            </a>`
+            :
+            "-"
+          }
+
+        </div>
+
+
+        <div class="info-box">
+
+          <b>👤 প্রতিনিধি:</b><br>
+          ${esc(order.representative||"-")}
+
+        </div>
+
+
+      </div>
+
+
+      <h3>🛒 পণ্যসমূহ</h3>
+
+
+      <div class="product-table-wrap">
+
+        <table class="product-table">
+
+          <thead>
+
+            <tr>
+
+              <th>#</th>
+              <th>Product</th>
+              <th>Code</th>
+              <th>Pack</th>
+              <th>Qty</th>
+              <th>Bonus</th>
+              <th>Rate Type</th>
+              <th>Rate</th>
+              <th>মোট</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${productRows}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div class="order-total">
+
+        মোট অর্ডার:
+        ৳${money(order.total)}
+
+      </div>
+
+
+      ${
+        order.note
+        ?
+        `
+        <div class="note-box">
+
+          <b>📝 মন্তব্য:</b><br>
+
+          ${esc(order.note)}
+
+        </div>
+        `
+        :
+        ""
+      }
+
+
+      <div style="margin-top:15px">
+
+        <label>
+          <b>📌 Status</b>
+        </label>
+
+        <select
+          class="status-select"
+          style="width:100%;margin-top:6px"
+          onchange="updateOrderStatus('${esc(order.id)}',this.value)">
+
+          ${
+            [
+              "pending",
+              "processing",
+              "delivery",
+              "completed",
+              "rejected"
+            ]
+            .map(x=>`
+
+              <option
+                value="${x}"
+                ${order.status===x?"selected":""}>
+
+                ${x}
+
+              </option>
+
+            `)
+            .join("")
+          }
+
+        </select>
+
+      </div>
+
+
+      <button
+        class="print-btn"
+        style="width:100%;margin-top:12px"
+        onclick="printOrder('${esc(order.id)}')">
+
+        🖨️ মেমো প্রিন্ট
+
+      </button>
+
+
+      <button
+        class="delete-btn"
+        style="width:100%;margin-top:8px"
+        onclick="deleteOrder('${esc(order.id)}')">
+
+        🗑️ অর্ডার Delete
+
+      </button>
+
+
+    </div>
+
+  `;
+
+
+  document
+    .getElementById("orderModal")
+    .classList.remove("hidden");
+
+}
+
+
+function closeOrderModal(){
+
+  document
+    .getElementById("orderModal")
+    .classList.add("hidden");
+
+}
+
+
+document
+  .getElementById("orderModal")
+  .addEventListener("click",function(e){
+
+    if(e.target===this){
+
+      closeOrderModal();
+
+    }
+
+  });
+
+
+/* =========================================================
+   UPDATE ORDER STATUS
+========================================================= */
+
+async function updateOrderStatus(id,status){
+
+  const {
+    error
+  }=
+  await supabaseClient
+    .from("orders")
+    .update({
+      status,
+      updated_at:new Date().toISOString()
+    })
+    .eq("id",id);
+
+
+  if(error){
+
+    alert(
+      "Status পরিবর্তন করা যায়নি:\n\n"+
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  const order=
+    allOrders.find(
+      o=>String(o.id)===String(id)
+    );
+
+
+  if(order){
+
+    order.status=status;
+
+  }
+
+
+  renderOrdersTable();
+
+
+  const modal=
+    document.getElementById("orderModal");
+
+  if(!modal.classList.contains("hidden")){
+
+    showOrderDetail(id);
+
+  }
+
+
+  alert("Status পরিবর্তন হয়েছে।");
+
+}
+
+
+/* =========================================================
+   DELETE ORDER
+========================================================= */
+
+async function deleteOrder(id){
+
+  if(
+    !confirm(
+      "এই অর্ডারটি Delete করতে চান?"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const {
+    error
+  }=
+  await supabaseClient
+    .from("orders")
+    .delete()
+    .eq("id",id);
+
+
+  if(error){
+
+    alert(
+      "Delete করা যায়নি:\n\n"+
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  closeOrderModal();
+
+
+  alert("অর্ডার Delete হয়েছে।");
+
+
+  loadOrders();
+
+}
+
+
+/* =========================================================
+   PRINT ORDER
+========================================================= */
+
+function printOrder(id){
+
+  const order=
+    allOrders.find(
+      o=>String(o.id)===String(id)
+    );
+
+
+  if(!order){
+
+    alert("অর্ডার পাওয়া যায়নি।");
+
+    return;
+
+  }
+
+
+  const products=
+    productsOf(order);
+
+
+  let rows="";
+
+
+  products.forEach((p,i)=>{
+
+    const q=
+      getProductQuantity(p);
+
+    const price=
+      getProductPrice(p);
+
+    const subtotal=
+      getProductSubtotal(p);
+
+
+    rows+=`
+
+      <tr>
+
+        <td>${i+1}</td>
+
+        <td>
+          ${esc(
+            p.name ||
+            p.product_name ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${esc(
+            p.code ||
+            p.product_code ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${esc(
+            p.pack ||
+            p.pack_size ||
+            "-"
+          )}
+        </td>
+
+        <td>${esc(q)}</td>
+
+        <td>
+          ${esc(p.bonus||0)}
+        </td>
+
+        <td>
+          ${esc(
+            p.rate_type ||
+            p.rateType ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ৳${money(price)}
+        </td>
+
+        <td>
+          ৳${money(subtotal)}
+        </td>
+
+      </tr>
+
+    `;
+
+  });
+
+
+  if(!rows){
+
+    rows=`
+
+      <tr>
+
+        <td colspan="9">
+          কোনো পণ্যের তথ্য পাওয়া যায়নি।
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+
+  const w=
+    window.open(
+      "",
+      "_blank",
+      "width=1000,height=900"
+    );
+
+
+  if(!w){
+
+    alert("Popup blocked হয়েছে।");
+
+    return;
+
+  }
+
+
+  w.document.write(`
+
+<!doctype html>
+
+<html lang="bn">
+
+<head>
+
+<meta charset="utf-8">
+
+<title>অর্ডার মেমো</title>
+
+<style>
+
+body{
+  font-family:Arial,"Noto Sans Bengali",sans-serif;
+  padding:25px;
+  color:#111;
+}
+
+.memo{
+  max-width:900px;
+  margin:auto;
+}
+
+.company{
+  text-align:center;
+  border-bottom:2px solid #000;
+  padding-bottom:12px;
+  margin-bottom:18px;
+}
+
+.company h1{
+  margin:0;
+  font-size:25px;
+}
+
+.company p{
+  margin:6px 0 0;
+}
+
+.info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:18px;
+}
+
+.info div{
+  border:1px solid #ddd;
+  padding:8px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th{
+  background:#eee;
+}
+
+th,
+td{
+  border:1px solid #999;
+  padding:8px;
+  font-size:13px;
+}
+
+.total{
+  text-align:right;
+  font-weight:bold;
+  font-size:18px;
+  margin-top:18px;
+}
+
+.note{
+  margin-top:15px;
+  border:1px solid #ddd;
+  padding:10px;
+}
+
+@media print{
+
+  body{
+    padding:0;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="memo">
+
+<div class="company">
+
+<h1>
+কহিনুর কেমিক্যাল পিএলসি
+</h1>
+
+<p>
+অর্ডার মেমো
+</p>
+
+</div>
+
+
+<div class="info">
+
+<div>
+<b>অর্ডার ID:</b><br>
+${esc(order.id)}
+</div>
+
+<div>
+<b>সময়:</b><br>
+${dateText(order.created_at)}
+</div>
+
+<div>
+<b>অর্ডার তারিখ:</b><br>
+${dateText(order.order_date)}
+</div>
+
+<div>
+<b>ডেলিভারি:</b><br>
+${dateText(order.delivery_date)}
+</div>
+
+<div>
+<b>দোকান:</b><br>
+${esc(order.shop||"-")}
+</div>
+
+<div>
+<b>মোবাইল:</b><br>
+${esc(order.mobile||"-")}
+</div>
+
+<div>
+<b>ঠিকানা:</b><br>
+${esc(order.address||"-")}
+</div>
+
+<div>
+<b>প্রতিনিধি:</b><br>
+${esc(order.representative||"-")}
+</div>
+
+</div>
+
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>#</th>
+<th>Product</th>
+<th>Code</th>
+<th>Pack</th>
+<th>Qty</th>
+<th>Bonus</th>
+<th>Rate Type</th>
+<th>Rate</th>
+<th>মোট</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+${rows}
+
+</tbody>
+
+</table>
+
+
+<div class="total">
+
+মোট অর্ডার:
+৳${money(order.total)}
+
+</div>
+
+
+${
+  order.note
+  ?
+  `
+  <div class="note">
+
+  <b>মন্তব্য:</b><br>
+
+  ${esc(order.note)}
+
+  </div>
+  `
+  :
+  ""
+}
+
+
+</div>
+
+
+<script>
+
+window.onload=function(){
+
+  window.print();
+
+};
+
+<\/script>
+
+
+</body>
+
+</html>
+
+`);
+
+
+  w.document.close();
+
+}
+
+
+/* =========================================================
+   USERS
+========================================================= */
+
 async function loadUsers(){
- const box=document.getElementById("usersBox");box.innerHTML='<div class="loading">User লোড হচ্ছে...</div>';
- const {data,error}=await supabaseClient.rpc("get_pending_users");
- if(error){box.innerHTML=`<div class="card statusbox error">User লোড করা যায়নি:<br><br>${esc(error.message)}</div>`;return}
- allUsers=data||[];document.getElementById("pendingCount").textContent=allUsers.filter(u=>u.status==="pending").length;renderUsers()
+
+  const box=
+    document.getElementById("usersBox");
+
+
+  box.innerHTML=
+    '<div class="loading">User লোড হচ্ছে...</div>';
+
+
+  const {
+    data,
+    error
+  }=
+  await supabaseClient
+    .rpc("get_pending_users");
+
+
+  if(error){
+
+    box.innerHTML=`
+
+      <div class="card statusbox error">
+
+        User লোড করা যায়নি:<br><br>
+
+        ${esc(error.message)}
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  allUsers=data||[];
+
+
+  document
+    .getElementById("pendingCount")
+    .textContent=
+      allUsers.filter(
+        u=>u.status==="pending"
+      ).length;
+
+
+  renderUsers();
+
 }
+
+
+/* =========================================================
+   RENDER USERS
+========================================================= */
+
 function renderUsers(){
- const q=(document.getElementById("userSearch").value||"").toLowerCase().trim(),box=document.getElementById("usersBox");
- const users=allUsers.filter(u=>(u.username||"").toLowerCase().includes(q)||(u.email||"").toLowerCase().includes(q));
- if(!users.length){box.innerHTML='<div class="card loading">কোনো User পাওয়া যায়নি।</div>';return}box.innerHTML="";
- users.forEach(u=>{const status=u.status||"pending",role=u.role||"user",div=document.createElement("div");div.className="user-card";
- div.innerHTML=`<h3>👤 ${esc(u.username||"-")}</h3><div class="muted">${esc(u.email||"-")}<br>তৈরি: ${dateText(u.created_at)}</div><div class="user-grid" style="margin-top:12px"><div><label>Username</label><input id="name_${u.id}" value="${esc(u.username||"")}"></div><div><label>Role</label><select id="role_${u.id}"><option value="user" ${role==="user"?"selected":""}>user</option><option value="admin" ${role==="admin"?"selected":""}>admin</option></select></div><div><label>Status</label><select id="status_${u.id}"><option value="pending" ${status==="pending"?"selected":""}>pending</option><option value="approved" ${status==="approved"?"selected":""}>approved</option><option value="rejected" ${status==="rejected"?"selected":""}>rejected</option><option value="inactive" ${status==="inactive"?"selected":""}>inactive</option></select></div><div><label>Current</label><div style="padding:10px 0"><span class="badge ${status}">${esc(status)}</span></div></div></div><div class="user-actions"><button class="save" onclick="saveUser('${u.id}',this)">💾 Save Changes</button><button class="reject" onclick="quickReject('${u.id}',this)">❌ Reject</button></div>`;box.appendChild(div)})
+
+  const q=
+    (
+      document
+        .getElementById("userSearch")
+        .value||""
+    )
+    .toLowerCase()
+    .trim();
+
+
+  const box=
+    document.getElementById("usersBox");
+
+
+  const users=
+    allUsers.filter(
+      u=>
+        (u.username||"")
+        .toLowerCase()
+        .includes(q)
+        ||
+        (u.email||"")
+        .toLowerCase()
+        .includes(q)
+    );
+
+
+  if(!users.length){
+
+    box.innerHTML=
+      '<div class="card loading">কোনো User পাওয়া যায়নি।</div>';
+
+    return;
+
+  }
+
+
+  box.innerHTML="";
+
+
+  users.forEach(u=>{
+
+    const status=
+      u.status||"pending";
+
+    const role=
+      u.role||"user";
+
+
+    const div=
+      document.createElement("div");
+
+
+    div.className="user-card";
+
+
+    div.innerHTML=`
+
+      <h3>
+        👤 ${esc(u.username||"-")}
+      </h3>
+
+
+      <div class="muted">
+
+        ${esc(u.email||"-")}
+
+        <br>
+
+        তৈরি:
+        ${dateText(u.created_at)}
+
+      </div>
+
+
+      <div
+        class="user-grid"
+        style="margin-top:12px">
+
+
+        <div>
+
+          <label>
+            Username
+          </label>
+
+          <input
+            id="name_${u.id}"
+            value="${esc(u.username||"")}"
+          >
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Role
+          </label>
+
+          <select id="role_${u.id}">
+
+            <option
+              value="user"
+              ${role==="user"?"selected":""}>
+              user
+            </option>
+
+            <option
+              value="admin"
+              ${role==="admin"?"selected":""}>
+              admin
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Status
+          </label>
+
+          <select id="status_${u.id}">
+
+            <option
+              value="pending"
+              ${status==="pending"?"selected":""}>
+              pending
+            </option>
+
+            <option
+              value="approved"
+              ${status==="approved"?"selected":""}>
+              approved
+            </option>
+
+            <option
+              value="rejected"
+              ${status==="rejected"?"selected":""}>
+              rejected
+            </option>
+
+            <option
+              value="inactive"
+              ${status==="inactive"?"selected":""}>
+              inactive
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Current
+          </label>
+
+          <div style="padding:10px 0">
+
+            <span class="badge ${status}">
+
+              ${esc(status)}
+
+            </span>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+      <div class="user-actions">
+
+        <button
+          class="save"
+          onclick="saveUser('${u.id}',this)">
+
+          💾 Save Changes
+
+        </button>
+
+
+        <button
+          class="reject"
+          onclick="quickReject('${u.id}',this)">
+
+          ❌ Reject
+
+        </button>
+
+      </div>
+
+    `;
+
+
+    box.appendChild(div);
+
+  });
+
 }
+
+
+/* =========================================================
+   SAVE USER
+========================================================= */
+
 async function saveUser(id,btn){
- btn.disabled=true;const username=document.getElementById("name_"+id).value.trim(),role=document.getElementById("role_"+id).value,status=document.getElementById("status_"+id).value;
- if(!username){showUserMessage("Username খালি রাখা যাবে না।","error");btn.disabled=false;return}
- const {error}=await supabaseClient.from("profiles").update({username,role,status}).eq("id",id);
- if(error){showUserMessage("Update করা যায়নি: "+error.message,"error");btn.disabled=false;return}
- showUserMessage("User তথ্য সফলভাবে Update হয়েছে।","success");await loadUsers()
+
+  btn.disabled=true;
+
+
+  const username=
+    document
+      .getElementById("name_"+id)
+      .value
+      .trim();
+
+
+  const role=
+    document
+      .getElementById("role_"+id)
+      .value;
+
+
+  const status=
+    document
+      .getElementById("status_"+id)
+      .value;
+
+
+  if(!username){
+
+    showUserMessage(
+      "Username খালি রাখা যাবে না।",
+      "error"
+    );
+
+    btn.disabled=false;
+
+    return;
+
+  }
+
+
+  const {
+    error
+  }=
+  await supabaseClient
+    .from("profiles")
+    .update({
+      username,
+      role,
+      status
+    })
+    .eq("id",id);
+
+
+  if(error){
+
+    showUserMessage(
+      "Update করা যায়নি: "+
+      error.message,
+      "error"
+    );
+
+    btn.disabled=false;
+
+    return;
+
+  }
+
+
+  showUserMessage(
+    "User তথ্য সফলভাবে Update হয়েছে।",
+    "success"
+  );
+
+
+  await loadUsers();
+
 }
-async function quickReject(id,btn){if(!confirm("এই User-কে Reject করতে চান?"))return;btn.disabled=true;const {error}=await supabaseClient.rpc("reject_user",{target_user_id:id});if(error){showUserMessage("Reject করা যায়নি: "+error.message,"error");btn.disabled=false;return}showUserMessage("User Rejected হয়েছে।","success");await loadUsers()}
-function showUserMessage(text,type){const b=document.getElementById("userMessage");b.textContent=text;b.className="statusbox "+(type==="success"?"success":"error");b.classList.remove("hidden")}
-async function initialize(){if(await checkAdmin()){showOrders()}}initialize();
+
+
+/* =========================================================
+   QUICK REJECT
+========================================================= */
+
+async function quickReject(id,btn){
+
+  if(
+    !confirm(
+      "এই User-কে Reject করতে চান?"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  btn.disabled=true;
+
+
+  const {
+    error
+  }=
+  await supabaseClient
+    .rpc(
+      "reject_user",
+      {
+        target_user_id:id
+      }
+    );
+
+
+  if(error){
+
+    showUserMessage(
+      "Reject করা যায়নি: "+
+      error.message,
+      "error"
+    );
+
+    btn.disabled=false;
+
+    return;
+
+  }
+
+
+  showUserMessage(
+    "User Rejected হয়েছে।",
+    "success"
+  );
+
+
+  await loadUsers();
+
+}
+
+
+/* =========================================================
+   USER MESSAGE
+========================================================= */
+
+function showUserMessage(text,type){
+
+  const b=
+    document.getElementById("userMessage");
+
+
+  b.textContent=text;
+
+
+  b.className=
+    "statusbox "+
+    (
+      type==="success"
+      ?
+      "success"
+      :
+      "error"
+    );
+
+
+  b.classList.remove("hidden");
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function initialize(){
+
+  if(await checkAdmin()){
+
+    showOrders();
+
+  }
+
+}
+
+
+initialize();
+
 </script>
+
 </body>
 </html>

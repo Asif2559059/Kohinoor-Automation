@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#087f50">
-
 <title>Kohinoor Admin Panel</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -73,7 +72,6 @@ main{
 }
 
 .card,
-.order,
 .user-card{
   background:#fff;
   border-radius:12px;
@@ -127,24 +125,23 @@ select{
   padding:25px;
 }
 
-/* =========================
+/* ================================
    ORDER TABLE
-========================= */
+================================ */
 
-.table-wrap{
+.table-container{
   width:100%;
   overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
   background:#fff;
   border-radius:12px;
   box-shadow:0 2px 8px #00000012;
+  -webkit-overflow-scrolling:touch;
 }
 
 .order-table{
   width:100%;
   min-width:1050px;
   border-collapse:collapse;
-  background:#fff;
 }
 
 .order-table th{
@@ -152,55 +149,62 @@ select{
   color:#fff;
   padding:13px 10px;
   text-align:left;
-  font-size:14px;
   white-space:nowrap;
+  font-size:14px;
 }
 
 .order-table td{
-  padding:12px 10px;
-  border-bottom:1px solid #e5e5e5;
+  padding:11px 10px;
+  border-bottom:1px solid #e3e3e3;
   vertical-align:middle;
   font-size:14px;
 }
 
 .order-table tbody tr:hover{
-  background:#f5faf7;
+  background:#f4faf7;
 }
 
 .order-table tbody tr:last-child td{
-  border-bottom:0;
+  border-bottom:none;
 }
 
 .order-number{
-  font-weight:700;
   color:#087f50;
+  font-weight:700;
 }
 
 .shop-name{
   font-weight:700;
 }
 
-.mobile-link{
+.small-text{
+  font-size:12px;
+  color:#777;
+  margin-top:3px;
+}
+
+.phone-link{
   color:#1565c0;
   text-decoration:none;
   white-space:nowrap;
 }
 
-.total-money{
-  font-weight:700;
+.money{
   color:#087f50;
+  font-weight:700;
   white-space:nowrap;
 }
 
-.table-actions{
+.action-buttons{
   display:flex;
-  gap:6px;
-  min-width:210px;
+  gap:5px;
+  min-width:220px;
 }
 
-.table-actions button{
-  padding:8px 10px;
-  font-size:13px;
+.action-buttons button{
+  padding:7px 9px;
+  font-size:12px;
+  white-space:nowrap;
 }
 
 .view-btn{
@@ -219,40 +223,25 @@ select{
 }
 
 .status-select{
-  min-width:130px;
+  min-width:125px;
   padding:8px;
   font-size:13px;
 }
 
-/* =========================
+/* ================================
    ORDER DETAIL
-========================= */
+================================ */
 
 .order-detail{
   background:#fff;
   border-radius:12px;
-  padding:18px;
-  margin-bottom:15px;
+  padding:15px;
   box-shadow:0 2px 8px #00000012;
 }
 
-.order-detail-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:15px;
-  flex-wrap:wrap;
-}
-
-.order-detail-head h3{
-  margin:0;
-  color:#087f50;
-}
-
-.info-grid{
+.detail-info{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
+  grid-template-columns:1fr 1fr;
   gap:10px;
   background:#f4f7f6;
   padding:12px;
@@ -260,38 +249,39 @@ select{
   margin-bottom:15px;
 }
 
-.info-box{
+.detail-info div{
   line-height:1.7;
 }
 
 .product-table-wrap{
+  width:100%;
   overflow-x:auto;
   margin-top:10px;
 }
 
 .product-table{
   width:100%;
-  min-width:650px;
+  min-width:750px;
   border-collapse:collapse;
 }
 
 .product-table th{
-  background:#e8f5ee;
-  color:#087f50;
+  background:#087f50;
+  color:#fff;
   padding:10px;
-  border:1px solid #cfe4d8;
   text-align:left;
+  white-space:nowrap;
 }
 
 .product-table td{
-  padding:10px;
+  padding:9px;
   border:1px solid #ddd;
 }
 
 .order-total{
   margin-top:12px;
   background:#e8f5ee;
-  padding:13px;
+  padding:12px;
   border-radius:8px;
   text-align:right;
   font-weight:bold;
@@ -305,9 +295,9 @@ select{
   border-radius:8px;
 }
 
-/* =========================
+/* ================================
    USER
-========================= */
+================================ */
 
 .user-grid{
   display:grid;
@@ -388,32 +378,32 @@ select{
   font-size:12px;
 }
 
-/* =========================
+/* ================================
    MODAL
-========================= */
+================================ */
 
 .modal{
   position:fixed;
   inset:0;
-  background:#0008;
+  background:rgba(0,0,0,.55);
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:15px;
+  padding:12px;
   z-index:1000;
 }
 
 .modal-box{
-  background:#fff;
   width:100%;
-  max-width:900px;
-  max-height:90vh;
+  max-width:1000px;
+  max-height:92vh;
   overflow:auto;
+  background:#fff;
   border-radius:14px;
-  padding:18px;
+  padding:16px;
 }
 
-.modal-head{
+.modal-header{
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -421,7 +411,7 @@ select{
   margin-bottom:15px;
 }
 
-.modal-head h2{
+.modal-header h2{
   margin:0;
 }
 
@@ -430,9 +420,9 @@ select{
   color:#fff;
 }
 
-/* =========================
+/* ================================
    MOBILE
-========================= */
+================================ */
 
 @media(max-width:700px){
 
@@ -444,29 +434,26 @@ select{
     grid-column:span 2;
   }
 
-  .user-grid{
-    grid-template-columns:1fr;
-  }
-
-  .info-grid{
-    grid-template-columns:1fr;
-  }
-
   main{
     padding:10px;
   }
 
-  .card{
-    padding:12px;
+  .user-grid{
+    grid-template-columns:1fr;
   }
 
-  .table-wrap{
-    border-radius:8px;
+  .detail-info{
+    grid-template-columns:1fr;
   }
 
   .order-table{
     min-width:1050px;
   }
+
+  .table-container{
+    border-radius:8px;
+  }
+
 }
 </style>
 </head>
@@ -480,14 +467,20 @@ select{
 <p>অর্ডার ও User Management Admin Panel</p>
 
 <nav>
-<button onclick="showOrders()">📦 অর্ডার</button>
+
+<button onclick="showOrders()">
+📦 অর্ডার
+</button>
 
 <button onclick="showUsers()">
 👥 User
 <span id="pendingCount" class="count">0</span>
 </button>
 
-<button onclick="adminLogout()">🚪 Logout</button>
+<button onclick="adminLogout()">
+🚪 Logout
+</button>
+
 </nav>
 
 </header>
@@ -495,9 +488,9 @@ select{
 
 <main id="adminContent" class="hidden">
 
-<!-- =========================
+<!-- =========================================
      ORDER SECTION
-========================= -->
+========================================= -->
 
 <section id="orderSection">
 
@@ -506,23 +499,28 @@ select{
 <button
 style="width:100%;background:#087f50;color:#fff"
 onclick="loadOrders()">
+
 🔄 অর্ডার Refresh
+
 </button>
 
 <div id="orderStatus" class="loading">
+
 অর্ডার লোড হচ্ছে...
+
 </div>
 
 </div>
+
 
 <div id="ordersBox"></div>
 
 </section>
 
 
-<!-- =========================
+<!-- =========================================
      USER SECTION
-========================= -->
+========================================= -->
 
 <section id="userSection" class="hidden">
 
@@ -546,15 +544,20 @@ oninput="renderUsers()"
 <button
 style="background:#087f50;color:#fff;width:100%"
 onclick="loadUsers()">
+
 🔄 User Refresh
+
 </button>
 
 </div>
 
+
 <div id="usersBox">
+
 <div class="loading">
 User লোড হচ্ছে...
 </div>
+
 </div>
 
 </section>
@@ -562,22 +565,28 @@ User লোড হচ্ছে...
 </main>
 
 
-<!-- =========================
+<!-- =========================================
      ORDER DETAIL MODAL
-========================= -->
+========================================= -->
 
-<div id="orderModal" class="modal hidden">
+<div
+id="orderModal"
+class="modal hidden">
 
 <div class="modal-box">
 
-<div class="modal-head">
+<div class="modal-header">
 
-<h2>📦 অর্ডার বিস্তারিত</h2>
+<h2>
+📦 অর্ডার বিস্তারিত
+</h2>
 
 <button
 class="close-btn"
 onclick="closeOrderModal()">
+
 ✕ বন্ধ
+
 </button>
 
 </div>
@@ -591,43 +600,45 @@ onclick="closeOrderModal()">
 
 <script>
 
-/* =========================================================
-   SUPABASE
-========================================================= */
+/* =========================================
+   SUPABASE CONFIG
+========================================= */
 
-/*
-  এখানে আপনার আগের Supabase URL এবং Publishable/Anon Key বসান।
-*/
+const SUPABASE_URL =
+"https://utzkpsohkoiawvuupgeb.supabase.co";
 
-const SUPABASE_URL="YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY =
+"sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
-const SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY";
+const ADMIN_EMAIL =
+"mdyeamin10288@gmail.com";
 
-const ADMIN_EMAIL="mdyeamin10288@gmail.com";
 
-const supabaseClient=
+const supabaseClient =
 window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
 
-/* =========================================================
-   GLOBAL
-========================================================= */
+/* =========================================
+   GLOBAL VARIABLES
+========================================= */
 
-let allUsers=[];
+let allUsers = [];
 
-let allOrders=[];
+let allOrders = [];
 
 
-/* =========================================================
-   HELPER
-========================================================= */
+/* =========================================
+   ESCAPE HTML
+========================================= */
 
 function esc(v){
 
-  if(v===null || v===undefined) return "";
+  if(v === null || v === undefined){
+    return "";
+  }
 
   return String(v)
     .replace(/&/g,"&amp;")
@@ -639,13 +650,21 @@ function esc(v){
 }
 
 
+/* =========================================
+   DATE
+========================================= */
+
 function dateText(v){
 
-  if(!v) return "-";
+  if(!v){
+    return "-";
+  }
 
-  const d=new Date(v);
+  const d = new Date(v);
 
-  if(isNaN(d)) return esc(v);
+  if(isNaN(d)){
+    return esc(v);
+  }
 
   return d.toLocaleString(
     "bn-BD",
@@ -661,9 +680,13 @@ function dateText(v){
 }
 
 
+/* =========================================
+   MONEY
+========================================= */
+
 function money(v){
 
-  return Number(v||0).toLocaleString(
+  return Number(v || 0).toLocaleString(
     "bn-BD",
     {
       minimumFractionDigits:2,
@@ -674,17 +697,23 @@ function money(v){
 }
 
 
+/* =========================================
+   PRODUCTS
+========================================= */
+
 function productsOf(order){
 
-  let p=order.products;
+  let p = order.products;
 
-  if(!p) return [];
+  if(!p){
+    return [];
+  }
 
-  if(typeof p==="string"){
+  if(typeof p === "string"){
 
     try{
 
-      p=JSON.parse(p);
+      p = JSON.parse(p);
 
     }catch(e){
 
@@ -699,51 +728,61 @@ function productsOf(order){
 }
 
 
-function getProductQuantity(p){
+function getQty(p){
 
-  return p.quantity ??
-         p.qty ??
-         0;
-
-}
-
-
-function getProductPrice(p){
-
-  return p.price ??
-         p.rate ??
-         0;
+  return (
+    p.quantity ??
+    p.qty ??
+    0
+  );
 
 }
 
 
-function getProductSubtotal(p){
+function getPrice(p){
 
-  const q=getProductQuantity(p);
-
-  const price=getProductPrice(p);
-
-  return p.subtotal ??
-         p.total ??
-         Number(q)*Number(price);
+  return (
+    p.price ??
+    p.rate ??
+    0
+  );
 
 }
 
 
-/* =========================================================
+function getSubtotal(p){
+
+  const qty = getQty(p);
+
+  const price = getPrice(p);
+
+  return (
+    p.subtotal ??
+    p.total ??
+    Number(qty) * Number(price)
+  );
+
+}
+
+
+/* =========================================
    ADMIN CHECK
-========================================================= */
+========================================= */
 
 async function checkAdmin(){
 
   const {
-    data:{session},
+    data:{
+      session
+    },
     error
-  }=await supabaseClient.auth.getSession();
+  } =
+  await supabaseClient.auth.getSession();
+
 
   if(error || !session){
 
-    location.href="login.html";
+    location.href = "login.html";
 
     return false;
 
@@ -751,7 +790,7 @@ async function checkAdmin(){
 
 
   if(
-    (session.user.email||"").toLowerCase()
+    (session.user.email || "").toLowerCase()
     !==
     ADMIN_EMAIL.toLowerCase()
   ){
@@ -762,7 +801,7 @@ async function checkAdmin(){
       "শুধুমাত্র Admin Account ব্যবহার করতে পারবেন।"
     );
 
-    location.href="login.html";
+    location.href = "login.html";
 
     return false;
 
@@ -772,7 +811,7 @@ async function checkAdmin(){
   const {
     data,
     error:ae
-  }=
+  } =
   await supabaseClient
     .from("app_admins")
     .select("user_id")
@@ -783,7 +822,7 @@ async function checkAdmin(){
   if(ae){
 
     alert(
-      "Admin permission check error:\n\n"+
+      "Admin permission check error:\n\n" +
       ae.message
     );
 
@@ -800,7 +839,7 @@ async function checkAdmin(){
       "এই Account-এ Admin permission নেই।"
     );
 
-    location.href="login.html";
+    location.href = "login.html";
 
     return false;
 
@@ -811,14 +850,15 @@ async function checkAdmin(){
     .getElementById("adminContent")
     .classList.remove("hidden");
 
+
   return true;
 
 }
 
 
-/* =========================================================
+/* =========================================
    NAVIGATION
-========================================================= */
+========================================= */
 
 function showOrders(){
 
@@ -854,49 +894,55 @@ async function adminLogout(){
 
   await supabaseClient.auth.signOut();
 
-  location.href="login.html";
+  location.href = "login.html";
 
 }
 
 
-/* =========================================================
+/* =========================================
    LOAD ORDERS
-========================================================= */
+========================================= */
 
 async function loadOrders(){
 
-  const status=
+  const statusBox =
     document.getElementById("orderStatus");
 
-  const box=
+  const ordersBox =
     document.getElementById("ordersBox");
 
 
-  status.className="loading";
+  statusBox.className = "loading";
 
-  status.textContent=
+  statusBox.textContent =
     "Supabase থেকে অর্ডার লোড হচ্ছে...";
 
-  box.innerHTML="";
+
+  ordersBox.innerHTML = "";
 
 
   const {
     data:orders,
     error
-  }=
+  } =
   await supabaseClient
     .from("orders")
     .select("*")
-    .order("created_at",{ascending:false});
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
+    );
 
 
   if(error){
 
-    status.className=
+    statusBox.className =
       "statusbox error";
 
-    status.textContent=
-      "অর্ডার লোড করা যায়নি: "+
+    statusBox.textContent =
+      "অর্ডার লোড করা যায়নি: " +
       error.message;
 
     return;
@@ -904,15 +950,15 @@ async function loadOrders(){
   }
 
 
-  allOrders=orders || [];
+  allOrders = orders || [];
 
 
   if(!allOrders.length){
 
-    status.className=
+    statusBox.className =
       "statusbox success";
 
-    status.textContent=
+    statusBox.textContent =
       "কোনো অর্ডার পাওয়া যায়নি।";
 
     return;
@@ -920,33 +966,33 @@ async function loadOrders(){
   }
 
 
-  status.className=
+  statusBox.className =
     "statusbox success";
 
-  status.textContent=
-    "✅ "+
-    allOrders.length+
+  statusBox.textContent =
+    "✅ " +
+    allOrders.length +
     " টি অর্ডার পাওয়া গেছে";
 
 
-  renderOrdersTable();
+  renderOrders();
 
 }
 
 
-/* =========================================================
-   RENDER ORDER TABLE
-========================================================= */
+/* =========================================
+   RENDER ORDERS TABLE
+========================================= */
 
-function renderOrdersTable(){
+function renderOrders(){
 
-  const box=
+  const box =
     document.getElementById("ordersBox");
 
 
   if(!allOrders.length){
 
-    box.innerHTML=
+    box.innerHTML =
       '<div class="card loading">কোনো অর্ডার পাওয়া যায়নি।</div>';
 
     return;
@@ -954,219 +1000,265 @@ function renderOrdersTable(){
   }
 
 
-  let rows="";
+  let rows = "";
 
 
-  allOrders.forEach((o,i)=>{
+  allOrders.forEach(
+    (o,index)=>{
 
-    const id=String(o.id);
+      const id =
+        String(o.id);
 
-    const mobile=
-      String(o.mobile||"")
-      .replace(/[^0-9+]/g,"");
 
+      const mobile =
+        String(o.mobile || "")
+        .replace(
+          /[^0-9+]/g,
+          ""
+        );
 
-    const status=
-      o.status || "pending";
 
+      const status =
+        o.status || "pending";
 
-    rows+=`
 
-      <tr>
+      rows += `
 
-        <td>
-          <span class="order-number">
-            #${i+1}
-          </span>
-        </td>
+<tr>
 
+<td>
+<span class="order-number">
+#${index + 1}
+</span>
+</td>
 
-        <td>
-          <b>${esc(id)}</b>
-        </td>
 
+<td>
+<b>${esc(id)}</b>
+</td>
 
-        <td>
-          ${dateText(o.created_at)}
-        </td>
 
+<td>
+${dateText(o.created_at)}
+</td>
 
-        <td>
-          <div class="shop-name">
-            ${esc(o.shop||"-")}
-          </div>
 
-          ${
-            o.address
-            ?
-            `<div class="muted">
-              ${esc(o.address)}
-            </div>`
-            :
-            ""
-          }
-        </td>
+<td>
 
+<div class="shop-name">
+${esc(o.shop || "-")}
+</div>
 
-        <td>
+${
+  o.address
+  ?
+  `
+  <div class="small-text">
+  ${esc(o.address)}
+  </div>
+  `
+  :
+  ""
+}
 
-          ${
-            mobile
-            ?
-            `<a
-              class="mobile-link"
-              href="tel:${esc(mobile)}">
-              📞 ${esc(o.mobile)}
-            </a>`
-            :
-            esc(o.mobile||"-")
-          }
+</td>
 
-        </td>
 
+<td>
 
-        <td>
-          ${esc(o.representative||"-")}
-        </td>
+${
+  mobile
+  ?
+  `
+  <a
+    class="phone-link"
+    href="tel:${esc(mobile)}">
 
+    📞 ${esc(o.mobile)}
 
-        <td>
-          <span class="total-money">
-            ৳${money(o.total)}
-          </span>
-        </td>
+  </a>
+  `
+  :
+  esc(o.mobile || "-")
+}
 
+</td>
 
-        <td>
 
-          <select
-            class="status-select"
-            onchange="updateOrderStatus('${esc(id)}',this.value)">
+<td>
+${esc(o.representative || "-")}
+</td>
 
-            ${
-              [
-                "pending",
-                "processing",
-                "delivery",
-                "completed",
-                "rejected"
-              ]
-              .map(x=>`
 
-                <option
-                  value="${x}"
-                  ${status===x?"selected":""}>
+<td>
 
-                  ${x}
+<span class="money">
 
-                </option>
+৳${money(o.total)}
 
-              `)
-              .join("")
-            }
+</span>
 
-          </select>
+</td>
 
-        </td>
 
+<td>
 
-        <td>
+<select
+class="status-select"
+onchange="
+updateOrderStatus(
+'${esc(id)}',
+this.value
+)
+">
 
-          <div class="table-actions">
+<option
+value="pending"
+${status==="pending"?"selected":""}>
+pending
+</option>
 
-            <button
-              class="view-btn"
-              onclick="showOrderDetail('${esc(id)}')">
+<option
+value="processing"
+${status==="processing"?"selected":""}>
+processing
+</option>
 
-              👁️ দেখুন
+<option
+value="delivery"
+${status==="delivery"?"selected":""}>
+delivery
+</option>
 
-            </button>
+<option
+value="completed"
+${status==="completed"?"selected":""}>
+completed
+</option>
 
+<option
+value="rejected"
+${status==="rejected"?"selected":""}>
+rejected
+</option>
 
-            <button
-              class="print-btn"
-              onclick="printOrder('${esc(id)}')">
+</select>
 
-              🖨️ Print
+</td>
 
-            </button>
 
+<td>
 
-            <button
-              class="delete-btn"
-              onclick="deleteOrder('${esc(id)}')">
+<div class="action-buttons">
 
-              🗑️ Delete
+<button
+class="view-btn"
+onclick="
+showOrderDetail(
+'${esc(id)}'
+)
+">
 
-            </button>
+👁️ দেখুন
 
-          </div>
+</button>
 
-        </td>
 
-      </tr>
+<button
+class="print-btn"
+onclick="
+printOrder(
+'${esc(id)}'
+)
+">
 
-    `;
+🖨️ Print
 
-  });
+</button>
 
 
-  box.innerHTML=`
+<button
+class="delete-btn"
+onclick="
+deleteOrder(
+'${esc(id)}'
+)
+">
 
-    <div class="table-wrap">
+🗑️ Delete
 
-      <table class="order-table">
+</button>
 
-        <thead>
+</div>
 
-          <tr>
+</td>
 
-            <th>#</th>
+</tr>
 
-            <th>Order ID</th>
+`;
 
-            <th>সময়</th>
+    }
+  );
 
-            <th>🏪 দোকান / ঠিকানা</th>
 
-            <th>📞 মোবাইল</th>
+  box.innerHTML = `
 
-            <th>👤 প্রতিনিধি</th>
+<div class="table-container">
 
-            <th>💰 মোট</th>
+<table class="order-table">
 
-            <th>📌 Status</th>
+<thead>
 
-            <th>⚙️ Action</th>
+<tr>
 
-          </tr>
+<th>#</th>
 
-        </thead>
+<th>Order ID</th>
 
-        <tbody>
+<th>সময়</th>
 
-          ${rows}
+<th>🏪 দোকান / ঠিকানা</th>
 
-        </tbody>
+<th>📞 মোবাইল</th>
 
-      </table>
+<th>👤 প্রতিনিধি</th>
 
-    </div>
+<th>💰 মোট</th>
 
-  `;
+<th>📌 Status</th>
+
+<th>⚙️ Action</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+${rows}
+
+</tbody>
+
+</table>
+
+</div>
+
+`;
 
 }
 
 
-/* =========================================================
+/* =========================================
    ORDER DETAIL
-========================================================= */
+========================================= */
 
 function showOrderDetail(id){
 
-  const order=
+  const order =
     allOrders.find(
-      o=>String(o.id)===String(id)
+      o =>
+      String(o.id) === String(id)
     );
 
 
@@ -1179,340 +1271,345 @@ function showOrderDetail(id){
   }
 
 
-  const products=
+  const products =
     productsOf(order);
 
 
-  let productRows="";
+  let productRows = "";
 
 
-  products.forEach((p,i)=>{
+  products.forEach(
+    (p,index)=>{
 
-    const q=
-      getProductQuantity(p);
+      const qty =
+        getQty(p);
 
-    const price=
-      getProductPrice(p);
+      const price =
+        getPrice(p);
 
-    const subtotal=
-      getProductSubtotal(p);
+      const subtotal =
+        getSubtotal(p);
 
 
-    productRows+=`
+      productRows += `
 
-      <tr>
+<tr>
 
-        <td>${i+1}</td>
+<td>${index + 1}</td>
 
-        <td>
-          ${esc(
-            p.name ||
-            p.product_name ||
-            "-"
-          )}
-        </td>
+<td>
+${esc(
+  p.name ||
+  p.product_name ||
+  "-"
+)}
+</td>
 
-        <td>
-          ${esc(
-            p.code ||
-            p.product_code ||
-            "-"
-          )}
-        </td>
+<td>
+${esc(
+  p.code ||
+  p.product_code ||
+  "-"
+)}
+</td>
 
-        <td>
-          ${esc(
-            p.pack ||
-            p.pack_size ||
-            "-"
-          )}
-        </td>
+<td>
+${esc(
+  p.pack ||
+  p.pack_size ||
+  "-"
+)}
+</td>
 
-        <td>
-          ${esc(q)}
-        </td>
+<td>
+${esc(qty)}
+</td>
 
-        <td>
-          ${esc(
-            p.bonus ||
-            0
-          )}
-        </td>
+<td>
+${esc(p.bonus || 0)}
+</td>
 
-        <td>
-          ${esc(
-            p.rate_type ||
-            p.rateType ||
-            "-"
-          )}
-        </td>
+<td>
+${esc(
+  p.rate_type ||
+  p.rateType ||
+  "-"
+)}
+</td>
 
-        <td>
-          ৳${money(price)}
-        </td>
+<td>
+৳${money(price)}
+</td>
 
-        <td>
-          ৳${money(subtotal)}
-        </td>
+<td>
+৳${money(subtotal)}
+</td>
 
-      </tr>
+</tr>
 
-    `;
+`;
 
-  });
+    }
+  );
 
 
   if(!productRows){
 
-    productRows=`
+    productRows = `
 
-      <tr>
+<tr>
 
-        <td
-          colspan="9"
-          style="text-align:center">
+<td
+colspan="9"
+style="text-align:center">
 
-          কোনো পণ্যের তথ্য পাওয়া যায়নি।
+কোনো পণ্যের তথ্য পাওয়া যায়নি।
 
-        </td>
+</td>
 
-      </tr>
+</tr>
 
-    `;
+`;
 
   }
 
 
-  const mobile=
-    String(order.mobile||"")
-    .replace(/[^0-9+]/g,"");
+  const mobile =
+    String(order.mobile || "")
+    .replace(
+      /[^0-9+]/g,
+      ""
+    );
 
 
   document.getElementById(
     "orderModalContent"
-  ).innerHTML=`
+  ).innerHTML = `
 
-    <div class="order-detail">
+<div class="order-detail">
 
 
-      <div class="order-detail-head">
+<div class="detail-info">
 
-        <h3>
-          📦 অর্ডার #${esc(order.id)}
-        </h3>
 
-        <span class="badge ${esc(order.status||"pending")}">
-          ${esc(order.status||"pending")}
-        </span>
+<div>
+<b>অর্ডার ID:</b><br>
+${esc(order.id)}
+</div>
 
-      </div>
 
+<div>
+<b>সময়:</b><br>
+${dateText(order.created_at)}
+</div>
 
-      <div class="info-grid">
 
+<div>
+<b>অর্ডার তারিখ:</b><br>
+${dateText(order.order_date)}
+</div>
 
-        <div class="info-box">
 
-          <b>অর্ডার ID:</b><br>
-          ${esc(order.id)}
+<div>
+<b>ডেলিভারি:</b><br>
+${dateText(order.delivery_date)}
+</div>
 
-        </div>
 
+<div>
+<b>🏪 দোকান:</b><br>
+${esc(order.shop || "-")}
+</div>
 
-        <div class="info-box">
 
-          <b>অর্ডার তৈরি:</b><br>
-          ${dateText(order.created_at)}
+<div>
+<b>📍 ঠিকানা:</b><br>
+${esc(order.address || "-")}
+</div>
 
-        </div>
 
+<div>
+<b>📞 মোবাইল:</b><br>
 
-        <div class="info-box">
+${
+  mobile
+  ?
+  `
+  <a
+    class="phone-link"
+    href="tel:${esc(mobile)}">
 
-          <b>অর্ডার তারিখ:</b><br>
-          ${dateText(order.order_date)}
+    ${esc(order.mobile)}
 
-        </div>
+  </a>
+  `
+  :
+  "-"
+}
 
+</div>
 
-        <div class="info-box">
 
-          <b>ডেলিভারি তারিখ:</b><br>
-          ${dateText(order.delivery_date)}
+<div>
+<b>👤 প্রতিনিধি:</b><br>
+${esc(order.representative || "-")}
+</div>
 
-        </div>
 
+<div>
+<b>📌 Status:</b><br>
 
-        <div class="info-box">
+<select
+class="status-select"
+style="margin-top:5px"
+onchange="
+updateOrderStatus(
+'${esc(order.id)}',
+this.value
+)
+">
 
-          <b>🏪 দোকান:</b><br>
-          ${esc(order.shop||"-")}
+<option
+value="pending"
+${order.status==="pending"?"selected":""}>
+pending
+</option>
 
-        </div>
+<option
+value="processing"
+${order.status==="processing"?"selected":""}>
+processing
+</option>
 
+<option
+value="delivery"
+${order.status==="delivery"?"selected":""}>
+delivery
+</option>
 
-        <div class="info-box">
+<option
+value="completed"
+${order.status==="completed"?"selected":""}>
+completed
+</option>
 
-          <b>📍 ঠিকানা:</b><br>
-          ${esc(order.address||"-")}
+<option
+value="rejected"
+${order.status==="rejected"?"selected":""}>
+rejected
+</option>
 
-        </div>
+</select>
 
+</div>
 
-        <div class="info-box">
 
-          <b>📞 মোবাইল:</b><br>
+</div>
 
-          ${
-            mobile
-            ?
-            `<a
-              class="mobile-link"
-              href="tel:${esc(mobile)}">
 
-              ${esc(order.mobile)}
+<h3>
+🛒 পণ্যসমূহ
+</h3>
 
-            </a>`
-            :
-            "-"
-          }
 
-        </div>
+<div class="product-table-wrap">
 
+<table class="product-table">
 
-        <div class="info-box">
+<thead>
 
-          <b>👤 প্রতিনিধি:</b><br>
-          ${esc(order.representative||"-")}
+<tr>
 
-        </div>
+<th>#</th>
 
+<th>Product</th>
 
-      </div>
+<th>Code</th>
 
+<th>Pack</th>
 
-      <h3>🛒 পণ্যসমূহ</h3>
+<th>Qty</th>
 
+<th>Bonus</th>
 
-      <div class="product-table-wrap">
+<th>Rate Type</th>
 
-        <table class="product-table">
+<th>Rate</th>
 
-          <thead>
+<th>মোট</th>
 
-            <tr>
+</tr>
 
-              <th>#</th>
-              <th>Product</th>
-              <th>Code</th>
-              <th>Pack</th>
-              <th>Qty</th>
-              <th>Bonus</th>
-              <th>Rate Type</th>
-              <th>Rate</th>
-              <th>মোট</th>
+</thead>
 
-            </tr>
 
-          </thead>
+<tbody>
 
-          <tbody>
+${productRows}
 
-            ${productRows}
+</tbody>
 
-          </tbody>
+</table>
 
-        </table>
+</div>
 
-      </div>
 
+<div class="order-total">
 
-      <div class="order-total">
+মোট অর্ডার:
+৳${money(order.total)}
 
-        মোট অর্ডার:
-        ৳${money(order.total)}
+</div>
 
-      </div>
 
+${
+  order.note
+  ?
+  `
+  <div class="note-box">
 
-      ${
-        order.note
-        ?
-        `
-        <div class="note-box">
+  <b>📝 মন্তব্য:</b><br>
 
-          <b>📝 মন্তব্য:</b><br>
+  ${esc(order.note)}
 
-          ${esc(order.note)}
+  </div>
+  `
+  :
+  ""
+}
 
-        </div>
-        `
-        :
-        ""
-      }
 
+<button
+class="print-btn"
+style="width:100%;margin-top:12px"
+onclick="
+printOrder(
+'${esc(order.id)}'
+)
+">
 
-      <div style="margin-top:15px">
+🖨️ মেমো প্রিন্ট
 
-        <label>
-          <b>📌 Status</b>
-        </label>
+</button>
 
-        <select
-          class="status-select"
-          style="width:100%;margin-top:6px"
-          onchange="updateOrderStatus('${esc(order.id)}',this.value)">
 
-          ${
-            [
-              "pending",
-              "processing",
-              "delivery",
-              "completed",
-              "rejected"
-            ]
-            .map(x=>`
+<button
+class="delete-btn"
+style="width:100%;margin-top:8px"
+onclick="
+deleteOrder(
+'${esc(order.id)}'
+)
+">
 
-              <option
-                value="${x}"
-                ${order.status===x?"selected":""}>
+🗑️ অর্ডার Delete
 
-                ${x}
+</button>
 
-              </option>
 
-            `)
-            .join("")
-          }
+</div>
 
-        </select>
-
-      </div>
-
-
-      <button
-        class="print-btn"
-        style="width:100%;margin-top:12px"
-        onclick="printOrder('${esc(order.id)}')">
-
-        🖨️ মেমো প্রিন্ট
-
-      </button>
-
-
-      <button
-        class="delete-btn"
-        style="width:100%;margin-top:8px"
-        onclick="deleteOrder('${esc(order.id)}')">
-
-        🗑️ অর্ডার Delete
-
-      </button>
-
-
-    </div>
-
-  `;
+`;
 
 
   document
@@ -1521,6 +1618,10 @@ function showOrderDetail(id){
 
 }
 
+
+/* =========================================
+   CLOSE MODAL
+========================================= */
 
 function closeOrderModal(){
 
@@ -1533,31 +1634,41 @@ function closeOrderModal(){
 
 document
   .getElementById("orderModal")
-  .addEventListener("click",function(e){
+  .addEventListener(
+    "click",
+    function(e){
 
-    if(e.target===this){
+      if(e.target === this){
 
-      closeOrderModal();
+        closeOrderModal();
+
+      }
 
     }
+  );
 
-  });
 
-
-/* =========================================================
+/* =========================================
    UPDATE ORDER STATUS
-========================================================= */
+========================================= */
 
-async function updateOrderStatus(id,status){
+async function updateOrderStatus(
+  id,
+  status
+){
 
   const {
     error
-  }=
+  } =
   await supabaseClient
     .from("orders")
     .update({
-      status,
-      updated_at:new Date().toISOString()
+
+      status:status,
+
+      updated_at:
+        new Date().toISOString()
+
     })
     .eq("id",id);
 
@@ -1565,7 +1676,7 @@ async function updateOrderStatus(id,status){
   if(error){
 
     alert(
-      "Status পরিবর্তন করা যায়নি:\n\n"+
+      "Status পরিবর্তন করা যায়নি:\n\n" +
       error.message
     );
 
@@ -1574,40 +1685,48 @@ async function updateOrderStatus(id,status){
   }
 
 
-  const order=
+  const order =
     allOrders.find(
-      o=>String(o.id)===String(id)
+      o =>
+      String(o.id) === String(id)
     );
 
 
   if(order){
 
-    order.status=status;
+    order.status = status;
 
   }
 
 
-  renderOrdersTable();
+  renderOrders();
 
 
-  const modal=
-    document.getElementById("orderModal");
+  const modal =
+    document.getElementById(
+      "orderModal"
+    );
 
-  if(!modal.classList.contains("hidden")){
+
+  if(
+    !modal.classList.contains("hidden")
+  ){
 
     showOrderDetail(id);
 
   }
 
 
-  alert("Status পরিবর্তন হয়েছে।");
+  alert(
+    "Status পরিবর্তন হয়েছে।"
+  );
 
 }
 
 
-/* =========================================================
+/* =========================================
    DELETE ORDER
-========================================================= */
+========================================= */
 
 async function deleteOrder(id){
 
@@ -1624,7 +1743,7 @@ async function deleteOrder(id){
 
   const {
     error
-  }=
+  } =
   await supabaseClient
     .from("orders")
     .delete()
@@ -1634,7 +1753,7 @@ async function deleteOrder(id){
   if(error){
 
     alert(
-      "Delete করা যায়নি:\n\n"+
+      "Delete করা যায়নি:\n\n" +
       error.message
     );
 
@@ -1646,131 +1765,143 @@ async function deleteOrder(id){
   closeOrderModal();
 
 
-  alert("অর্ডার Delete হয়েছে।");
+  alert(
+    "অর্ডার Delete হয়েছে।"
+  );
 
 
-  loadOrders();
+  await loadOrders();
 
 }
 
 
-/* =========================================================
+/* =========================================
    PRINT ORDER
-========================================================= */
+========================================= */
 
 function printOrder(id){
 
-  const order=
+  const order =
     allOrders.find(
-      o=>String(o.id)===String(id)
+      o =>
+      String(o.id) === String(id)
     );
 
 
   if(!order){
 
-    alert("অর্ডার পাওয়া যায়নি।");
+    alert(
+      "অর্ডার পাওয়া যায়নি।"
+    );
 
     return;
 
   }
 
 
-  const products=
+  const products =
     productsOf(order);
 
 
-  let rows="";
+  let rows = "";
 
 
-  products.forEach((p,i)=>{
+  products.forEach(
+    (p,index)=>{
 
-    const q=
-      getProductQuantity(p);
+      const qty =
+        getQty(p);
 
-    const price=
-      getProductPrice(p);
+      const price =
+        getPrice(p);
 
-    const subtotal=
-      getProductSubtotal(p);
+      const subtotal =
+        getSubtotal(p);
 
 
-    rows+=`
+      rows += `
 
-      <tr>
+<tr>
 
-        <td>${i+1}</td>
+<td>${index + 1}</td>
 
-        <td>
-          ${esc(
-            p.name ||
-            p.product_name ||
-            "-"
-          )}
-        </td>
+<td>
+${esc(
+  p.name ||
+  p.product_name ||
+  "-"
+)}
+</td>
 
-        <td>
-          ${esc(
-            p.code ||
-            p.product_code ||
-            "-"
-          )}
-        </td>
+<td>
+${esc(
+  p.code ||
+  p.product_code ||
+  "-"
+)}
+</td>
 
-        <td>
-          ${esc(
-            p.pack ||
-            p.pack_size ||
-            "-"
-          )}
-        </td>
+<td>
+${esc(
+  p.pack ||
+  p.pack_size ||
+  "-"
+)}
+</td>
 
-        <td>${esc(q)}</td>
+<td>
+${esc(qty)}
+</td>
 
-        <td>
-          ${esc(p.bonus||0)}
-        </td>
+<td>
+${esc(p.bonus || 0)}
+</td>
 
-        <td>
-          ${esc(
-            p.rate_type ||
-            p.rateType ||
-            "-"
-          )}
-        </td>
+<td>
+${esc(
+  p.rate_type ||
+  p.rateType ||
+  "-"
+)}
+</td>
 
-        <td>
-          ৳${money(price)}
-        </td>
+<td>
+৳${money(price)}
+</td>
 
-        <td>
-          ৳${money(subtotal)}
-        </td>
+<td>
+৳${money(subtotal)}
+</td>
 
-      </tr>
+</tr>
 
-    `;
+`;
 
-  });
+    }
+  );
 
 
   if(!rows){
 
-    rows=`
+    rows = `
 
-      <tr>
+<tr>
 
-        <td colspan="9">
-          কোনো পণ্যের তথ্য পাওয়া যায়নি।
-        </td>
+<td colspan="9"
+style="text-align:center">
 
-      </tr>
+কোনো পণ্যের তথ্য পাওয়া যায়নি।
 
-    `;
+</td>
+
+</tr>
+
+`;
 
   }
 
 
-  const w=
+  const w =
     window.open(
       "",
       "_blank",
@@ -1780,7 +1911,9 @@ function printOrder(id){
 
   if(!w){
 
-    alert("Popup blocked হয়েছে।");
+    alert(
+      "Popup blocked হয়েছে। Browser-এর Popup Allow করুন।"
+    );
 
     return;
 
@@ -1799,81 +1932,142 @@ function printOrder(id){
 
 <title>অর্ডার মেমো</title>
 
+
 <style>
 
 body{
-  font-family:Arial,"Noto Sans Bengali",sans-serif;
-  padding:25px;
-  color:#111;
+
+font-family:
+Arial,
+"Noto Sans Bengali",
+sans-serif;
+
+padding:25px;
+
+color:#111;
+
 }
 
 .memo{
-  max-width:900px;
-  margin:auto;
+
+max-width:950px;
+
+margin:auto;
+
 }
 
 .company{
-  text-align:center;
-  border-bottom:2px solid #000;
-  padding-bottom:12px;
-  margin-bottom:18px;
+
+text-align:center;
+
+border-bottom:
+2px solid #000;
+
+padding-bottom:12px;
+
+margin-bottom:18px;
+
 }
 
 .company h1{
-  margin:0;
-  font-size:25px;
+
+margin:0;
+
+font-size:25px;
+
 }
 
 .company p{
-  margin:6px 0 0;
+
+margin:5px 0 0;
+
 }
 
+
 .info{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-bottom:18px;
+
+display:grid;
+
+grid-template-columns:
+1fr 1fr;
+
+gap:8px;
+
+margin-bottom:18px;
+
 }
 
 .info div{
-  border:1px solid #ddd;
-  padding:8px;
+
+border:1px solid #ddd;
+
+padding:8px;
+
+line-height:1.6;
+
 }
+
 
 table{
-  width:100%;
-  border-collapse:collapse;
+
+width:100%;
+
+border-collapse:collapse;
+
 }
 
+
 th{
-  background:#eee;
+
+background:#eee;
+
 }
+
 
 th,
 td{
-  border:1px solid #999;
-  padding:8px;
-  font-size:13px;
+
+border:
+1px solid #999;
+
+padding:8px;
+
+font-size:13px;
+
 }
+
 
 .total{
-  text-align:right;
-  font-weight:bold;
-  font-size:18px;
-  margin-top:18px;
+
+text-align:right;
+
+font-weight:bold;
+
+font-size:18px;
+
+margin-top:18px;
+
 }
 
+
 .note{
-  margin-top:15px;
-  border:1px solid #ddd;
-  padding:10px;
+
+margin-top:15px;
+
+border:1px solid #ddd;
+
+padding:10px;
+
 }
+
 
 @media print{
 
-  body{
-    padding:0;
-  }
+body{
+
+padding:0;
+
+}
 
 }
 
@@ -1881,9 +2075,11 @@ td{
 
 </head>
 
+
 <body>
 
 <div class="memo">
+
 
 <div class="company">
 
@@ -1922,22 +2118,22 @@ ${dateText(order.delivery_date)}
 
 <div>
 <b>দোকান:</b><br>
-${esc(order.shop||"-")}
+${esc(order.shop || "-")}
 </div>
 
 <div>
 <b>মোবাইল:</b><br>
-${esc(order.mobile||"-")}
+${esc(order.mobile || "-")}
 </div>
 
 <div>
 <b>ঠিকানা:</b><br>
-${esc(order.address||"-")}
+${esc(order.address || "-")}
 </div>
 
 <div>
 <b>প্রতিনিধি:</b><br>
-${esc(order.representative||"-")}
+${esc(order.representative || "-")}
 </div>
 
 </div>
@@ -1950,18 +2146,27 @@ ${esc(order.representative||"-")}
 <tr>
 
 <th>#</th>
+
 <th>Product</th>
+
 <th>Code</th>
+
 <th>Pack</th>
+
 <th>Qty</th>
+
 <th>Bonus</th>
+
 <th>Rate Type</th>
+
 <th>Rate</th>
+
 <th>মোট</th>
 
 </tr>
 
 </thead>
+
 
 <tbody>
 
@@ -2004,7 +2209,7 @@ ${
 
 window.onload=function(){
 
-  window.print();
+window.print();
 
 };
 
@@ -2023,55 +2228,63 @@ window.onload=function(){
 }
 
 
-/* =========================================================
-   USERS
-========================================================= */
+/* =========================================
+   LOAD USERS
+========================================= */
 
 async function loadUsers(){
 
-  const box=
-    document.getElementById("usersBox");
+  const box =
+    document.getElementById(
+      "usersBox"
+    );
 
 
-  box.innerHTML=
+  box.innerHTML =
     '<div class="loading">User লোড হচ্ছে...</div>';
 
 
   const {
     data,
     error
-  }=
+  } =
   await supabaseClient
     .rpc("get_pending_users");
 
 
   if(error){
 
-    box.innerHTML=`
+    box.innerHTML = `
 
-      <div class="card statusbox error">
+<div class="card statusbox error">
 
-        User লোড করা যায়নি:<br><br>
+User লোড করা যায়নি:
 
-        ${esc(error.message)}
+<br><br>
 
-      </div>
+${esc(error.message)}
 
-    `;
+</div>
+
+`;
 
     return;
 
   }
 
 
-  allUsers=data||[];
+  allUsers =
+    data || [];
 
 
   document
-    .getElementById("pendingCount")
-    .textContent=
+    .getElementById(
+      "pendingCount"
+    )
+    .textContent =
       allUsers.filter(
-        u=>u.status==="pending"
+        u =>
+        u.status === "pending"
       ).length;
 
 
@@ -2080,42 +2293,46 @@ async function loadUsers(){
 }
 
 
-/* =========================================================
+/* =========================================
    RENDER USERS
-========================================================= */
+========================================= */
 
 function renderUsers(){
 
-  const q=
-    (
-      document
-        .getElementById("userSearch")
-        .value||""
-    )
+  const input =
+    document.getElementById(
+      "userSearch"
+    );
+
+
+  const q =
+    (input.value || "")
     .toLowerCase()
     .trim();
 
 
-  const box=
-    document.getElementById("usersBox");
+  const box =
+    document.getElementById(
+      "usersBox"
+    );
 
 
-  const users=
+  const users =
     allUsers.filter(
-      u=>
-        (u.username||"")
-        .toLowerCase()
-        .includes(q)
-        ||
-        (u.email||"")
-        .toLowerCase()
-        .includes(q)
+      u =>
+      (u.username || "")
+      .toLowerCase()
+      .includes(q)
+      ||
+      (u.email || "")
+      .toLowerCase()
+      .includes(q)
     );
 
 
   if(!users.length){
 
-    box.innerHTML=
+    box.innerHTML =
       '<div class="card loading">কোনো User পাওয়া যায়নি।</div>';
 
     return;
@@ -2123,203 +2340,239 @@ function renderUsers(){
   }
 
 
-  box.innerHTML="";
+  box.innerHTML = "";
 
 
-  users.forEach(u=>{
+  users.forEach(
+    u=>{
 
-    const status=
-      u.status||"pending";
+      const status =
+        u.status || "pending";
 
-    const role=
-      u.role||"user";
 
+      const role =
+        u.role || "user";
 
-    const div=
-      document.createElement("div");
 
+      const div =
+        document.createElement(
+          "div"
+        );
 
-    div.className="user-card";
 
+      div.className =
+        "user-card";
 
-    div.innerHTML=`
 
-      <h3>
-        👤 ${esc(u.username||"-")}
-      </h3>
+      div.innerHTML = `
 
+<h3>
+👤 ${esc(u.username || "-")}
+</h3>
 
-      <div class="muted">
 
-        ${esc(u.email||"-")}
+<div class="muted">
 
-        <br>
+${esc(u.email || "-")}
 
-        তৈরি:
-        ${dateText(u.created_at)}
+<br>
 
-      </div>
+তৈরি:
+${dateText(u.created_at)}
 
+</div>
 
-      <div
-        class="user-grid"
-        style="margin-top:12px">
 
+<div
+class="user-grid"
+style="margin-top:12px">
 
-        <div>
 
-          <label>
-            Username
-          </label>
+<div>
 
-          <input
-            id="name_${u.id}"
-            value="${esc(u.username||"")}"
-          >
+<label>
+Username
+</label>
 
-        </div>
+<input
+id="name_${u.id}"
+value="${esc(u.username || "")}"
+>
 
+</div>
 
-        <div>
 
-          <label>
-            Role
-          </label>
+<div>
 
-          <select id="role_${u.id}">
+<label>
+Role
+</label>
 
-            <option
-              value="user"
-              ${role==="user"?"selected":""}>
-              user
-            </option>
+<select
+id="role_${u.id}">
 
-            <option
-              value="admin"
-              ${role==="admin"?"selected":""}>
-              admin
-            </option>
+<option
+value="user"
+${role==="user"?"selected":""}>
 
-          </select>
+user
 
-        </div>
+</option>
 
+<option
+value="admin"
+${role==="admin"?"selected":""}>
 
-        <div>
+admin
 
-          <label>
-            Status
-          </label>
+</option>
 
-          <select id="status_${u.id}">
+</select>
 
-            <option
-              value="pending"
-              ${status==="pending"?"selected":""}>
-              pending
-            </option>
+</div>
 
-            <option
-              value="approved"
-              ${status==="approved"?"selected":""}>
-              approved
-            </option>
 
-            <option
-              value="rejected"
-              ${status==="rejected"?"selected":""}>
-              rejected
-            </option>
+<div>
 
-            <option
-              value="inactive"
-              ${status==="inactive"?"selected":""}>
-              inactive
-            </option>
+<label>
+Status
+</label>
 
-          </select>
+<select
+id="status_${u.id}">
 
-        </div>
+<option
+value="pending"
+${status==="pending"?"selected":""}>
 
+pending
 
-        <div>
+</option>
 
-          <label>
-            Current
-          </label>
+<option
+value="approved"
+${status==="approved"?"selected":""}>
 
-          <div style="padding:10px 0">
+approved
 
-            <span class="badge ${status}">
+</option>
 
-              ${esc(status)}
+<option
+value="rejected"
+${status==="rejected"?"selected":""}>
 
-            </span>
+rejected
 
-          </div>
+</option>
 
-        </div>
+<option
+value="inactive"
+${status==="inactive"?"selected":""}>
 
+inactive
 
-      </div>
+</option>
 
+</select>
 
-      <div class="user-actions">
+</div>
 
-        <button
-          class="save"
-          onclick="saveUser('${u.id}',this)">
 
-          💾 Save Changes
+<div>
 
-        </button>
+<label>
+Current
+</label>
 
+<div style="padding:10px 0">
 
-        <button
-          class="reject"
-          onclick="quickReject('${u.id}',this)">
+<span class="badge ${esc(status)}">
 
-          ❌ Reject
+${esc(status)}
 
-        </button>
+</span>
 
-      </div>
+</div>
 
-    `;
+</div>
 
 
-    box.appendChild(div);
+</div>
 
-  });
+
+<div class="user-actions">
+
+<button
+class="save"
+onclick="
+saveUser(
+'${u.id}',
+this
+)
+">
+
+💾 Save Changes
+
+</button>
+
+
+<button
+class="reject"
+onclick="
+quickReject(
+'${u.id}',
+this
+)
+">
+
+❌ Reject
+
+</button>
+
+</div>
+
+`;
+
+
+      box.appendChild(div);
+
+    }
+  );
 
 }
 
 
-/* =========================================================
+/* =========================================
    SAVE USER
-========================================================= */
+========================================= */
 
 async function saveUser(id,btn){
 
-  btn.disabled=true;
+  btn.disabled = true;
 
 
-  const username=
+  const username =
     document
-      .getElementById("name_"+id)
+      .getElementById(
+        "name_" + id
+      )
       .value
       .trim();
 
 
-  const role=
+  const role =
     document
-      .getElementById("role_"+id)
+      .getElementById(
+        "role_" + id
+      )
       .value;
 
 
-  const status=
+  const status =
     document
-      .getElementById("status_"+id)
+      .getElementById(
+        "status_" + id
+      )
       .value;
 
 
@@ -2330,7 +2583,7 @@ async function saveUser(id,btn){
       "error"
     );
 
-    btn.disabled=false;
+    btn.disabled = false;
 
     return;
 
@@ -2339,7 +2592,7 @@ async function saveUser(id,btn){
 
   const {
     error
-  }=
+  } =
   await supabaseClient
     .from("profiles")
     .update({
@@ -2353,12 +2606,12 @@ async function saveUser(id,btn){
   if(error){
 
     showUserMessage(
-      "Update করা যায়নি: "+
+      "Update করা যায়নি: " +
       error.message,
       "error"
     );
 
-    btn.disabled=false;
+    btn.disabled = false;
 
     return;
 
@@ -2376,9 +2629,9 @@ async function saveUser(id,btn){
 }
 
 
-/* =========================================================
+/* =========================================
    QUICK REJECT
-========================================================= */
+========================================= */
 
 async function quickReject(id,btn){
 
@@ -2393,12 +2646,12 @@ async function quickReject(id,btn){
   }
 
 
-  btn.disabled=true;
+  btn.disabled = true;
 
 
   const {
     error
-  }=
+  } =
   await supabaseClient
     .rpc(
       "reject_user",
@@ -2411,12 +2664,12 @@ async function quickReject(id,btn){
   if(error){
 
     showUserMessage(
-      "Reject করা যায়নি: "+
+      "Reject করা যায়নি: " +
       error.message,
       "error"
     );
 
-    btn.disabled=false;
+    btn.disabled = false;
 
     return;
 
@@ -2434,23 +2687,28 @@ async function quickReject(id,btn){
 }
 
 
-/* =========================================================
+/* =========================================
    USER MESSAGE
-========================================================= */
+========================================= */
 
-function showUserMessage(text,type){
+function showUserMessage(
+  text,
+  type
+){
 
-  const b=
-    document.getElementById("userMessage");
+  const b =
+    document.getElementById(
+      "userMessage"
+    );
 
 
-  b.textContent=text;
+  b.textContent = text;
 
 
-  b.className=
-    "statusbox "+
+  b.className =
+    "statusbox " +
     (
-      type==="success"
+      type === "success"
       ?
       "success"
       :
@@ -2458,18 +2716,24 @@ function showUserMessage(text,type){
     );
 
 
-  b.classList.remove("hidden");
+  b.classList.remove(
+    "hidden"
+  );
 
 }
 
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
+/* =========================================
+   START
+========================================= */
 
 async function initialize(){
 
-  if(await checkAdmin()){
+  const ok =
+    await checkAdmin();
+
+
+  if(ok){
 
     showOrders();
 

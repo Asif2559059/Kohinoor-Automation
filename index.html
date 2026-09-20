@@ -11,7 +11,7 @@
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
-<title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
+<title>Kohinur Chemical Order Automation</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -88,8 +88,8 @@ textarea{min-height:75px;resize:vertical}
 
 <header class="header">
   <div class="header-title">
-    <strong>কহিনুর কেমিক্যাল পিএলসি</strong>
-    <small>অর্ডার অটোমেশন</small>
+    <strong>Kohinur Chemical PLC</strong>
+    <small>Order Automation</small>
   </div>
   <button class="icon-btn" onclick="openNotifications()">🔔</button>
   <button class="icon-btn" onclick="adminLogout()">🚪</button>
@@ -99,7 +99,7 @@ textarea{min-height:75px;resize:vertical}
   <section class="card" onclick="openProfileModal()" style="cursor:pointer">
     <div class="profile">
       <div class="avatar" id="profileAvatar">A</div>
-      <div><strong id="profileName">লোড হচ্ছে...</strong></div>
+      <div><strong id="profileName">Loading...</strong></div>
     </div>
   </section>
 
@@ -109,15 +109,15 @@ textarea{min-height:75px;resize:vertical}
       <div class="stat"><b id="dashItems">0</b><span>Items</span></div>
       <div class="stat"><b id="dashOrders">0</b><span>Sent Orders</span></div>
     </div>
-    <div class="small" style="margin-top:10px;text-align:center">মোট অর্ডার মূল্য: <b id="dashTotal">৳0.00</b></div>
+    <div class="small" style="margin-top:10px;text-align:center">Total Order Value: <b id="dashTotal">৳0.00</b></div>
   </section>
 
   <section class="card">
-    <h3 style="margin-top:0">⚡ দ্রুত কাজ</h3>
+    <h3 style="margin-top:0">🌿Menu</h3>
     <div class="grid">
-      <button class="btn btn-primary" onclick="openOrderModal()">➕ নতুন অর্ডার</button>
+      <button class="btn btn-primary" onclick="openOrderModal()">➕ New Order</button>
       <button class="btn btn-warning" onclick="openHistory()">📝 Draft / History</button>
-      <button class="btn btn-light" onclick="focusProductSearch()">🔎 Product খুঁজুন</button>
+      <button class="btn btn-light" onclick="focusProductSearch()">🔎 Product Search</button>
       <button class="btn btn-light" onclick="openProductManager()">📦 Products</button>
       <button class="btn btn-light" onclick="openMarketShopManager()">📍 Market / Shop</button>
     </div>
@@ -145,7 +145,7 @@ textarea{min-height:75px;resize:vertical}
 <!-- ORDER MODAL -->
 <div class="modal" id="orderModal">
   <div class="modal-box">
-    <div class="modal-head"><h3 id="orderModalTitle">➕ নতুন অর্ডার</h3><button class="close" onclick="closeModal('orderModal')">✕</button></div>
+    <div class="modal-head"><h3 id="orderModalTitle">➕ New Order</h3><button class="close" onclick="closeModal('orderModal')">✕</button></div>
     <div class="small" style="margin-bottom:10px">প্রথমে <b>Save Draft</b> করুন। Save করলে অনলাইনে যাবে না। পরে Draft খুলে Product যোগ/পরিবর্তন করে আবার Save করে <b>Send Order</b> চাপলে অনলাইনে যাবে।</div>
     <div class="form-grid">
       <div class="field"><label>মার্কেট</label><select id="marketSelect" onchange="filterShopList(true)"><option value="">-- মার্কেট নির্বাচন করুন --</option></select></div>

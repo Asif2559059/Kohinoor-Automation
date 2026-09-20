@@ -27,10 +27,10 @@
     .signup-box {
       width: 100%;
       max-width: 420px;
-      background: #ffffff;
+      background: #fff;
       padding: 30px 25px;
       border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
     }
 
     h2 {
@@ -67,7 +67,7 @@
 
     input:focus {
       border-color: #0b6b45;
-      box-shadow: 0 0 0 2px rgba(11, 107, 69, 0.10);
+      box-shadow: 0 0 0 2px rgba(11,107,69,.10);
     }
 
     button {
@@ -88,7 +88,7 @@
     }
 
     button:disabled {
-      opacity: 0.6;
+      opacity: .6;
       cursor: not-allowed;
     }
 
@@ -143,528 +143,568 @@
 
 <body>
 
-  <div class="signup-box">
+<div class="signup-box">
 
-    <h2>🔐 নতুন User Account</h2>
+  <h2>🔐 নতুন User Account</h2>
 
-    <p class="subtitle">
-      Kohinoor Automation-এ আপনার Account তৈরি করুন
-    </p>
+  <p class="subtitle">
+    Kohinoor Automation-এ আপনার Account তৈরি করুন
+  </p>
 
-    <form id="signupForm">
+  <form id="signupForm">
 
-      <label for="username">User ID</label>
+    <label for="username">
+      User ID
+    </label>
 
-      <input
-        type="text"
-        id="username"
-        placeholder="যেমন: asif123"
-        autocomplete="username"
-        minlength="3"
-        maxlength="30"
-        required
-      >
+    <input
+      type="text"
+      id="username"
+      placeholder="যেমন: asif123"
+      autocomplete="username"
+      minlength="3"
+      maxlength="30"
+      required
+    >
 
-      <div class="hint">
-        ৩–৩০ অক্ষর | English অক্ষর, সংখ্যা, . _ - ব্যবহার করুন
-      </div>
-
-
-      <label for="email">Email</label>
-
-      <input
-        type="email"
-        id="email"
-        placeholder="আপনার Email"
-        autocomplete="email"
-        required
-      >
-
-
-      <label for="password">Password</label>
-
-      <input
-        type="password"
-        id="password"
-        placeholder="কমপক্ষে ৬ অক্ষর"
-        autocomplete="new-password"
-        minlength="6"
-        required
-      >
-
-
-      <label for="confirmPassword">
-        Confirm Password
-      </label>
-
-      <input
-        type="password"
-        id="confirmPassword"
-        placeholder="Password আবার লিখুন"
-        autocomplete="new-password"
-        minlength="6"
-        required
-      >
-
-
-      <button type="submit" id="signupButton">
-        Sign Up
-      </button>
-
-      <div id="message" role="alert"></div>
-
-    </form>
-
-
-    <div class="login-link">
-      আগে থেকেই Account আছে?
-      <a href="signin.html">Login করুন</a>
+    <div class="hint">
+      ৩–৩০ অক্ষর | English অক্ষর, সংখ্যা, . _ - ব্যবহার করুন
     </div>
 
+
+    <label for="email">
+      Email
+    </label>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="আপনার Email"
+      autocomplete="email"
+      required
+    >
+
+
+    <label for="password">
+      Password
+    </label>
+
+    <input
+      type="password"
+      id="password"
+      placeholder="কমপক্ষে ৬ অক্ষর"
+      autocomplete="new-password"
+      minlength="6"
+      required
+    >
+
+
+    <label for="confirmPassword">
+      Confirm Password
+    </label>
+
+    <input
+      type="password"
+      id="confirmPassword"
+      placeholder="Password আবার লিখুন"
+      autocomplete="new-password"
+      minlength="6"
+      required
+    >
+
+
+    <button
+      type="submit"
+      id="signupButton"
+    >
+      Sign Up
+    </button>
+
+
+    <div
+      id="message"
+      role="alert"
+    ></div>
+
+  </form>
+
+
+  <div class="login-link">
+    আগে থেকেই Account আছে?
+    <a href="signin.html">
+      Login করুন
+    </a>
   </div>
 
-
-  <script>
-    /* =========================================
-       SUPABASE CONFIG
-    ========================================= */
-
-    const SUPABASE_URL =
-      "https://utzkpsohkoiawvuupgeb.supabase.co";
-
-    const SUPABASE_ANON_KEY =
-      "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
+</div>
 
 
-    /* =========================================
-       EMAIL REDIRECT URL
-    ========================================= */
+<script>
 
-    const EMAIL_REDIRECT_URL =
-      "https://asif2559059.github.io/Kohinoor-Automation/signin.html";
+/* =====================================================
+   SUPABASE CONFIG
+===================================================== */
+
+const SUPABASE_URL =
+  "https://utzkpsohkoiawvuupgeb.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 
 
-    /* =========================================
-       SUPABASE CLIENT
-    ========================================= */
+/* =====================================================
+   EMAIL REDIRECT URL
+===================================================== */
 
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        {
-          auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: true
-          }
-        }
+const EMAIL_REDIRECT_URL =
+  "https://asif2559059.github.io/Kohinoor-Automation/signin.html";
+
+
+/* =====================================================
+   SUPABASE CLIENT
+===================================================== */
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    }
+  );
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const form =
+  document.getElementById("signupForm");
+
+const usernameInput =
+  document.getElementById("username");
+
+const emailInput =
+  document.getElementById("email");
+
+const passwordInput =
+  document.getElementById("password");
+
+const confirmPasswordInput =
+  document.getElementById("confirmPassword");
+
+const signupButton =
+  document.getElementById("signupButton");
+
+const message =
+  document.getElementById("message");
+
+
+/* =====================================================
+   SHOW MESSAGE
+===================================================== */
+
+function showMessage(text, type) {
+
+  message.textContent = text;
+  message.className = type;
+  message.style.display = "block";
+
+}
+
+
+/* =====================================================
+   HIDE MESSAGE
+===================================================== */
+
+function hideMessage() {
+
+  message.textContent = "";
+  message.className = "";
+  message.style.display = "none";
+
+}
+
+
+/* =====================================================
+   ERROR TRANSLATION
+===================================================== */
+
+function translateError(errorMessage) {
+
+  const text =
+    String(errorMessage || "").toLowerCase();
+
+
+  if (
+    text.includes("user already registered") ||
+    text.includes("already registered")
+  ) {
+    return "এই Email দিয়ে আগে থেকেই Account আছে। Login করুন।";
+  }
+
+
+  if (
+    text.includes("email rate limit") ||
+    text.includes("rate limit")
+  ) {
+    return "অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
+  }
+
+
+  if (
+    text.includes("password should be at least") ||
+    text.includes("password must be at least") ||
+    text.includes("password should contain")
+  ) {
+    return "Password আরও শক্তিশালী দিন।";
+  }
+
+
+  if (
+    text.includes("invalid email") ||
+    text.includes("unable to validate email")
+  ) {
+    return "সঠিক Email Address দিন।";
+  }
+
+
+  if (text.includes("email not confirmed")) {
+    return "আপনার Email এখনো Confirm করা হয়নি। Email Inbox চেক করুন।";
+  }
+
+
+  if (
+    text.includes("row-level security") ||
+    text.includes("permission denied")
+  ) {
+    return "Database Permission সমস্যার কারণে Account তৈরি করা যাচ্ছে না।";
+  }
+
+
+  if (
+    text.includes("duplicate") ||
+    text.includes("already exists")
+  ) {
+    return "এই তথ্য আগে থেকেই ব্যবহার করা হয়েছে।";
+  }
+
+
+  if (text.includes("network")) {
+    return "Internet Connection পরীক্ষা করে আবার চেষ্টা করুন।";
+  }
+
+
+  return (
+    errorMessage ||
+    "Account তৈরি করা যায়নি। আবার চেষ্টা করুন।"
+  );
+}
+
+
+/* =====================================================
+   SIGNUP
+===================================================== */
+
+form.addEventListener(
+  "submit",
+  async function(event) {
+
+    event.preventDefault();
+
+    hideMessage();
+
+
+    const username =
+      usernameInput.value.trim();
+
+    const email =
+      emailInput.value.trim().toLowerCase();
+
+    const password =
+      passwordInput.value;
+
+    const confirmPassword =
+      confirmPasswordInput.value;
+
+
+    /* =================================================
+       USERNAME VALIDATION
+    ================================================= */
+
+    if (username.length < 3) {
+
+      showMessage(
+        "User ID কমপক্ষে ৩ অক্ষরের হতে হবে।",
+        "error"
       );
 
+      usernameInput.focus();
 
-    /* =========================================
-       ELEMENTS
-    ========================================= */
-
-    const form =
-      document.getElementById("signupForm");
-
-    const usernameInput =
-      document.getElementById("username");
-
-    const emailInput =
-      document.getElementById("email");
-
-    const passwordInput =
-      document.getElementById("password");
-
-    const confirmPasswordInput =
-      document.getElementById("confirmPassword");
-
-    const signupButton =
-      document.getElementById("signupButton");
-
-    const message =
-      document.getElementById("message");
-
-
-    /* =========================================
-       SHOW MESSAGE
-    ========================================= */
-
-    function showMessage(text, type) {
-
-      message.textContent = text;
-      message.className = type;
-      message.style.display = "block";
-
+      return;
     }
 
 
-    /* =========================================
-       HIDE MESSAGE
-    ========================================= */
+    if (username.length > 30) {
 
-    function hideMessage() {
+      showMessage(
+        "User ID সর্বোচ্চ ৩০ অক্ষরের হতে হবে।",
+        "error"
+      );
 
-      message.textContent = "";
-      message.className = "";
-      message.style.display = "none";
+      usernameInput.focus();
 
+      return;
     }
 
 
-    /* =========================================
-       TRANSLATE SUPABASE ERROR
-    ========================================= */
+    if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
 
-    function translateError(errorMessage) {
+      showMessage(
+        "User ID-তে শুধু English অক্ষর, সংখ্যা, ., _ এবং - ব্যবহার করুন।",
+        "error"
+      );
 
-      const text =
-        String(errorMessage || "").toLowerCase();
+      usernameInput.focus();
 
-
-      if (
-        text.includes("user already registered") ||
-        text.includes("already registered")
-      ) {
-        return "এই Email দিয়ে আগে থেকেই Account আছে। Login করুন।";
-      }
-
-
-      if (
-        text.includes("email rate limit") ||
-        text.includes("rate limit")
-      ) {
-        return "অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
-      }
-
-
-      if (
-        text.includes("password should be at least") ||
-        text.includes("password must be at least") ||
-        text.includes("password should contain")
-      ) {
-        return "Password আরও শক্তিশালী দিন। কমপক্ষে ৬ অক্ষর ব্যবহার করুন।";
-      }
-
-
-      if (
-        text.includes("invalid email") ||
-        text.includes("unable to validate email")
-      ) {
-        return "সঠিক Email Address দিন।";
-      }
-
-
-      if (text.includes("email not confirmed")) {
-        return "আপনার Email এখনো Confirm করা হয়নি। Email Inbox চেক করুন।";
-      }
-
-
-      if (
-        text.includes("row-level security") ||
-        text.includes("permission denied")
-      ) {
-        return "Database Permission সমস্যার কারণে Account তৈরি করা যাচ্ছে না।";
-      }
-
-
-      if (
-        text.includes("duplicate") ||
-        text.includes("already exists")
-      ) {
-        return "এই তথ্য আগে থেকেই ব্যবহার করা হয়েছে।";
-      }
-
-
-      if (text.includes("network")) {
-        return "Internet Connection পরীক্ষা করে আবার চেষ্টা করুন।";
-      }
-
-
-      return errorMessage ||
-        "Account তৈরি করা যায়নি। আবার চেষ্টা করুন।";
-
+      return;
     }
 
 
-    /* =========================================
-       SIGNUP FORM SUBMIT
-    ========================================= */
+    /* =================================================
+       EMAIL
+    ================================================= */
 
-    form.addEventListener(
-      "submit",
-      async function(event) {
+    if (!emailInput.checkValidity()) {
 
-        event.preventDefault();
+      showMessage(
+        "সঠিক Email Address দিন।",
+        "error"
+      );
 
-        hideMessage();
+      emailInput.focus();
 
+      return;
+    }
 
-        const username =
-          usernameInput.value.trim();
 
-        const email =
-          emailInput.value.trim().toLowerCase();
+    /* =================================================
+       PASSWORD
+    ================================================= */
 
-        const password =
-          passwordInput.value;
+    if (password.length < 6) {
 
-        const confirmPassword =
-          confirmPasswordInput.value;
+      showMessage(
+        "Password কমপক্ষে ৬ অক্ষরের হতে হবে।",
+        "error"
+      );
 
+      passwordInput.focus();
 
-        /* =====================================
-           USERNAME VALIDATION
-        ===================================== */
+      return;
+    }
 
-        if (username.length < 3) {
 
-          showMessage(
-            "User ID কমপক্ষে ৩ অক্ষরের হতে হবে।",
-            "error"
-          );
+    /* =================================================
+       CONFIRM PASSWORD
+    ================================================= */
 
-          usernameInput.focus();
+    if (password !== confirmPassword) {
 
-          return;
-        }
+      showMessage(
+        "Password এবং Confirm Password মিলছে না।",
+        "error"
+      );
 
+      confirmPasswordInput.focus();
 
-        if (username.length > 30) {
+      return;
+    }
 
-          showMessage(
-            "User ID সর্বোচ্চ ৩০ অক্ষরের হতে হবে।",
-            "error"
-          );
 
-          usernameInput.focus();
+    /* =================================================
+       LOADING
+    ================================================= */
 
-          return;
-        }
+    signupButton.disabled = true;
 
+    signupButton.textContent =
+      "Account তৈরি হচ্ছে...";
 
-        if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
 
-          showMessage(
-            "User ID-তে শুধু English অক্ষর, সংখ্যা, ., _ এবং - ব্যবহার করুন।",
-            "error"
-          );
+    try {
 
-          usernameInput.focus();
+      /* =================================================
+         CHECK USERNAME
+         
+         IMPORTANT:
+         এখানে profiles ব্যবহার হচ্ছে।
+         user_profiles আর ব্যবহার করা হচ্ছে না।
+      ================================================= */
 
-          return;
-        }
+      const {
+        data: existingUser,
+        error: usernameError
+      } =
+        await supabaseClient
+          .from("profiles")
+          .select("id")
+          .eq("username", username)
+          .maybeSingle();
 
 
-        /* =====================================
-           EMAIL VALIDATION
-        ===================================== */
+      if (usernameError) {
 
-        if (!emailInput.checkValidity()) {
+        console.error(
+          "Username Check Error:",
+          usernameError
+        );
 
-          showMessage(
-            "সঠিক Email Address দিন।",
-            "error"
-          );
+        throw new Error(
+          "User ID যাচাই করা যাচ্ছে না। Database Permission পরীক্ষা করুন।"
+        );
+      }
 
-          emailInput.focus();
 
-          return;
-        }
+      /* =================================================
+         USERNAME EXISTS
+      ================================================= */
 
+      if (existingUser) {
 
-        /* =====================================
-           PASSWORD VALIDATION
-        ===================================== */
+        showMessage(
+          "এই User ID আগে থেকেই ব্যবহার করা হয়েছে। অন্য User ID দিন।",
+          "error"
+        );
 
-        if (password.length < 6) {
+        return;
+      }
 
-          showMessage(
-            "Password কমপক্ষে ৬ অক্ষরের হতে হবে।",
-            "error"
-          );
 
-          passwordInput.focus();
+      /* =================================================
+         CREATE AUTH USER
+         
+         Database Trigger automatically profile তৈরি করবে।
+      ================================================= */
 
-          return;
-        }
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth.signUp({
 
+          email: email,
 
-        /* =====================================
-           CONFIRM PASSWORD VALIDATION
-        ===================================== */
+          password: password,
 
-        if (password !== confirmPassword) {
+          options: {
 
-          showMessage(
-            "Password এবং Confirm Password মিলছে না।",
-            "error"
-          );
+            emailRedirectTo:
+              EMAIL_REDIRECT_URL,
 
-          confirmPasswordInput.focus();
+            data: {
 
-          return;
-        }
+              username: username,
 
-
-        /* =====================================
-           LOADING START
-        ===================================== */
-
-        signupButton.disabled = true;
-        signupButton.textContent =
-          "Account তৈরি হচ্ছে...";
-
-
-        try {
-
-          /* ===================================
-             CHECK USERNAME IN user_profiles
-          =================================== */
-
-          const {
-            data: existingUser,
-            error: usernameError
-          } = await supabaseClient
-            .from("user_profiles")
-            .select("id")
-            .eq("username", username)
-            .maybeSingle();
-
-
-          if (usernameError) {
-
-            console.error(
-              "Username Check Error:",
-              usernameError
-            );
-
-            throw new Error(
-              "User ID যাচাই করা যাচ্ছে না। Database Permission পরীক্ষা করুন।"
-            );
-
-          }
-
-
-          if (existingUser) {
-
-            showMessage(
-              "এই User ID আগে থেকেই ব্যবহার করা হয়েছে। অন্য User ID দিন।",
-              "error"
-            );
-
-            return;
-
-          }
-
-
-          /* ===================================
-             CREATE SUPABASE AUTH USER
-          =================================== */
-
-          const {
-            data,
-            error
-          } = await supabaseClient.auth.signUp({
-
-            email: email,
-
-            password: password,
-
-            options: {
-
-              emailRedirectTo:
-                EMAIL_REDIRECT_URL,
-
-              data: {
-
-                username: username,
-
-                role: "user"
-
-              }
+              role: "user"
 
             }
 
-          });
-
-
-          if (error) {
-
-            console.error(
-              "Supabase Auth Error:",
-              error
-            );
-
-            throw error;
-
           }
 
-
-          if (!data || !data.user) {
-
-            throw new Error(
-              "Supabase User তৈরি করতে পারেনি।"
-            );
-
-          }
+        });
 
 
-          console.log(
-            "New User ID:",
-            data.user.id
-          );
+      /* =================================================
+         AUTH ERROR
+      ================================================= */
+
+      if (error) {
+
+        console.error(
+          "Supabase Auth Error:",
+          error
+        );
+
+        throw error;
+      }
 
 
-          /* ===================================
-             SIGNUP SUCCESS
-          =================================== */
+      /* =================================================
+         CHECK USER
+      ================================================= */
 
-          showMessage(
-            "✅ Account সফলভাবে তৈরি হয়েছে। আপনার Email Inbox থেকে Email Confirm করুন। এরপর Admin Approval-এর জন্য অপেক্ষা করুন।",
-            "success"
-          );
+      if (!data || !data.user) {
 
-
-          form.reset();
-
-
-          /* ===================================
-             CLEAR SESSION IF CREATED
-          =================================== */
-
-          if (data.session) {
-
-            await supabaseClient.auth.signOut();
-
-          }
+        throw new Error(
+          "Supabase User তৈরি করতে পারেনি।"
+        );
+      }
 
 
-        } catch (error) {
+      console.log(
+        "New User ID:",
+        data.user.id
+      );
 
-          console.error(
-            "SIGNUP ERROR:",
-            error
-          );
 
-          showMessage(
-            "❌ " + translateError(error.message),
-            "error"
-          );
+      /* =================================================
+         SUCCESS
+      ================================================= */
 
-        } finally {
+      showMessage(
+        "✅ Account সফলভাবে তৈরি হয়েছে। আপনার Email Inbox থেকে Email Confirm করুন। এরপর Admin Approval-এর জন্য অপেক্ষা করুন।",
+        "success"
+      );
 
-          signupButton.disabled = false;
-          signupButton.textContent =
-            "Sign Up";
 
-        }
+      /* =================================================
+         RESET FORM
+      ================================================= */
+
+      form.reset();
+
+
+      /* =================================================
+         SIGN OUT IF SESSION EXISTS
+      ================================================= */
+
+      if (data.session) {
+
+        await supabaseClient.auth.signOut();
 
       }
-    );
-  </script>
+
+    } catch (error) {
+
+      console.error(
+        "SIGNUP ERROR:",
+        error
+      );
+
+      showMessage(
+        "❌ " +
+        translateError(error.message),
+        "error"
+      );
+
+    } finally {
+
+      signupButton.disabled = false;
+
+      signupButton.textContent =
+        "Sign Up";
+
+    }
+
+  }
+);
+
+</script>
 
 </body>
 </html>

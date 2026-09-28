@@ -49,6 +49,8 @@ button{cursor:pointer}
 .modal-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}.modal-head h3{flex:1;margin:0}
 .close{border:0;background:#eee;border-radius:9px;padding:8px 11px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.product-edit-panel{background:#fff;border:1px solid #dfe9e5;border-radius:12px;padding:10px;margin-bottom:12px}
+.product-edit-panel.editing{position:sticky;top:0;z-index:8;box-shadow:0 6px 18px #0002}
 .field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}
 .field label{font-size:12px;font-weight:700;color:#476157}
 .field input,.field select,.field textarea{border:1px solid #d8e2de;border-radius:10px;padding:10px;background:#fff}
@@ -180,6 +182,7 @@ textarea{min-height:75px;resize:vertical}
   <div class="modal-box">
     <div class="modal-head"><h3>📦 Product Manager</h3><button class="close" onclick="closeModal('productModal')">✕</button></div>
     <div class="small" style="margin-bottom:10px">এখানে <b>মূল রেট</b> হলো সাধারণ বিক্রির রেট, <b>Carton Rate</b> হলো কার্টন নিলে প্রযোজ্য রেট এবং <b>MRP</b> পণ্যের জন্য সংরক্ষিত থাকবে। অর্ডার পাঠানোর সময় MRP পাঠানো হবে না।</div>
+    <div id="productEditPanel" class="product-edit-panel">
     <div class="form-grid">
       <div class="field"><label>Code</label><input id="pCode" placeholder="03227"></div>
       <div class="field"><label>Pack</label><input id="pPack" placeholder="60"></div>
@@ -193,6 +196,7 @@ textarea{min-height:75px;resize:vertical}
     <div class="actions">
       <button class="btn btn-primary" onclick="saveProduct()">💾 Save Product</button>
       <button class="btn btn-light" onclick="closeModal('productModal')">Cancel</button>
+    </div>
     </div>
     <div id="productManagerList" style="margin-top:14px"></div>
   </div>
@@ -699,21 +703,27 @@ function showOrderDetail(index){
   openModal("detailModal");
 }
 
-function openProductManager(){editingProductId=null;clearProductForm();renderProductManagerList();openModal("productModal")}
+function openProductManager(){editingProductId=null;clearProductForm();document.getElementById("productEditPanel").classList.remove("editing");renderProductManagerList();openModal("productModal")}
 function clearProductForm(){["pCode","pName","pPack","pPrice","pCartonRate","pMrp","pTpRate","pStock"].forEach(id=>document.getElementById(id).value="")}
 
 function editProduct(id){
   const p=products.find(x=>String(x.id)===String(id));if(!p)return;
   editingProductId=id;
   document.getElementById("pCode").value=p.code||"";document.getElementById("pName").value=p.name||"";document.getElementById("pPack").value=p.pack||"";document.getElementById("pPrice").value=p.price||0;document.getElementById("pCartonRate").value=p.carton_rate||0;document.getElementById("pMrp").value=p.mrp||0;document.getElementById("pTpRate").value=p.tp_rate||0;document.getElementById("pStock").value=p.stock||0;
+
+  const modal=document.getElementById("productModal");
+  const panel=document.getElementById("productEditPanel");
+  panel.classList.add("editing");
   openModal("productModal");
-  setTimeout(()=>{
-    const modal=document.getElementById("productModal");
-    const box=modal.querySelector(".modal-box");
-    modal.scrollTop=0;
-    if(box) box.scrollTop=0;
-    document.getElementById("pCode").focus({preventScroll:true});
-  },50);
+
+  // Edit চাপলেই Edit box-কে modal-এর একদম উপরে নিয়ে যাবে।
+  requestAnimationFrame(()=>{
+    panel.scrollIntoView({behavior:"smooth",block:"start"});
+    setTimeout(()=>{
+      modal.scrollTop=0;
+      document.getElementById("pCode").focus({preventScroll:true});
+    },350);
+  });
 }
 
 async function saveProduct(){
@@ -723,7 +733,7 @@ async function saveProduct(){
   if(editingProductId)result=await supabaseClient.from("products").update(payload).eq("id",editingProductId);
   else result=await supabaseClient.from("products").insert(payload);
   if(result.error){alert("Product Save হয়নি:\n"+result.error.message+"\n\nProducts টেবিলে carton_rate কলাম আছে কিনা দেখুন।");return}
-  await loadProducts();renderProductManagerList();clearProductForm();editingProductId=null;showToast("✅ Product Save হয়েছে");
+  await loadProducts();renderProductManagerList();clearProductForm();editingProductId=null;document.getElementById("productEditPanel").classList.remove("editing");showToast("✅ Product Save হয়েছে");
 }
 
 async function deleteProduct(id){

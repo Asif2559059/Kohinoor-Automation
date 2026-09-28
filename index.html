@@ -358,7 +358,15 @@ function showToast(msg){
   showToast.t=setTimeout(()=>el.style.display="none",2500);
 }
 
-function openModal(id){document.getElementById(id).classList.add("show")}
+function openModal(id){
+  const el=document.getElementById(id);
+  el.classList.add("show");
+  setTimeout(()=>{
+    el.scrollTop=0;
+    const box=el.querySelector(".modal-box");
+    if(box) box.scrollTop=0;
+  },0);
+}
 function closeModal(id){document.getElementById(id).classList.remove("show")}
 function scrollTopPage(){window.scrollTo({top:0,behavior:"smooth"})}
 
@@ -699,6 +707,13 @@ function editProduct(id){
   editingProductId=id;
   document.getElementById("pCode").value=p.code||"";document.getElementById("pName").value=p.name||"";document.getElementById("pPack").value=p.pack||"";document.getElementById("pPrice").value=p.price||0;document.getElementById("pCartonRate").value=p.carton_rate||0;document.getElementById("pMrp").value=p.mrp||0;document.getElementById("pTpRate").value=p.tp_rate||0;document.getElementById("pStock").value=p.stock||0;
   openModal("productModal");
+  setTimeout(()=>{
+    const modal=document.getElementById("productModal");
+    const box=modal.querySelector(".modal-box");
+    modal.scrollTop=0;
+    if(box) box.scrollTop=0;
+    document.getElementById("pCode").focus({preventScroll:true});
+  },50);
 }
 
 async function saveProduct(){

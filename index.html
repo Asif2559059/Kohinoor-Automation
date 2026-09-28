@@ -191,12 +191,7 @@ textarea{min-height:75px;resize:vertical}
       <div class="field"><label>Carton Rate</label><input id="pCartonRate" type="number" step="0.01" placeholder="80"></div>
       <div class="field"><label>MRP</label><input id="pMrp" type="number" step="0.01" placeholder="100"></div>
       <div class="field"><label>TP Rate</label><input id="pTpRate" type="number" step="0.01" placeholder="TP Rate" oninput="autoCalculateMainRate()"></div>
-      <div class="field"><label>Offer / Free</label><select id="pOffer" onchange="autoCalculateMainRate()">
-        <option value="">-- Offer নির্বাচন করুন --</option>
-        <option value="9+1">9 + 1 Free</option>
-        <option value="10+1">10 + 1 Free</option>
-        <option value="12+1">12 + 1 Free</option>
-      </select><div class="small">TP Rate থাকলে Offer অনুযায়ী মূল রেট অটো হিসাব হবে।</div></div>
+      <div class="field"><label>Offer / Free</label><input id="pOffer" type="text" placeholder="যেমন: 5:1, 9:1, 10:1" oninput="autoCalculateMainRate()"><div class="small">যেমন 5:1 দিলে TP Rate × 5 ÷ 6 অনুযায়ী মূল রেট অটো হবে।</div></div>
       <div class="field"><label>Stock</label><input id="pStock" type="number" placeholder="100"></div>
     </div>
     <div class="actions">
@@ -733,10 +728,14 @@ function editProduct(id){
 }
 
 function getOfferFactor(offer){
-  if(offer==="9+1")return 9/10;
-  if(offer==="10+1")return 10/11;
-  if(offer==="12+1")return 12/13;
-  return 1;
+  const text=String(offer||"").trim();
+  if(!text)return 1;
+  const match=text.match(/^(\d+(?:\.\d+)?)\s*[:+\-]\s*(\d+(?:\.\d+)?)$/);
+  if(!match)return 1;
+  const buy=Number(match[1]);
+  const free=Number(match[2]);
+  if(buy<=0 || free<0)return 1;
+  return buy/(buy+free);
 }
 
 function autoCalculateMainRate(){

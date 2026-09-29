@@ -16,7 +16,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box
+}
 
 body{
   margin:0;
@@ -25,8 +27,13 @@ body{
   color:#18352a
 }
 
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
+button,input,select,textarea{
+  font:inherit
+}
+
+button{
+  cursor:pointer
+}
 
 .header{
   position:sticky;
@@ -41,9 +48,18 @@ button{cursor:pointer}
   box-shadow:0 2px 8px #0002
 }
 
-.header-title{flex:1}
-.header-title strong{display:block;font-size:16px}
-.header-title small{opacity:.85}
+.header-title{
+  flex:1
+}
+
+.header-title strong{
+  display:block;
+  font-size:16px
+}
+
+.header-title small{
+  opacity:.85
+}
 
 .icon-btn{
   border:0;
@@ -267,6 +283,17 @@ button{cursor:pointer}
   background:#eef9f4;
 }
 
+/* SERIAL */
+.order-table .serial-cell{
+  width:45px;
+  min-width:45px;
+  max-width:45px;
+  text-align:center !important;
+  font-weight:900;
+  color:#087f50;
+  font-size:13px;
+}
+
 .order-table .product-cell{
   text-align:left;
   white-space:normal;
@@ -311,12 +338,7 @@ button{cursor:pointer}
   color:#fff;
   border-radius:7px;
   padding:6px 8px;
-  font-weight:700;
-}
-
-.order-table .row-number{
-  font-weight:800;
-  color:#087f50;
+  font-weight:700
 }
 
 /* ========================================= */
@@ -346,7 +368,9 @@ button{cursor:pointer}
   overflow:auto
 }
 
-.modal.show{display:block}
+.modal.show{
+  display:block
+}
 
 .modal-box{
   max-width:720px;
@@ -656,6 +680,12 @@ textarea{
 
   .order-table td{
     padding:6px 5px
+  }
+
+  .order-table .serial-cell{
+    width:45px;
+    min-width:45px;
+    max-width:45px;
   }
 }
 
@@ -972,8 +1002,6 @@ textarea{
       ></div>
 
     </div>
-
-    <!-- SELECTED PRODUCTS TABLE -->
 
     <div id="orderItems" class="order-items"></div>
 
@@ -1528,23 +1556,14 @@ const LOCAL_PRODUCTS_KEY =
 ========================================= */
 
 let currentUser = null;
-
 let products = [];
-
 let orders = [];
-
 let draftOrders = [];
-
 let notifications = [];
-
 let currentOrderItems = [];
-
 let editingDraftId = null;
-
 let realtimeChannel = null;
-
 let pollingTimer = null;
-
 let editingProductId = null;
 
 
@@ -2512,6 +2531,7 @@ function addProductToOrder(p){
 
 /* =========================================
    NEW ORDER PRODUCT TABLE
+   SERIAL FIXED
 ========================================= */
 
 function renderOrderItems(){
@@ -2521,220 +2541,155 @@ function renderOrderItems(){
       "orderItems"
     );
 
+  const totalBox=
+    document.getElementById(
+      "orderTotal"
+    );
+
+  if(!box)return;
+
   if(!currentOrderItems.length){
 
     box.innerHTML=
       '<div class="empty">এখনো কোনো Product যোগ করা হয়নি</div>';
 
-    document
-      .getElementById("orderTotal")
-      .textContent=money(0);
+    if(totalBox)
+      totalBox.textContent=money(0);
 
     return;
   }
 
+  let grandTotal=0;
 
   const rows=
     currentOrderItems
-      .map(
-        (item,i)=>{
+      .map((item,index)=>{
 
-          const type=
-            item.rate_type||
-            "main";
+        const rateType=
+          item.rate_type==="carton"
+          ?
+          "carton"
+          :
+          "main";
 
-          const selectedRate=
-            type==="carton"
-            ?
-            Number(
-              item.carton_rate||0
-            )
-            :
-            Number(
-              item.price||0
-            );
+        const selectedRate=
+          rateType==="carton"
+          ?
+          Number(item.carton_rate||0)
+          :
+          Number(item.price||0);
 
-          const qty=
-            Math.max(
-              0,
-              Number(
-                item.quantity||0
-              )
-            );
+        const qty=
+          Math.max(
+            1,
+            Number(item.quantity||1)
+          );
 
-          const bonus=
-            Math.max(
-              0,
-              Number(
-                item.bonus||0
-              )
-            );
+        const bonus=
+          Math.max(
+            0,
+            Number(item.bonus||0)
+          );
 
-          const total=
-            selectedRate*qty;
+        const rowTotal=
+          selectedRate*qty;
 
+        grandTotal+=rowTotal;
 
-          return `
+        return `
+          <tr>
 
-            <tr>
+            <td class="serial-cell">
+              ${index + 1}
+            </td>
 
-              <!-- # -->
+            <td class="product-cell">
+              ${escapeHtml(item.name||"")}
+            </td>
 
-              <td>
-                <span class="row-number">
-                  ${i+1}
-                </span>
-              </td>
+            <td class="code-cell">
+              ${escapeHtml(item.code||"")}
+            </td>
 
+            <td class="pack-cell">
+              ${escapeHtml(item.pack||"")}
+            </td>
 
-              <!-- PRODUCT -->
+            <td class="price-cell">
+              ${money(
+                item.base_price ??
+                item.price ??
+                0
+              )}
+            </td>
 
-              <td class="product-cell">
-                ${escapeHtml(item.name||"")}
-              </td>
+            <td>
+              <input
+                type="number"
+                min="1"
+                value="${qty}"
+                onchange="changeItemQty(${index},this.value)"
+              >
+            </td>
 
+            <td>
+              <input
+                type="number"
+                min="0"
+                value="${bonus}"
+                onchange="changeItemBonus(${index},this.value)"
+              >
+            </td>
 
-              <!-- CODE -->
+            <td>
 
-              <td class="code-cell">
-                ${escapeHtml(item.code||"")}
-              </td>
+              <select
+                onchange="changeItemRateType(${index},this.value)"
+              >
 
-
-              <!-- PACK -->
-
-              <td class="pack-cell">
-                ${escapeHtml(item.pack||"")}
-              </td>
-
-
-              <!-- PRICE -->
-
-              <td class="price-cell">
-                ${money(
-                  item.base_price??
-                  item.price??
-                  0
-                )}
-              </td>
-
-
-              <!-- QTY -->
-
-              <td>
-
-                <input
-                  type="number"
-                  min="1"
-                  value="${qty||1}"
-                  onchange="
-                    changeItemQty(
-                      ${i},
-                      this.value
-                    )
-                  "
+                <option
+                  value="main"
+                  ${rateType==="main"?"selected":""}
                 >
+                  Main
+                </option>
 
-              </td>
-
-
-              <!-- BONUS -->
-
-              <td>
-
-                <input
-                  type="number"
-                  min="0"
-                  value="${bonus}"
-                  onchange="
-                    changeItemBonus(
-                      ${i},
-                      this.value
-                    )
-                  "
+                <option
+                  value="carton"
+                  ${rateType==="carton"?"selected":""}
                 >
+                  Carton
+                </option>
 
-              </td>
+              </select>
 
+            </td>
 
-              <!-- RATE TYPE -->
+            <td class="rate-cell">
+              ${money(selectedRate)}
+            </td>
 
-              <td>
+            <td class="total-cell">
+              ${money(rowTotal)}
+            </td>
 
-                <select
-                  onchange="
-                    changeItemRateType(
-                      ${i},
-                      this.value
-                    )
-                  "
-                >
+            <td>
 
-                  <option
-                    value="main"
-                    ${
-                      type==="main"
-                      ?"selected"
-                      :""
-                    }
-                  >
-                    Main
-                  </option>
+              <button
+                class="remove-btn"
+                onclick="removeOrderItem(${index})"
+                title="Remove Product"
+              >
+                ✕
+              </button>
 
-                  <option
-                    value="carton"
-                    ${
-                      type==="carton"
-                      ?"selected"
-                      :""
-                    }
-                  >
-                    Carton
-                  </option>
+            </td>
 
-                </select>
+          </tr>
+        `;
 
-              </td>
-
-
-              <!-- RATE -->
-
-              <td class="rate-cell">
-                ${money(selectedRate)}
-              </td>
-
-
-              <!-- TOTAL -->
-
-              <td class="total-cell">
-                ${money(total)}
-              </td>
-
-
-              <!-- REMOVE -->
-
-              <td>
-
-                <button
-                  class="remove-btn"
-                  onclick="
-                    removeOrderItem(${i})
-                  "
-                  title="Remove Product"
-                >
-                  ✕
-                </button>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      )
+      })
       .join("");
-
 
   box.innerHTML=`
 
@@ -2747,25 +2702,15 @@ function renderOrderItems(){
           <tr>
 
             <th>#</th>
-
             <th>Product</th>
-
             <th>Code</th>
-
             <th>Pack</th>
-
             <th>Price</th>
-
             <th>Qty</th>
-
             <th>Bonus</th>
-
             <th>Rate Type</th>
-
             <th>Rate</th>
-
             <th>Total</th>
-
             <th>✕</th>
 
           </tr>
@@ -2773,9 +2718,7 @@ function renderOrderItems(){
         </thead>
 
         <tbody>
-
           ${rows}
-
         </tbody>
 
       </table>
@@ -2784,44 +2727,9 @@ function renderOrderItems(){
 
   `;
 
-
-  const total=
-    currentOrderItems.reduce(
-      (sum,x)=>{
-
-        const rateType=
-          x.rate_type==="carton"
-          ?
-          "carton"
-          :
-          "main";
-
-        const rate=
-          rateType==="carton"
-          ?
-          Number(
-            x.carton_rate||0
-          )
-          :
-          Number(
-            x.price||0
-          );
-
-        return sum+
-          rate*
-          Number(
-            x.quantity||0
-          );
-
-      },
-      0
-    );
-
-
-  document
-    .getElementById("orderTotal")
-    .textContent=
-      money(total);
+  if(totalBox)
+    totalBox.textContent=
+      money(grandTotal);
 
 }
 
@@ -2838,13 +2746,12 @@ function changeItemRateType(
   if(!currentOrderItems[i])
     return;
 
-  currentOrderItems[i]
-    .rate_type=
-      type==="carton"
-      ?
-      "carton"
-      :
-      "main";
+  currentOrderItems[i].rate_type=
+    type==="carton"
+    ?
+    "carton"
+    :
+    "main";
 
   renderOrderItems();
 
@@ -2859,12 +2766,11 @@ function changeItemQty(
   if(!currentOrderItems[i])
     return;
 
-  currentOrderItems[i]
-    .quantity=
-      Math.max(
-        1,
-        Number(v||1)
-      );
+  currentOrderItems[i].quantity=
+    Math.max(
+      1,
+      Number(v||1)
+    );
 
   renderOrderItems();
 
@@ -2879,12 +2785,11 @@ function changeItemBonus(
   if(!currentOrderItems[i])
     return;
 
-  currentOrderItems[i]
-    .bonus=
-      Math.max(
-        0,
-        Number(v||0)
-      );
+  currentOrderItems[i].bonus=
+    Math.max(
+      0,
+      Number(v||0)
+    );
 
   renderOrderItems();
 
@@ -2892,6 +2797,12 @@ function changeItemBonus(
 
 
 function removeOrderItem(i){
+
+  if(
+    i<0||
+    i>=currentOrderItems.length
+  )
+    return;
 
   currentOrderItems.splice(
     i,
@@ -2930,7 +2841,6 @@ function getOrderFormData(){
 
     return null;
   }
-
 
   const productsForOrder=
     currentOrderItems.map(
@@ -3008,7 +2918,6 @@ function getOrderFormData(){
       }
     );
 
-
   const total=
     productsForOrder.reduce(
       (s,x)=>
@@ -3018,7 +2927,6 @@ function getOrderFormData(){
         ),
       0
     );
-
 
   return {
 
@@ -3159,7 +3067,6 @@ function openOrderModal(
     )
     .value="";
 
-
   if(draftId){
 
     const d=
@@ -3176,7 +3083,6 @@ function openOrderModal(
       return;
     }
 
-
     populateMarketSelect(
       d.market||""
     );
@@ -3188,7 +3094,6 @@ function openOrderModal(
         d.address||""
       )
     );
-
 
     document.getElementById(
       "shop"
@@ -3225,7 +3130,6 @@ function openOrderModal(
       "note"
     ).value=
       d.note||"";
-
 
     currentOrderItems=
       (d.products||[])
@@ -3341,7 +3245,6 @@ function openOrderModal(
 
   }
 
-
   renderOrderProductResults();
 
   renderOrderItems();
@@ -3412,7 +3315,6 @@ function saveOrder(){
   const now=
     new Date().toISOString();
 
-
   if(editingDraftId){
 
     const i=
@@ -3468,7 +3370,6 @@ function saveOrder(){
     );
 
   }
-
 
   saveDrafts();
 
@@ -3555,14 +3456,12 @@ async function sendDraftOrder(
     return;
   }
 
-
   if(
     !confirm(
       `"${draft.shop}" এর Order Online-এ Send করবেন?`
     )
   )
     return;
-
 
   const payload={
 
@@ -3593,7 +3492,6 @@ async function sendDraftOrder(
     note:
       draft.note,
 
-
     products:
       (draft.products||[])
         .map(
@@ -3623,7 +3521,6 @@ async function sendDraftOrder(
               Number(
                 p.quantity||0
               );
-
 
             return {
 
@@ -3684,7 +3581,6 @@ async function sendDraftOrder(
           }
         ),
 
-
     total:
       (draft.products||[])
         .reduce(
@@ -3725,7 +3621,6 @@ async function sendDraftOrder(
 
   };
 
-
   const {
     data,
     error
@@ -3736,7 +3631,6 @@ async function sendDraftOrder(
       .select()
       .single();
 
-
   if(error){
 
     alert(
@@ -3746,7 +3640,6 @@ async function sendDraftOrder(
 
     return;
   }
-
 
   draftOrders=
     draftOrders.filter(
@@ -3828,11 +3721,9 @@ function updateDashboard(){
   ).textContent=
     orders.length;
 
-
   let items=0;
 
   let total=0;
-
 
   orders.forEach(
     o=>{
@@ -3870,7 +3761,6 @@ function updateDashboard(){
 
     }
   );
-
 
   document.getElementById(
     "dashItems"
@@ -3911,7 +3801,6 @@ function renderHistory(){
     .trim()
     .toLowerCase();
 
-
   const drafts=
     draftOrders.filter(
       d=>
@@ -3927,7 +3816,6 @@ function renderHistory(){
         .toLowerCase()
         .includes(q)
     );
-
 
   document.getElementById(
     "draftList"
@@ -4009,7 +3897,6 @@ function renderHistory(){
       '<div class="empty">No Saved Drafts</div>'
     );
 
-
   const sent=
     orders.filter(
       o=>
@@ -4025,7 +3912,6 @@ function renderHistory(){
         .toLowerCase()
         .includes(q)
     );
-
 
   document.getElementById(
     "historyList"
@@ -4116,7 +4002,6 @@ function showOrderDetail(index){
     :
     [];
 
-
   document.getElementById(
     "detailContent"
   ).innerHTML=`
@@ -4162,9 +4047,7 @@ function showOrderDetail(index){
 
     </div>
 
-
     ${
-
       items
         .map(
           p=>{
@@ -4189,10 +4072,17 @@ function showOrderDetail(index){
                 0
               );
 
-
             return `
 
-              <div class="order-item">
+              <div
+                class="order-item"
+                style="
+                  border:1px solid #dfe9e5;
+                  border-radius:10px;
+                  padding:10px;
+                  margin-bottom:8px;
+                "
+              >
 
                 <b>
                   ${escapeHtml(p.name)}
@@ -4258,9 +4148,7 @@ function showOrderDetail(index){
           }
         )
         .join("")
-
     }
-
 
     <div class="total">
 
@@ -4276,7 +4164,6 @@ function showOrderDetail(index){
     </div>
 
   `;
-
 
   openModal(
     "detailModal"
@@ -4345,7 +4232,6 @@ function editProduct(id){
 
   editingProductId=id;
 
-
   document.getElementById(
     "pCode"
   ).value=p.code||"";
@@ -4382,7 +4268,6 @@ function editProduct(id){
     "pStock"
   ).value=p.stock||0;
 
-
   const modal=
     document.getElementById(
       "productModal"
@@ -4400,7 +4285,6 @@ function editProduct(id){
   openModal(
     "productModal"
   );
-
 
   requestAnimationFrame(()=>{
 
@@ -4582,7 +4466,6 @@ async function saveProduct(){
 
   };
 
-
   if(!payload.name){
 
     alert(
@@ -4592,9 +4475,7 @@ async function saveProduct(){
     return;
   }
 
-
   let result;
-
 
   if(editingProductId){
 
@@ -4616,7 +4497,6 @@ async function saveProduct(){
 
   }
 
-
   if(result.error){
 
     alert(
@@ -4627,7 +4507,6 @@ async function saveProduct(){
 
     return;
   }
-
 
   await loadProducts();
 
@@ -4671,7 +4550,6 @@ async function deleteProduct(id){
   )
     return;
 
-
   const {
     error
   }=
@@ -4679,7 +4557,6 @@ async function deleteProduct(id){
       .from("products")
       .delete()
       .eq("id",id);
-
 
   if(error){
 
@@ -4690,7 +4567,6 @@ async function deleteProduct(id){
 
     return;
   }
-
 
   await loadProducts();
 
@@ -4721,7 +4597,6 @@ function renderProductManagerList(){
 
     return;
   }
-
 
   box.innerHTML=
     products
@@ -4957,7 +4832,6 @@ function loadMarketShops(){
     return;
   }
 
-
   try{
 
     marketShops=
@@ -4980,7 +4854,6 @@ function loadMarketShops(){
 
   }
 
-
   populateMarketSelect();
 
   populateShopSelect();
@@ -5001,7 +4874,6 @@ function saveMarketShops(){
 
     return;
   }
-
 
   localStorage.setItem(
     key,
@@ -5072,7 +4944,6 @@ function saveMarketShop(){
       .value
       .trim();
 
-
   if(!market){
 
     alert(
@@ -5082,7 +4953,6 @@ function saveMarketShop(){
     return;
   }
 
-
   if(!shop){
 
     alert(
@@ -5091,7 +4961,6 @@ function saveMarketShop(){
 
     return;
   }
-
 
   const item={
 
@@ -5147,7 +5016,6 @@ function saveMarketShop(){
 
   };
 
-
   if(editingMarketShopId){
 
     const i=
@@ -5173,7 +5041,6 @@ function saveMarketShop(){
     );
 
   }
-
 
   saveMarketShops();
 
@@ -5201,7 +5068,6 @@ function editMarketShop(id){
 
   editingMarketShopId=
     x.id;
-
 
   document.getElementById(
     "msMarket"
@@ -5258,7 +5124,6 @@ function deleteMarketShop(id){
   )
     return;
 
-
   marketShops=
     marketShops.filter(
       v=>
@@ -5288,7 +5153,6 @@ function renderMarketShopList(){
 
   if(!box)return;
 
-
   const q=
     (
       document
@@ -5300,7 +5164,6 @@ function renderMarketShopList(){
     )
     .trim()
     .toLowerCase();
-
 
   const list=
     marketShops.filter(
@@ -5320,7 +5183,6 @@ function renderMarketShopList(){
               .includes(q)
         )
     );
-
 
   box.innerHTML=
 
@@ -5440,7 +5302,6 @@ function populateMarketSelect(
 
   if(!s)return;
 
-
   const markets=
     [
       ...new Set(
@@ -5459,7 +5320,6 @@ function populateMarketSelect(
         )
     );
 
-
   s.innerHTML=
     '<option value="">-- Market নির্বাচন করুন --</option>'+
     markets
@@ -5474,7 +5334,6 @@ function populateMarketSelect(
           `
       )
       .join("");
-
 
   if(selected)
     s.value=selected;
@@ -5504,13 +5363,11 @@ function populateShopSelect(
 
   if(!s)return;
 
-
   const market=
     document.getElementById(
       "marketSelect"
     )?.value||
     "";
-
 
   const list=
     marketShops.filter(
@@ -5518,7 +5375,6 @@ function populateShopSelect(
         !market||
         x.market===market
     );
-
 
   s.innerHTML=
     '<option value="">-- Select Shop --</option>'+
@@ -5542,7 +5398,6 @@ function populateShopSelect(
       )
       .join("");
 
-
   if(selected)
     s.value=selected;
 
@@ -5554,7 +5409,6 @@ function populateShopSelect(
       String(
         list[0].id
       );
-
 
   if(
     autoSelect&&
@@ -5588,7 +5442,6 @@ function selectSavedShop(){
 
   if(!id)return;
 
-
   const x=
     marketShops.find(
       v=>
@@ -5597,7 +5450,6 @@ function selectSavedShop(){
     );
 
   if(!x)return;
-
 
   document.getElementById(
     "marketSelect"
@@ -5661,7 +5513,6 @@ function setupRealtime(){
 
   if(realtimeChannel)return;
 
-
   realtimeChannel=
     supabaseClient
       .channel("orders-live")
@@ -5676,7 +5527,6 @@ function setupRealtime(){
 
           const row=
             payload.new;
-
 
           if(
             !orders.some(
@@ -5710,7 +5560,6 @@ function setupRealtime(){
             document.getElementById(
               "onlineStatus"
             );
-
 
           if(
             status==="SUBSCRIBED"

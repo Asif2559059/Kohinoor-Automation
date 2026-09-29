@@ -1241,3 +1241,6281 @@ Save করলে অনলাইনে যাবে না।
 
 <button class="close"
         onclick="closeModal('detailModal')">
+  ✕
+</button>
+
+</div>
+
+
+<div id="detailContent">
+</div>
+
+
+<div class="actions no-print">
+
+<button class="btn btn-light"
+        onclick="window.print()">
+  🖨 Print
+</button>
+
+<button class="btn btn-light"
+        onclick="closeModal('detailModal')">
+  Close
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================
+     PROFILE MODAL
+========================= -->
+
+<div class="modal" id="profileModal">
+
+<div class="modal-box">
+
+<div class="modal-head">
+
+<h3>
+👤 Profile
+</h3>
+
+<button class="close"
+        onclick="closeModal('profileModal')">
+  ✕
+</button>
+
+</div>
+
+
+<div style="text-align:center">
+
+<div class="avatar"
+     id="profileModalAvatar"
+     style="margin:auto;width:100px;height:100px;font-size:30px">
+A
+</div>
+
+
+<label class="btn btn-light"
+       style="display:inline-block;margin-top:12px">
+
+📷 ছবি পরিবর্তন
+
+<input id="profilePhotoInput"
+       type="file"
+       accept="image/*"
+       onchange="uploadProfilePhoto(event)"
+       style="display:none">
+
+</label>
+
+</div>
+
+
+<div class="field full"
+     style="margin-top:16px">
+
+<label>Username</label>
+
+<input id="profileUsername"
+       placeholder="আপনার User Name">
+
+</div>
+
+
+<div class="actions">
+
+<button class="btn btn-primary"
+        onclick="saveProfileInfo()">
+  💾 Save Profile
+</button>
+
+<button class="btn btn-light"
+        onclick="closeModal('profileModal')">
+  Close
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================
+     MARKET SHOP MODAL
+========================= -->
+
+<div class="modal" id="marketShopModal">
+
+<div class="modal-box">
+
+<div class="modal-head">
+
+<h3>
+📍 Market & Shop List
+</h3>
+
+<button class="close"
+        onclick="closeModal('marketShopModal')">
+  ✕
+</button>
+
+</div>
+
+
+<div class="small" style="margin-bottom:10px">
+
+এখানে নতুন মার্কেট ও দোকানের নাম/ঠিকানা যোগ করতে পারবেন।
+
+যেকোনো পুরোনো তথ্য Edit বা Delete করা যাবে।
+
+তথ্য এই ডিভাইসে সংরক্ষিত থাকবে।
+
+</div>
+
+
+<div class="form-grid">
+
+
+<div class="field">
+
+<label>মার্কেটের নাম *</label>
+
+<input id="msMarket"
+       placeholder="যেমন: মিরপুর মার্কেট">
+
+</div>
+
+
+<div class="field">
+
+<label>দোকানের নাম *</label>
+
+<input id="msShop"
+       placeholder="যেমন: রহিম স্টোর">
+
+</div>
+
+
+<div class="field">
+
+<label>দোকানের কোড</label>
+
+<input id="msShopCode"
+       placeholder="যেমন: S-001">
+
+</div>
+
+
+<div class="field full">
+
+<label>ঠিকানা</label>
+
+<input id="msAddress"
+       placeholder="দোকানের ঠিকানা">
+
+</div>
+
+
+<div class="field">
+
+<label>মোবাইল</label>
+
+<input id="msMobile"
+       placeholder="01XXXXXXXXX">
+
+</div>
+
+
+<div class="field">
+
+<label>Representative</label>
+
+<input id="msRepresentative"
+       placeholder="প্রতিনিধির নাম">
+
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button class="btn btn-primary"
+        onclick="saveMarketShop()">
+  💾 Save
+</button>
+
+<button class="btn btn-light"
+        onclick="clearMarketShopForm()">
+  ✚ নতুন
+</button>
+
+</div>
+
+
+<input id="marketShopSearch"
+       class="search"
+       style="margin-top:12px"
+       placeholder="মার্কেট/দোকান/ঠিকানা দিয়ে খুঁজুন"
+       oninput="renderMarketShopList()">
+
+
+<div id="marketShopList"
+     class="list-box">
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================
+     NOTIFICATION MODAL
+========================= -->
+
+<div class="modal" id="notificationModal">
+
+<div class="modal-box">
+
+<div class="modal-head">
+
+<h3>
+🔔 Notifications
+</h3>
+
+<button class="close"
+        onclick="closeModal('notificationModal')">
+  ✕
+</button>
+
+</div>
+
+
+<div id="notificationList"
+     class="notification-list">
+</div>
+
+</div>
+</div>
+
+
+<div id="toast"
+     class="toast">
+</div>
+
+
+<script>
+
+/* =====================================================
+   PWA
+===================================================== */
+
+if("serviceWorker" in navigator){
+
+  window.addEventListener("load",()=>{
+
+    navigator.serviceWorker
+      .register("./sw.js",{scope:"./"})
+      .catch(err=>
+        console.error(
+          "PWA service worker error:",
+          err
+        )
+      );
+
+  });
+
+}
+
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+"https://utzkpsohkoiawvuupgeb.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
+
+
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+
+/* =====================================================
+   STORAGE KEYS
+===================================================== */
+
+const DRAFTS_KEY =
+"kohinoor_order_drafts_v3";
+
+const LOCAL_NOTICES_KEY =
+"kohinoor_notifications_v3";
+
+const LOCAL_PRODUCTS_KEY =
+"kohinoor_products_cache_v3";
+
+const LOCAL_ORDERS_KEY =
+"kohinoor_orders_cache_v1";
+
+const PENDING_PRODUCTS_KEY =
+"kohinoor_pending_products_v1";
+
+const LOCAL_PROFILE_KEY =
+"kohinoor_profile_cache_v1";
+
+const MARKET_SHOPS_KEY =
+"kohinoor_market_shop_list_v2_user_";
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let currentUser=null;
+
+let products=[];
+
+let orders=[];
+
+let draftOrders=[];
+
+let notifications=[];
+
+let currentOrderItems=[];
+
+let editingDraftId=null;
+
+let realtimeChannel=null;
+
+let pollingTimer=null;
+
+let editingProductId=null;
+
+let isSyncing=false;
+
+
+/* =====================================================
+   BASIC HELPERS
+===================================================== */
+
+function isOnline(){
+
+  return navigator.onLine;
+
+}
+
+
+function setOnlineStatus(text=null){
+
+  const el=
+    document.getElementById(
+      "onlineStatus"
+    );
+
+  if(!el)return;
+
+
+  if(!navigator.onLine){
+
+    el.textContent="📴 অফলাইন";
+
+    el.className="offline";
+
+    return;
+
+  }
+
+
+  el.textContent=
+    text||"🌐 অনলাইন";
+
+  el.className="online";
+
+}
+
+
+function escapeHtml(value){
+
+  return String(value??"")
+    .replace(/[&<>"']/g,m=>({
+
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+
+    }[m]));
+
+}
+
+
+function money(n){
+
+  return "৳"+
+    Number(n||0).toFixed(2);
+
+}
+
+
+function showToast(msg){
+
+  const el=
+    document.getElementById("toast");
+
+  el.textContent=msg;
+
+  el.style.display="block";
+
+  clearTimeout(
+    showToast.t
+  );
+
+  showToast.t=
+    setTimeout(()=>{
+
+      el.style.display="none";
+
+    },2800);
+
+}
+
+
+function openModal(id){
+
+  const el=
+    document.getElementById(id);
+
+  if(!el)return;
+
+  el.classList.add("show");
+
+  setTimeout(()=>{
+
+    el.scrollTop=0;
+
+    const box=
+      el.querySelector(".modal-box");
+
+    if(box)
+      box.scrollTop=0;
+
+  },0);
+
+}
+
+
+function closeModal(id){
+
+  const el=
+    document.getElementById(id);
+
+  if(el)
+    el.classList.remove("show");
+
+}
+
+
+function scrollTopPage(){
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+function focusProductSearch(){
+
+  document
+    .getElementById("productSearchCard")
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+  setTimeout(()=>{
+
+    document
+      .getElementById("productSearch")
+      .focus();
+
+  },250);
+
+}
+
+
+/* =====================================================
+   DATE
+===================================================== */
+
+function setTodayDates(){
+
+  const d=
+    new Date();
+
+  const today=
+    new Date(
+      d.getTime()-
+      d.getTimezoneOffset()*60000
+    )
+    .toISOString()
+    .slice(0,10);
+
+
+  const od=
+    document.getElementById(
+      "orderDate"
+    );
+
+  const dd=
+    document.getElementById(
+      "deliveryDate"
+    );
+
+
+  if(od)
+    od.value=today;
+
+  if(dd)
+    dd.value=today;
+
+}
+
+
+/* =====================================================
+   LOCAL DRAFTS
+===================================================== */
+
+function saveDrafts(){
+
+  localStorage.setItem(
+    DRAFTS_KEY,
+    JSON.stringify(draftOrders)
+  );
+
+}
+
+
+function loadDrafts(){
+
+  try{
+
+    const data=
+      JSON.parse(
+        localStorage.getItem(
+          DRAFTS_KEY
+        )||"[]"
+      );
+
+    draftOrders=
+      Array.isArray(data)
+        ?data
+        :[];
+
+  }catch{
+
+    draftOrders=[];
+
+  }
+
+}
+
+
+/* =====================================================
+   LOCAL PRODUCTS
+===================================================== */
+
+function saveLocalProducts(){
+
+  localStorage.setItem(
+    LOCAL_PRODUCTS_KEY,
+    JSON.stringify(products)
+  );
+
+}
+
+
+function loadLocalProducts(){
+
+  try{
+
+    const data=
+      JSON.parse(
+        localStorage.getItem(
+          LOCAL_PRODUCTS_KEY
+        )||"[]"
+      );
+
+    products=
+      Array.isArray(data)
+        ?data
+        :[];
+
+  }catch{
+
+    products=[];
+
+  }
+
+}
+
+
+/* =====================================================
+   LOCAL ORDERS
+===================================================== */
+
+function saveLocalOrders(){
+
+  localStorage.setItem(
+    LOCAL_ORDERS_KEY,
+    JSON.stringify(orders)
+  );
+
+}
+
+
+function loadLocalOrders(){
+
+  try{
+
+    const data=
+      JSON.parse(
+        localStorage.getItem(
+          LOCAL_ORDERS_KEY
+        )||"[]"
+      );
+
+    orders=
+      Array.isArray(data)
+        ?data
+        :[];
+
+  }catch{
+
+    orders=[];
+
+  }
+
+}
+
+
+/* =====================================================
+   PENDING PRODUCT QUEUE
+===================================================== */
+
+function getPendingProducts(){
+
+  try{
+
+    const data=
+      JSON.parse(
+        localStorage.getItem(
+          PENDING_PRODUCTS_KEY
+        )||"[]"
+      );
+
+    return Array.isArray(data)
+      ?data
+      :[];
+
+  }catch{
+
+    return[];
+
+  }
+
+}
+
+
+function savePendingProducts(list){
+
+  localStorage.setItem(
+    PENDING_PRODUCTS_KEY,
+    JSON.stringify(list)
+  );
+
+}
+
+
+function addPendingProduct(job){
+
+  let list=
+    getPendingProducts();
+
+
+  /*
+    একই Product-এর পুরোনো pending
+    কাজগুলোকে একত্র করা হবে।
+  */
+
+  if(job.id){
+
+    list=
+      list.filter(
+        x=>
+          String(x.id)!==
+          String(job.id)
+      );
+
+  }
+
+
+  list.push(job);
+
+  savePendingProducts(list);
+
+}
+
+
+/* =====================================================
+   PROFILE LOCAL CACHE
+===================================================== */
+
+function getLocalProfile(){
+
+  if(!currentUser)return null;
+
+  try{
+
+    const all=
+      JSON.parse(
+        localStorage.getItem(
+          LOCAL_PROFILE_KEY
+        )||"{}"
+      );
+
+    return all[currentUser.id]||null;
+
+  }catch{
+
+    return null;
+
+  }
+
+}
+
+
+function saveLocalProfile(profile){
+
+  if(!currentUser)return;
+
+  let all={};
+
+  try{
+
+    all=
+      JSON.parse(
+        localStorage.getItem(
+          LOCAL_PROFILE_KEY
+        )||"{}"
+      );
+
+  }catch{
+
+    all={};
+
+  }
+
+
+  all[currentUser.id]=profile;
+
+
+  localStorage.setItem(
+    LOCAL_PROFILE_KEY,
+    JSON.stringify(all)
+  );
+
+}
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async()=>{
+
+    setTodayDates();
+
+    loadDrafts();
+
+    loadNotifications();
+
+    loadLocalProducts();
+
+    loadLocalOrders();
+
+    loadMarketShops();
+
+    updateDashboard();
+
+    renderProductResults();
+
+    renderHistory();
+
+    setOnlineStatus();
+
+
+    const ok=
+      await checkAdmin();
+
+
+    if(!ok)return;
+
+
+    loadMarketShops();
+
+    /*
+      Offline হলেও Local Product
+      সঙ্গে সঙ্গে ব্যবহার করা যাবে।
+    */
+
+    loadLocalProducts();
+
+    updateDashboard();
+
+    populateOrderProductSearch();
+
+    renderProductResults();
+
+
+    if(navigator.onLine){
+
+      await loadProducts();
+
+      await loadOrdersFromSupabase();
+
+      await syncPendingProducts();
+
+    }
+
+
+    renderProductResults();
+
+    renderNotifications();
+
+    renderHistory();
+
+    setupRealtime();
+
+    startPolling();
+
+    setOnlineStatus();
+
+  }
+);
+
+
+/* =====================================================
+   AUTH
+===================================================== */
+
+async function checkAdmin(){
+
+  try{
+
+    const {
+      data,
+      error
+    }=
+      await supabaseClient.auth.getSession();
+
+
+    if(error){
+
+      /*
+        Offline অবস্থায় যদি পুরোনো session
+        থাকে, Supabase সাধারণত local session
+        ফেরত দেয়।
+      */
+
+      const localSession=
+        data?.session;
+
+      if(localSession){
+
+        currentUser=
+          localSession.user;
+
+        await loadUserProfile(
+          currentUser
+        );
+
+        return true;
+
+      }
+
+      throw error;
+
+    }
+
+
+    if(!data.session){
+
+      window.location.replace(
+        "signin.html"
+      );
+
+      return false;
+
+    }
+
+
+    currentUser=
+      data.session.user;
+
+
+    await loadUserProfile(
+      currentUser
+    );
+
+
+    return true;
+
+  }catch(e){
+
+    console.error(
+      "Auth error:",
+      e
+    );
+
+
+    /*
+      Offline অবস্থায় session পাওয়া না গেলে
+      Login page-এ পাঠানো হবে।
+    */
+
+    window.location.replace(
+      "signin.html"
+    );
+
+    return false;
+
+  }
+
+}
+
+
+async function adminLogout(){
+
+  try{
+
+    await supabaseClient
+      .auth
+      .signOut();
+
+  }catch(e){
+
+    console.error(e);
+
+  }
+
+  window.location.replace(
+    "signin.html"
+  );
+
+}
+
+
+/* =====================================================
+   RATE
+===================================================== */
+
+function mainRate(p){
+
+  return Number(
+    p?.price??0
+  );
+
+}
+
+
+function cartonRate(p){
+
+  return Number(
+    p?.carton_rate??0
+  );
+
+}
+
+
+/* =====================================================
+   PROFILE
+===================================================== */
+
+async function loadUserProfile(user){
+
+  const fallbackName=
+    user.email?.split("@")[0]||
+    "User";
+
+
+  const local=
+    getLocalProfile();
+
+
+  if(local){
+
+    const localName=
+      local.username||
+      fallbackName;
+
+
+    document
+      .getElementById("profileName")
+      .textContent=
+        localName;
+
+
+    setProfileAvatar(
+      document.getElementById(
+        "profileAvatar"
+      ),
+      local.avatar_url||"",
+      localName
+    );
+
+  }else{
+
+    document
+      .getElementById("profileName")
+      .textContent=
+        fallbackName;
+
+  }
+
+
+  /*
+    Offline হলে Server request করা হবে না।
+  */
+
+  if(!navigator.onLine){
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      data,
+      error
+    }=
+      await supabaseClient
+      .from("user_profiles")
+      .select(
+        "username,avatar_url"
+      )
+      .eq("id",user.id)
+      .maybeSingle();
+
+
+    if(error)throw error;
+
+
+    const p=
+      data||{};
+
+
+    const name=
+      p.username||
+      fallbackName;
+
+
+    saveLocalProfile({
+
+      id:user.id,
+
+      username:name,
+
+      avatar_url:
+        p.avatar_url||""
+
+    });
+
+
+    document
+      .getElementById("profileName")
+      .textContent=name;
+
+
+    setProfileAvatar(
+      document.getElementById(
+        "profileAvatar"
+      ),
+      p.avatar_url||"",
+      name
+    );
+
+  }catch(e){
+
+    console.error(
+      "Profile load:",
+      e
+    );
+
+  }
+
+}
+
+
+function setProfileAvatar(
+  el,
+  url,
+  name
+){
+
+  if(!el)return;
+
+
+  if(url){
+
+    el.innerHTML=
+      '<img src="'+
+      escapeHtml(url)+
+      '" alt="profile">';
+
+  }else{
+
+    el.textContent=
+      (name||"A")
+      .trim()
+      .charAt(0)
+      .toUpperCase()||
+      "A";
+
+  }
+
+}
+
+
+async function openProfileModal(){
+
+  if(!currentUser)return;
+
+
+  const local=
+    getLocalProfile();
+
+
+  const fallbackName=
+    currentUser.email?.split("@")[0]||
+    "User";
+
+
+  const name=
+    local?.username||
+    fallbackName;
+
+
+  document
+    .getElementById("profileUsername")
+    .value=name;
+
+
+  setProfileAvatar(
+    document.getElementById(
+      "profileModalAvatar"
+    ),
+    local?.avatar_url||"",
+    name
+  );
+
+
+  /*
+    Online হলে সর্বশেষ Profile নেওয়ার চেষ্টা।
+  */
+
+  if(navigator.onLine){
+
+    try{
+
+      const {
+        data,
+        error
+      }=
+        await supabaseClient
+        .from("user_profiles")
+        .select(
+          "username,avatar_url"
+        )
+        .eq(
+          "id",
+          currentUser.id
+        )
+        .maybeSingle();
+
+
+      if(!error){
+
+        const p=
+          data||{};
+
+
+        const serverName=
+          p.username||
+          fallbackName;
+
+
+        document
+          .getElementById(
+            "profileUsername"
+          )
+          .value=
+            serverName;
+
+
+        setProfileAvatar(
+          document.getElementById(
+            "profileModalAvatar"
+          ),
+          p.avatar_url||"",
+          serverName
+        );
+
+      }
+
+    }catch(e){
+
+      console.error(e);
+
+    }
+
+  }
+
+
+  openModal("profileModal");
+
+}
+
+
+async function saveProfileInfo(){
+
+  if(!currentUser){
+
+    alert(
+      "User session পাওয়া যায়নি। আবার Login করুন।"
+    );
+
+    return;
+
+  }
+
+
+  const username=
+    document
+      .getElementById(
+        "profileUsername"
+      )
+      .value
+      .trim();
+
+
+  if(!username){
+
+    alert("Username দিন");
+
+    return;
+
+  }
+
+
+  const old=
+    getLocalProfile()||{};
+
+
+  /*
+    আগে Local Save
+  */
+
+  const localProfile={
+
+    id:currentUser.id,
+
+    username:username,
+
+    avatar_url:
+      old.avatar_url||""
+
+  };
+
+
+  saveLocalProfile(
+    localProfile
+  );
+
+
+  document
+    .getElementById(
+      "profileName"
+    )
+    .textContent=
+      username;
+
+
+  setProfileAvatar(
+    document.getElementById(
+      "profileAvatar"
+    ),
+    localProfile.avatar_url,
+    username
+  );
+
+
+  /*
+    Offline হলে এখানেই শেষ।
+  */
+
+  if(!navigator.onLine){
+
+    closeModal("profileModal");
+
+    showToast(
+      "📴 Profile Local-এ Save হয়েছে"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      data:existing,
+      error:readError
+    }=
+      await supabaseClient
+      .from("user_profiles")
+      .select(
+        "id,avatar_url,status"
+      )
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+    if(readError)
+      throw readError;
+
+
+    let error;
+
+
+    if(existing){
+
+      ({
+        error
+      }=
+        await supabaseClient
+        .from("user_profiles")
+        .update({
+          username
+        })
+        .eq(
+          "id",
+          currentUser.id
+        ));
+
+    }else{
+
+      ({
+        error
+      }=
+        await supabaseClient
+        .from("user_profiles")
+        .insert({
+          id:currentUser.id,
+          email:currentUser.email,
+          username
+        }));
+
+    }
+
+
+    if(error)
+      throw error;
+
+
+    closeModal("profileModal");
+
+    showToast(
+      "✅ Username সফলভাবে Save হয়েছে"
+    );
+
+  }catch(e){
+
+    /*
+      Server fail হলেও Local-এ data আছে।
+    */
+
+    closeModal("profileModal");
+
+    showToast(
+      "📴 Local-এ Save হয়েছে — Online হলে আবার Save করুন"
+    );
+
+    console.error(
+      "Username save:",
+      e
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PROFILE PHOTO
+===================================================== */
+
+function resizeImageToDataUrl(
+  file,
+  maxSize=500,
+  quality=.82
+){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const reader=
+        new FileReader();
+
+
+      reader.onload=()=>{
+
+        const img=
+          new Image();
+
+
+        img.onload=()=>{
+
+          let w=
+            img.width;
+
+          let h=
+            img.height;
+
+
+          if(
+            w>maxSize||
+            h>maxSize
+          ){
+
+            const r=
+              Math.min(
+                maxSize/w,
+                maxSize/h
+              );
+
+
+            w=
+              Math.round(w*r);
+
+            h=
+              Math.round(h*r);
+
+          }
+
+
+          const c=
+            document.createElement(
+              "canvas"
+            );
+
+
+          c.width=w;
+          c.height=h;
+
+
+          c
+            .getContext("2d")
+            .drawImage(
+              img,
+              0,
+              0,
+              w,
+              h
+            );
+
+
+          resolve(
+            c.toDataURL(
+              "image/jpeg",
+              quality
+            )
+          );
+
+        };
+
+
+        img.onerror=reject;
+
+        img.src=
+          reader.result;
+
+      };
+
+
+      reader.onerror=reject;
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+async function uploadProfilePhoto(event){
+
+  const file=
+    event.target.files?.[0];
+
+
+  if(!file||
+     !currentUser)return;
+
+
+  try{
+
+    const dataUrl=
+      await resizeImageToDataUrl(
+        file
+      );
+
+
+    const old=
+      getLocalProfile()||{};
+
+
+    const username=
+      old.username||
+      currentUser.email?.split("@")[0]||
+      "User";
+
+
+    /*
+      প্রথমে Local Save
+    */
+
+    saveLocalProfile({
+
+      id:currentUser.id,
+
+      username:username,
+
+      avatar_url:dataUrl
+
+    });
+
+
+    setProfileAvatar(
+      document.getElementById(
+        "profileAvatar"
+      ),
+      dataUrl,
+      username
+    );
+
+
+    setProfileAvatar(
+      document.getElementById(
+        "profileModalAvatar"
+      ),
+      dataUrl,
+      username
+    );
+
+
+    event.target.value="";
+
+
+    /*
+      Offline হলে Local-এ থাকবে।
+    */
+
+    if(!navigator.onLine){
+
+      showToast(
+        "📴 Profile Photo Local-এ Save হয়েছে"
+      );
+
+      return;
+
+    }
+
+
+    const {
+      data:existing
+    }=
+      await supabaseClient
+      .from("user_profiles")
+      .select(
+        "username,status"
+      )
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+    const {
+      error
+    }=
+      await supabaseClient
+      .from("user_profiles")
+      .upsert(
+        {
+          id:currentUser.id,
+          email:currentUser.email,
+          username:
+            existing?.username||
+            username,
+          status:
+            existing?.status||
+            "Active",
+          avatar_url:dataUrl
+        },
+        {
+          onConflict:"id"
+        }
+      );
+
+
+    if(error)
+      throw error;
+
+
+    showToast(
+      "✅ Profile Photo Save হয়েছে"
+    );
+
+  }catch(e){
+
+    console.error(e);
+
+    showToast(
+      "📴 Photo Local-এ রাখা হয়েছে"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PRODUCTS LOAD
+===================================================== */
+
+async function loadProducts(){
+
+  /*
+    প্রথমে Local data
+  */
+
+  loadLocalProducts();
+
+  updateDashboard();
+
+  populateOrderProductSearch();
+
+  renderProductResults();
+
+
+  if(!navigator.onLine){
+
+    setOnlineStatus("📴 অফলাইন");
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      data,
+      error
+    }=
+      await supabaseClient
+      .from("products")
+      .select("*")
+      .order(
+        "name",
+        {
+          ascending:true
+        }
+      );
+
+
+    if(error)
+      throw error;
+
+
+    products=
+      data||[];
+
+
+    saveLocalProducts();
+
+
+    updateDashboard();
+
+    populateOrderProductSearch();
+
+    renderProductResults();
+
+    renderProductManagerList();
+
+
+    setOnlineStatus("🌐 অনলাইন");
+
+  }catch(e){
+
+    console.error(
+      "Products load:",
+      e
+    );
+
+
+    setOnlineStatus(
+      "📦 Local Data"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PRODUCT SEARCH
+===================================================== */
+
+function renderProductResults(){
+
+  const input=
+    document.getElementById(
+      "productSearch"
+    );
+
+
+  const box=
+    document.getElementById(
+      "productResults"
+    );
+
+
+  if(!input||!box)return;
+
+
+  const q=
+    input.value
+      .trim()
+      .toLowerCase();
+
+
+  const list=
+    products
+      .filter(p=>
+        !q||
+        String(p.name||"")
+          .toLowerCase()
+          .includes(q)||
+        String(p.code||"")
+          .toLowerCase()
+          .includes(q)
+      )
+      .slice(0,30);
+
+
+  box.innerHTML=
+    list.length
+
+      ?
+
+      list.map(p=>`
+
+        <div class="product-result">
+
+          <div class="product-result-info">
+
+            <b>
+              ${escapeHtml(p.name)}
+            </b>
+
+            <div class="small">
+
+              ${escapeHtml(p.code||"")}
+
+              · Pack
+              ${escapeHtml(p.pack||"")}
+
+            </div>
+
+          </div>
+
+
+          <div class="product-result-rate">
+
+            <div>
+              <b>
+                মূল ${money(mainRate(p))}
+              </b>
+            </div>
+
+            <div class="small">
+              MRP ${money(p.mrp)}
+            </div>
+
+            <div class="small">
+
+              Carton
+              ${money(cartonRate(p))}
+
+              ${
+                p.offer
+                ?
+                ` · ${escapeHtml(p.offer)} Free`
+                :
+                ""
+              }
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `).join("")
+
+      :
+
+      '<div class="empty">Product পাওয়া যায়নি</div>';
+
+}
+
+
+/* =====================================================
+   ORDER PRODUCT SEARCH
+===================================================== */
+
+function populateOrderProductSearch(){
+
+  renderOrderProductResults();
+
+}
+
+
+function renderOrderProductResults(){
+
+  const input=
+    document.getElementById(
+      "orderProductSearch"
+    );
+
+
+  const box=
+    document.getElementById(
+      "orderProductResults"
+    );
+
+
+  if(!input||!box)return;
+
+
+  const q=
+    input.value
+      .trim()
+      .toLowerCase();
+
+
+  let list=
+    products.filter(p=>
+      !q||
+      String(p.name||"")
+        .toLowerCase()
+        .includes(q)||
+      String(p.code||"")
+        .toLowerCase()
+        .includes(q)
+    );
+
+
+  if(!q)
+    list=list.slice(0,20);
+  else
+    list=list.slice(0,50);
+
+
+  box.innerHTML=
+    list.length
+
+      ?
+
+      list.map(p=>`
+
+        <div
+          class="order-search-result"
+          onclick="addProductById('${escapeHtml(String(p.id))}')">
+
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            gap:8px">
+
+            <div style="flex:1">
+
+              <b>
+
+                ${escapeHtml(p.code||"")}
+                —
+                ${escapeHtml(p.name||"")}
+
+              </b>
+
+
+              <div class="small">
+
+                Pack
+                ${escapeHtml(p.pack||"")}
+
+                · Stock
+                ${Number(p.stock||0)}
+
+              </div>
+
+            </div>
+
+
+            <div style="
+              text-align:right;
+              white-space:nowrap">
+
+              <b>
+                মূল ${money(mainRate(p))}
+              </b>
+
+              <div class="small">
+                Carton ${money(cartonRate(p))}
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `).join("")
+
+      :
+
+      '<div class="empty" style="padding:12px">Product পাওয়া যায়নি</div>';
+
+}
+
+
+function addProductById(id){
+
+  const p=
+    products.find(
+      x=>
+        String(x.id)===
+        String(id)
+    );
+
+
+  if(!p)return;
+
+
+  addProductToOrder(p);
+
+
+  document
+    .getElementById(
+      "orderProductSearch"
+    )
+    .value="";
+
+
+  renderOrderProductResults();
+
+}
+
+
+/* =====================================================
+   ADD PRODUCT TO ORDER
+===================================================== */
+
+function addProductToOrder(p){
+
+  const existing=
+    currentOrderItems.find(x=>
+      String(x.product_id||"")===
+      String(p.id||"")||
+      (
+        x.code&&
+        p.code&&
+        x.code===p.code
+      )
+    );
+
+
+  if(existing){
+
+    existing.quantity=
+      Number(existing.quantity||0)+1;
+
+  }else{
+
+    currentOrderItems.push({
+
+      product_id:p.id,
+
+      code:p.code||"",
+
+      name:p.name||"",
+
+      pack:p.pack||"",
+
+      price:mainRate(p),
+
+      base_price:mainRate(p),
+
+      carton_rate:
+        cartonRate(p),
+
+      tp_rate:
+        Number(p.tp_rate||0),
+
+      offer:p.offer||"",
+
+      rate_type:"main",
+
+      rate:mainRate(p),
+
+      quantity:1,
+
+      bonus:0,
+
+      value:mainRate(p)
+
+    });
+
+  }
+
+
+  renderOrderItems();
+
+}
+
+
+/* =====================================================
+   ORDER ITEMS
+===================================================== */
+
+function renderOrderItems(){
+
+  const box=
+    document.getElementById(
+      "orderItems"
+    );
+
+
+  if(!currentOrderItems.length){
+
+    box.innerHTML=
+      '<div class="empty">এখনো কোনো Product যোগ করা হয়নি</div>';
+
+  }else{
+
+    box.innerHTML=
+      currentOrderItems.map(
+        (item,i)=>{
+
+          const main=
+            Number(
+              item.base_price??
+              item.price??
+              0
+            );
+
+
+          const carton=
+            Number(
+              item.carton_rate??
+              0
+            );
+
+
+          let type=
+            item.rate_type==="carton"&&
+            carton>0
+              ?"carton"
+              :"main";
+
+
+          if(
+            item.rate_type==="carton"&&
+            carton<=0
+          ){
+
+            item.rate_type="main";
+
+          }
+
+
+          const selectedRate=
+            type==="carton"
+              ?carton
+              :main;
+
+
+          return `
+
+          <div class="order-item">
+
+            <div class="order-item-top">
+
+              <div>
+
+                <div class="order-item-name">
+                  ${escapeHtml(item.name)}
+                </div>
+
+                <div class="small">
+
+                  ${escapeHtml(item.code)}
+
+                  · Pack
+                  ${escapeHtml(item.pack)}
+
+                </div>
+
+              </div>
+
+
+              <button
+                class="btn btn-danger"
+                style="padding:7px 9px"
+                onclick="removeOrderItem(${i})">
+
+                ✕
+
+              </button>
+
+            </div>
+
+
+            <div class="rate-box">
+
+              <div class="field">
+
+                <label>
+                  Rate Type
+                </label>
+
+                <select
+                  onchange="changeItemRateType(${i},this.value)">
+
+                  <option
+                    value="main"
+                    ${type==="main"?"selected":""}>
+                    মূল রেট
+                  </option>
+
+
+                  ${
+                    carton>0
+                    ?
+                    `<option
+                      value="carton"
+                      ${type==="carton"?"selected":""}>
+                      Carton Rate
+                    </option>`
+                    :
+                    ""
+                  }
+
+                </select>
+
+              </div>
+
+
+              <div class="selected-rate">
+
+                <div class="small">
+                  এই অর্ডারে প্রযোজ্য রেট
+                </div>
+
+                ${
+                  type==="carton"
+                  ?"Carton Rate"
+                  :"মূল রেট"
+                }:
+
+                ${money(selectedRate)}
+
+              </div>
+
+            </div>
+
+
+            <div
+              class="small"
+              style="margin-top:7px">
+
+              মূল রেট:
+              ${money(main)}
+
+              ·
+
+              Carton Rate:
+              ${
+                carton>0
+                ?money(carton)
+                :"নেই"
+              }
+
+            </div>
+
+
+            <div class="qty-row">
+
+              <div class="field">
+
+                <label>
+                  Qty
+                </label>
+
+                <input
+                  type="number"
+                  min="1"
+                  value="${Number(item.quantity||1)}"
+                  onchange="changeItemQty(${i},this.value)">
+
+              </div>
+
+
+              <div class="field">
+
+                <label>
+                  Bonus
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  value="${Number(item.bonus||0)}"
+                  onchange="changeItemBonus(${i},this.value)">
+
+              </div>
+
+
+              <div class="field">
+
+                <label>
+                  Value
+                </label>
+
+                <input
+                  readonly
+                  value="${money(
+                    selectedRate*
+                    Number(item.quantity||0)
+                  )}">
+
+              </div>
+
+            </div>
+
+          </div>
+
+          `;
+
+        }
+      ).join("");
+
+  }
+
+
+  const total=
+    currentOrderItems.reduce(
+      (s,x)=>{
+
+        const main=
+          Number(
+            x.base_price??
+            x.price??
+            0
+          );
+
+
+        const carton=
+          Number(
+            x.carton_rate??
+            0
+          );
+
+
+        const rate=
+          x.rate_type==="carton"&&
+          carton>0
+            ?carton
+            :main;
+
+
+        return s+
+          rate*
+          Number(x.quantity||0);
+
+      },
+      0
+    );
+
+
+  document
+    .getElementById(
+      "orderTotal"
+    )
+    .textContent=
+      money(total);
+
+}
+
+
+/* =====================================================
+   RATE / QTY / BONUS
+===================================================== */
+
+function changeItemRateType(
+  i,
+  type
+){
+
+  if(!currentOrderItems[i])
+    return;
+
+
+  const carton=
+    Number(
+      currentOrderItems[i]
+        .carton_rate||0
+    );
+
+
+  if(
+    type==="carton"&&
+    carton<=0
+  ){
+
+    currentOrderItems[i]
+      .rate_type="main";
+
+
+    showToast(
+      "⚠️ Carton Rate নেই — Main Rate ব্যবহার হবে"
+    );
+
+  }else{
+
+    currentOrderItems[i]
+      .rate_type=
+        type==="carton"
+          ?"carton"
+          :"main";
+
+  }
+
+
+  renderOrderItems();
+
+}
+
+
+function changeItemQty(i,v){
+
+  if(!currentOrderItems[i])
+    return;
+
+
+  currentOrderItems[i]
+    .quantity=
+      Math.max(
+        1,
+        Number(v||1)
+      );
+
+
+  renderOrderItems();
+
+}
+
+
+function changeItemBonus(i,v){
+
+  if(!currentOrderItems[i])
+    return;
+
+
+  currentOrderItems[i]
+    .bonus=
+      Math.max(
+        0,
+        Number(v||0)
+      );
+
+
+  renderOrderItems();
+
+}
+
+
+function removeOrderItem(i){
+
+  currentOrderItems.splice(
+    i,
+    1
+  );
+
+  renderOrderItems();
+
+}
+
+
+/* =====================================================
+   GET ORDER DATA
+===================================================== */
+
+function getOrderFormData(){
+
+  const shop=
+    document
+      .getElementById("shop")
+      .value
+      .trim();
+
+
+  if(!shop){
+
+    alert(
+      "দোকানের নাম দিন"
+    );
+
+    return null;
+
+  }
+
+
+  if(!currentOrderItems.length){
+
+    alert(
+      "কমপক্ষে ১টি Product যোগ করুন"
+    );
+
+    return null;
+
+  }
+
+
+  const productsForOrder=
+    currentOrderItems.map(item=>{
+
+      const main=
+        Number(
+          item.base_price??
+          item.price??
+          0
+        );
+
+
+      const carton=
+        Number(
+          item.carton_rate??
+          0
+        );
+
+
+      const rateType=
+        item.rate_type==="carton"&&
+        carton>0
+          ?"carton"
+          :"main";
+
+
+      const selectedRate=
+        rateType==="carton"
+          ?carton
+          :main;
+
+
+      const quantity=
+        Math.max(
+          1,
+          Number(
+            item.quantity||1
+          )
+        );
+
+
+      const bonus=
+        Math.max(
+          0,
+          Number(
+            item.bonus||0
+          )
+        );
+
+
+      return {
+
+        product_id:
+          item.product_id||null,
+
+        code:item.code||"",
+
+        name:item.name||"",
+
+        pack:item.pack||"",
+
+        base_price:main,
+
+        price:selectedRate,
+
+        carton_rate:carton,
+
+        tp_rate:
+          Number(
+            item.tp_rate||0
+          ),
+
+        offer:
+          item.offer||"",
+
+        rate_type:rateType,
+
+        rate:selectedRate,
+
+        quantity:quantity,
+
+        bonus:bonus,
+
+        value:
+          selectedRate*
+          quantity
+
+      };
+
+    });
+
+
+  const total=
+    productsForOrder.reduce(
+      (s,x)=>
+        s+
+        Number(x.value||0),
+      0
+    );
+
+
+  return {
+
+    market:
+      document
+        .getElementById(
+          "marketSelect"
+        )
+        ?.value
+        .trim()||"",
+
+    shop:shop,
+
+    shop_code:
+      document
+        .getElementById(
+          "shopCode"
+        )
+        ?.value
+        .trim()||"",
+
+    address:
+      document
+        .getElementById(
+          "address"
+        )
+        .value
+        .trim(),
+
+    mobile:
+      document
+        .getElementById(
+          "mobile"
+        )
+        .value
+        .trim(),
+
+    representative:
+      document
+        .getElementById(
+          "representative"
+        )
+        .value
+        .trim(),
+
+    order_date:
+      document
+        .getElementById(
+          "orderDate"
+        )
+        .value,
+
+    delivery_date:
+      document
+        .getElementById(
+          "deliveryDate"
+        )
+        .value,
+
+    note:
+      document
+        .getElementById(
+          "note"
+        )
+        .value
+        .trim(),
+
+    products:
+      productsForOrder,
+
+    total:total
+
+  };
+
+}
+
+
+/* =====================================================
+   OPEN ORDER
+===================================================== */
+
+function openOrderModal(
+  draftId=null
+){
+
+  editingDraftId=
+    draftId;
+
+  currentOrderItems=[];
+
+
+  document
+    .getElementById(
+      "orderModalTitle"
+    )
+    .textContent=
+      draftId
+      ?"✏️ Draft Edit"
+      :"➕ নতুন অর্ডার";
+
+
+  document
+    .getElementById(
+      "orderProductSearch"
+    )
+    .value="";
+
+
+  if(draftId){
+
+    const d=
+      draftOrders.find(
+        x=>x.id===draftId
+      );
+
+
+    if(!d){
+
+      alert(
+        "Draft পাওয়া যায়নি"
+      );
+
+      return;
+
+    }
+
+
+    populateMarketSelect(
+      d.market||""
+    );
+
+
+    populateShopSelect(
+      findSavedShopId(
+        d.shop||"",
+        d.market||"",
+        d.address||""
+      )
+    );
+
+
+    document
+      .getElementById("shop")
+      .value=
+        d.shop||"";
+
+
+    document
+      .getElementById("shopCode")
+      .value=
+        d.shop_code||"";
+
+
+    document
+      .getElementById("address")
+      .value=
+        d.address||"";
+
+
+    document
+      .getElementById("mobile")
+      .value=
+        d.mobile||"";
+
+
+    document
+      .getElementById(
+        "representative"
+      )
+      .value=
+        d.representative||"";
+
+
+    document
+      .getElementById(
+        "orderDate"
+      )
+      .value=
+        d.order_date||"";
+
+
+    document
+      .getElementById(
+        "deliveryDate"
+      )
+      .value=
+        d.delivery_date||"";
+
+
+    document
+      .getElementById(
+        "note"
+      )
+      .value=
+        d.note||"";
+
+
+    currentOrderItems=
+      (d.products||[])
+      .map(x=>({
+
+        ...x,
+
+        price:
+          Number(
+            x.base_price??
+            x.price??
+            0
+          ),
+
+        base_price:
+          Number(
+            x.base_price??
+            x.price??
+            0
+          ),
+
+        carton_rate:
+          Number(
+            x.carton_rate??
+            0
+          ),
+
+        tp_rate:
+          Number(
+            x.tp_rate||
+            0
+          ),
+
+        offer:
+          x.offer||"",
+
+        rate_type:
+          x.rate_type==="carton"&&
+          Number(
+            x.carton_rate||0
+          )>0
+            ?"carton"
+            :"main",
+
+        rate:
+          Number(
+            x.rate||
+            (
+              x.rate_type==="carton"&&
+              Number(
+                x.carton_rate||0
+              )>0
+
+              ?
+
+              Number(
+                x.carton_rate||0
+              )
+
+              :
+
+              Number(
+                x.base_price??
+                x.price??
+                0
+              )
+            )
+          ),
+
+        quantity:
+          Number(
+            x.quantity||1
+          ),
+
+        bonus:
+          Number(
+            x.bonus||0
+          )
+
+      }));
+
+
+  }else{
+
+    document
+      .getElementById(
+        "marketSelect"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "shopSelect"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "shop"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "shopCode"
+      )
+      .value="";
+
+
+    populateMarketSelect(
+      "",
+      true
+    );
+
+
+    populateShopSelect(
+      "",
+      true
+    );
+
+
+    document
+      .getElementById(
+        "address"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "mobile"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "representative"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "note"
+      )
+      .value="";
+
+
+    setTodayDates();
+
+  }
+
+
+  renderOrderProductResults();
+
+  renderOrderItems();
+
+  openModal("orderModal");
+
+}
+
+
+/* =====================================================
+   SAVE ORDER DRAFT
+===================================================== */
+
+function saveOrder(){
+
+  const data=
+    getOrderFormData();
+
+
+  if(!data)return;
+
+
+  const now=
+    new Date().toISOString();
+
+
+  if(editingDraftId){
+
+    const i=
+      draftOrders.findIndex(
+        x=>
+          x.id===editingDraftId
+      );
+
+
+    if(i<0){
+
+      alert(
+        "Draft পাওয়া যায়নি"
+      );
+
+      return;
+
+    }
+
+
+    draftOrders[i]={
+      ...draftOrders[i],
+      ...data,
+      updated_at:now,
+      status:"draft"
+    };
+
+
+    showToast(
+      "✅ Draft আপডেট হয়েছে"
+    );
+
+  }else{
+
+    const draft={
+
+      ...data,
+
+      id:
+        "draft-"+
+        Date.now()+
+        "-"+
+        Math.random()
+          .toString(36)
+          .slice(2,7),
+
+      status:"draft",
+
+      created_at:now,
+
+      updated_at:now
+
+    };
+
+
+    draftOrders.unshift(
+      draft
+    );
+
+
+    editingDraftId=
+      draft.id;
+
+
+    showToast(
+      "✅ Draft Save হয়েছে — এখনো Send হয়নি"
+    );
+
+  }
+
+
+  saveDrafts();
+
+  updateDashboard();
+
+  renderHistory();
+
+  closeModal(
+    "orderModal"
+  );
+
+}
+
+
+/* =====================================================
+   SEND CURRENT DRAFT
+===================================================== */
+
+async function sendCurrentDraft(){
+
+  if(!editingDraftId){
+
+    alert(
+      "আগে Save Draft করুন। তারপর Draft খুলে Send Order চাপুন।"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Send করার সময় অবশ্যই Online
+  */
+
+  if(!navigator.onLine){
+
+    alert(
+      "📴 আপনি এখন Offline আছেন।\n\n"+
+      "Draft Save করা যাবে।\n"+
+      "কিন্তু Order Send করতে Internet লাগবে।"
+    );
+
+    return;
+
+  }
+
+
+  const data=
+    getOrderFormData();
+
+
+  if(!data)return;
+
+
+  const i=
+    draftOrders.findIndex(
+      x=>
+        x.id===editingDraftId
+    );
+
+
+  if(i<0){
+
+    alert(
+      "Draft পাওয়া যায়নি"
+    );
+
+    return;
+
+  }
+
+
+  draftOrders[i]={
+    ...draftOrders[i],
+    ...data,
+    updated_at:
+      new Date().toISOString()
+  };
+
+
+  saveDrafts();
+
+
+  await sendDraftOrder(
+    editingDraftId
+  );
+
+}
+
+
+/* =====================================================
+   SEND DRAFT ONLINE
+===================================================== */
+
+async function sendDraftOrder(
+  draftId
+){
+
+  const draft=
+    draftOrders.find(
+      x=>x.id===draftId
+    );
+
+
+  if(!draft){
+
+    alert(
+      "Draft পাওয়া যায়নি"
+    );
+
+    return;
+
+  }
+
+
+  if(!navigator.onLine){
+
+    alert(
+      "📴 Offline অবস্থায় Order Send করা যাবে না।\n\n"+
+      "Internet চালু করে আবার Send চাপুন।"
+    );
+
+    return;
+
+  }
+
+
+  if(!confirm(
+    `"${draft.shop}" এর অর্ডার Online-এ Send করবেন?`
+  ))return;
+
+
+  const mappedProducts=
+    (draft.products||[])
+    .map(p=>{
+
+      const main=
+        Number(
+          p.base_price??
+          p.price??
+          0
+        );
+
+
+      const carton=
+        Number(
+          p.carton_rate??
+          0
+        );
+
+
+      const rateType=
+        p.rate_type==="carton"&&
+        carton>0
+          ?"carton"
+          :"main";
+
+
+      const selectedRate=
+        rateType==="carton"
+          ?carton
+          :main;
+
+
+      const quantity=
+        Number(
+          p.quantity||0
+        );
+
+
+      return {
+
+        product_id:
+          p.product_id||null,
+
+        code:p.code||"",
+
+        name:p.name||"",
+
+        pack:p.pack||"",
+
+        base_price:main,
+
+        price:selectedRate,
+
+        carton_rate:carton,
+
+        tp_rate:
+          Number(
+            p.tp_rate||0
+          ),
+
+        offer:
+          p.offer||"",
+
+        rate_type:
+          rateType,
+
+        rate:
+          selectedRate,
+
+        quantity:
+          quantity,
+
+        bonus:
+          Number(
+            p.bonus||0
+          ),
+
+        value:
+          selectedRate*
+          quantity
+
+      };
+
+    });
+
+
+  const total=
+    mappedProducts.reduce(
+      (sum,p)=>
+        sum+
+        Number(p.value||0),
+      0
+    );
+
+
+  const payload={
+
+    market:
+      draft.market||"",
+
+    shop:
+      draft.shop,
+
+    shop_code:
+      draft.shop_code||"",
+
+    address:
+      draft.address||"",
+
+    mobile:
+      draft.mobile||"",
+
+    representative:
+      draft.representative||"",
+
+    order_date:
+      draft.order_date||"",
+
+    delivery_date:
+      draft.delivery_date||"",
+
+    note:
+      draft.note||"",
+
+    products:
+      mappedProducts,
+
+    total:total
+
+  };
+
+
+  try{
+
+    const {
+      data,
+      error
+    }=
+      await supabaseClient
+      .from("orders")
+      .insert(payload)
+      .select()
+      .single();
+
+
+    if(error)
+      throw error;
+
+
+    draftOrders=
+      draftOrders.filter(
+        x=>
+          x.id!==draftId
+      );
+
+
+    saveDrafts();
+
+
+    if(data){
+
+      orders.unshift(
+        data
+      );
+
+    }
+
+
+    saveLocalOrders();
+
+
+    addNotification(
+      "অর্ডার Sent",
+      `${draft.shop} এর অর্ডার Online-এ পাঠানো হয়েছে।`
+    );
+
+
+    updateDashboard();
+
+    renderHistory();
+
+
+    closeModal(
+      "orderModal"
+    );
+
+
+    showToast(
+      "✅ অর্ডার সফলভাবে Online-এ Send হয়েছে"
+    );
+
+
+  }catch(e){
+
+    console.error(
+      "Order Send Error:",
+      e
+    );
+
+
+    /*
+      Draft থাকবে।
+      তাই আবার Send করা যাবে।
+    */
+
+    saveDrafts();
+
+
+    alert(
+      "❌ অর্ডার Send হয়নি:\n\n"+
+      e.message+
+      "\n\nInternet ঠিক আছে কিনা দেখুন।"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   LOAD ORDERS
+===================================================== */
+
+async function loadOrdersFromSupabase(){
+
+  loadLocalOrders();
+
+  updateDashboard();
+
+  renderHistory();
+
+
+  if(!navigator.onLine){
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      data,
+      error
+    }=
+      await supabaseClient
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+    if(error)
+      throw error;
+
+
+    orders=
+      data||[];
+
+
+    saveLocalOrders();
+
+
+    updateDashboard();
+
+    renderHistory();
+
+  }catch(e){
+
+    console.error(
+      "Orders load:",
+      e
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
+function updateDashboard(){
+
+  const dp=
+    document.getElementById(
+      "dashProducts"
+    );
+
+  const di=
+    document.getElementById(
+      "dashItems"
+    );
+
+  const dox=
+    document.getElementById(
+      "dashOrders"
+    );
+
+  const dt=
+    document.getElementById(
+      "dashTotal"
+    );
+
+
+  if(dp)
+    dp.textContent=
+      products.length;
+
+
+  if(dox)
+    dox.textContent=
+      orders.length;
+
+
+  let items=0;
+
+  let total=0;
+
+
+  orders.forEach(o=>{
+
+    (
+      Array.isArray(
+        o.products
+      )
+      ?o.products
+      :[]
+    ).forEach(p=>{
+
+      items+=
+        Number(
+          p.quantity||0
+        );
+
+
+      total+=
+        Number(
+          p.value||
+          Number(
+            p.rate||
+            p.price||
+            0
+          )*
+          Number(
+            p.quantity||0
+          )
+        );
+
+    });
+
+  });
+
+
+  if(di)
+    di.textContent=
+      items;
+
+
+  if(dt)
+    dt.textContent=
+      money(total);
+
+}
+
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+function openHistory(){
+
+  renderHistory();
+
+  openModal(
+    "historyModal"
+  );
+
+}
+
+
+function renderHistory(){
+
+  const q=
+    (
+      document
+        .getElementById(
+          "historySearch"
+        )
+        ?.value||
+      ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+  const drafts=
+    draftOrders.filter(d=>
+      !q||
+      String(d.shop||"")
+        .toLowerCase()
+        .includes(q)||
+      String(d.mobile||"")
+        .toLowerCase()
+        .includes(q)
+    );
+
+
+  const draftBox=
+    document.getElementById(
+      "draftList"
+    );
+
+
+  if(draftBox){
+
+    draftBox.innerHTML=
+      '<h4 style="margin:0 0 5px">📝 Saved Drafts ('+
+      drafts.length+
+      ')</h4>'+
+      (
+        drafts.length
+
+        ?
+
+        drafts.map(d=>`
+
+          <div class="draft-card">
+
+            <div class="history-head">
+
+              <b>
+                ${escapeHtml(d.shop)}
+              </b>
+
+              <span class="badge draft">
+                DRAFT
+              </span>
+
+            </div>
+
+
+            <div class="small">
+
+              ${escapeHtml(d.mobile||"")}
+
+              ·
+
+              ${escapeHtml(d.order_date||"")}
+
+              ·
+
+              ${d.products?.length||0}
+              Product
+
+              ·
+
+              ${money(d.total)}
+
+            </div>
+
+
+            <div class="draft-actions">
+
+              <button
+                class="btn btn-light"
+                onclick="openOrderModal('${escapeHtml(d.id)}')">
+
+                ✏️ Edit / Add
+
+              </button>
+
+
+              <button
+                class="btn btn-primary"
+                onclick="sendDraftOrder('${escapeHtml(d.id)}')">
+
+                📤 Send
+
+              </button>
+
+            </div>
+
+          </div>
+
+        `).join("")
+
+        :
+
+        '<div class="empty">কোনো Saved Draft নেই</div>'
+      );
+
+  }
+
+
+  const sent=
+    orders.filter(o=>
+      !q||
+      String(o.shop||"")
+        .toLowerCase()
+        .includes(q)||
+      String(o.mobile||"")
+        .toLowerCase()
+        .includes(q)
+    );
+
+
+  const historyBox=
+    document.getElementById(
+      "historyList"
+    );
+
+
+  if(!historyBox)return;
+
+
+  historyBox.innerHTML=
+    sent.length
+
+    ?
+
+    sent.map((o,i)=>`
+
+      <div class="history-row">
+
+        <div class="history-head">
+
+          <div>
+
+            <b>
+              ${escapeHtml(o.shop||"")}
+            </b>
+
+            <div class="small">
+
+              ${escapeHtml(o.mobile||"")}
+
+              ·
+
+              ${escapeHtml(o.order_date||"")}
+
+            </div>
+
+          </div>
+
+
+          <span class="badge sent">
+            SENT
+          </span>
+
+        </div>
+
+
+        <div style="margin-top:5px">
+
+          ${(o.products||[]).length}
+          Product
+
+          ·
+
+          <b>
+            ${money(o.total)}
+          </b>
+
+        </div>
+
+
+        <div class="history-actions">
+
+          <button
+            class="btn btn-light"
+            onclick="showOrderDetail(${i})">
+
+            👁 বিস্তারিত
+
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("")
+
+    :
+
+    '<div class="empty">কোনো Sent Order নেই</div>';
+
+}
+
+
+/* =====================================================
+   ORDER DETAIL
+===================================================== */
+
+function showOrderDetail(index){
+
+  const q=
+    (
+      document
+        .getElementById(
+          "historySearch"
+        )
+        ?.value||
+      ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+  const sent=
+    orders.filter(o=>
+      !q||
+      String(o.shop||"")
+        .toLowerCase()
+        .includes(q)||
+      String(o.mobile||"")
+        .toLowerCase()
+        .includes(q)
+    );
+
+
+  const o=
+    sent[index];
+
+
+  if(!o)return;
+
+
+  const items=
+    Array.isArray(
+      o.products
+    )
+      ?o.products
+      :[];
+
+
+  document
+    .getElementById(
+      "detailContent"
+    )
+    .innerHTML=`
+
+      <div
+        class="card"
+        style="
+          margin:0 0 10px;
+          background:#f8fbfa">
+
+        <b>মার্কেট:</b>
+        ${escapeHtml(o.market||"")}
+        <br>
+
+        <b>দোকান:</b>
+        ${escapeHtml(o.shop)}
+        <br>
+
+        <b>দোকানের কোড:</b>
+        ${escapeHtml(o.shop_code||"")}
+        <br>
+
+        <b>মোবাইল:</b>
+        ${escapeHtml(o.mobile||"")}
+        <br>
+
+        <b>ঠিকানা:</b>
+        ${escapeHtml(o.address||"")}
+        <br>
+
+        <b>Representative:</b>
+        ${escapeHtml(o.representative||"")}
+        <br>
+
+        <b>Order Date:</b>
+        ${escapeHtml(o.order_date||"")}
+        <br>
+
+        <b>Delivery:</b>
+        ${escapeHtml(o.delivery_date||"")}
+
+      </div>
+
+
+      ${
+        items.map(p=>{
+
+          const carton=
+            Number(
+              p.carton_rate||0
+            );
+
+
+          const type=
+            p.rate_type==="carton"&&
+            carton>0
+              ?"carton"
+              :"main";
+
+
+          const rate=
+            type==="carton"
+              ?carton
+              :Number(
+                p.base_price??
+                p.price??
+                0
+              );
+
+
+          return `
+
+            <div class="order-item">
+
+              <b>
+                ${escapeHtml(p.name)}
+              </b>
+
+
+              <div class="small">
+
+                ${escapeHtml(p.code||"")}
+
+                · Pack
+                ${escapeHtml(p.pack||"")}
+
+                · Qty
+                ${Number(p.quantity||0)}
+
+                · Bonus
+                ${Number(p.bonus||0)}
+
+              </div>
+
+
+              <div
+                class="small"
+                style="margin-top:3px">
+
+                Rate Type:
+
+                <b>
+
+                  ${
+                    type==="carton"
+                      ?"Carton Rate"
+                      :"মূল রেট"
+                  }
+
+                </b>
+
+                · Rate
+                ${money(rate)}
+
+                ${
+                  p.offer
+                  ?
+                  ` · Offer ${escapeHtml(p.offer)} Free`
+                  :
+                  ""
+                }
+
+              </div>
+
+
+              <div style="margin-top:4px">
+
+                ${money(
+                  p.value||
+                  rate*
+                  Number(
+                    p.quantity||0
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+          `;
+
+        }).join("")
+      }
+
+
+      <div class="total">
+
+        মোট:
+        ${money(o.total)}
+
+      </div>
+
+
+      <div class="small">
+
+        ${escapeHtml(o.note||"")}
+
+      </div>
+
+    `;
+
+
+  openModal(
+    "detailModal"
+  );
+
+}
+
+
+/* =====================================================
+   PRODUCT MANAGER
+===================================================== */
+
+function openProductManager(){
+
+  editingProductId=null;
+
+  clearProductForm();
+
+
+  document
+    .getElementById(
+      "productEditPanel"
+    )
+    .classList
+    .remove("editing");
+
+
+  renderProductManagerList();
+
+  openModal(
+    "productModal"
+  );
+
+}
+
+
+function clearProductForm(){
+
+  [
+    "pCode",
+    "pName",
+    "pPack",
+    "pPrice",
+    "pCartonRate",
+    "pMrp",
+    "pTpRate",
+    "pOffer",
+    "pStock"
+
+  ].forEach(id=>
+
+    document
+      .getElementById(id)
+      .value=""
+
+  );
+
+}
+
+
+/* =====================================================
+   EDIT PRODUCT
+===================================================== */
+
+function editProduct(id){
+
+  const p=
+    products.find(
+      x=>
+        String(x.id)===
+        String(id)
+    );
+
+
+  if(!p)return;
+
+
+  editingProductId=id;
+
+
+  document
+    .getElementById("pCode")
+    .value=
+      p.code||"";
+
+
+  document
+    .getElementById("pName")
+    .value=
+      p.name||"";
+
+
+  document
+    .getElementById("pPack")
+    .value=
+      p.pack||"";
+
+
+  document
+    .getElementById("pPrice")
+    .value=
+      p.price||0;
+
+
+  document
+    .getElementById("pCartonRate")
+    .value=
+      p.carton_rate||0;
+
+
+  document
+    .getElementById("pMrp")
+    .value=
+      p.mrp||0;
+
+
+  document
+    .getElementById("pTpRate")
+    .value=
+      p.tp_rate||0;
+
+
+  document
+    .getElementById("pOffer")
+    .value=
+      p.offer||"";
+
+
+  document
+    .getElementById("pStock")
+    .value=
+      p.stock||0;
+
+
+  const panel=
+    document.getElementById(
+      "productEditPanel"
+    );
+
+
+  panel
+    .classList
+    .add("editing");
+
+
+  openModal(
+    "productModal"
+  );
+
+
+  requestAnimationFrame(()=>{
+
+    panel.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+
+
+    setTimeout(()=>{
+
+      document
+        .getElementById(
+          "pCode"
+        )
+        .focus({
+          preventScroll:true
+        });
+
+    },350);
+
+  });
+
+}
+
+
+/* =====================================================
+   OFFER CALCULATION
+===================================================== */
+
+function getOfferFactor(
+  offer
+){
+
+  const text=
+    String(offer||"")
+      .trim();
+
+
+  if(!text)return 1;
+
+
+  const match=
+    text.match(
+      /^(\d+(?:\.\d+)?)\s*[:+\-]\s*(\d+(?:\.\d+)?)$/
+    );
+
+
+  if(!match)return 1;
+
+
+  const buy=
+    Number(match[1]);
+
+
+  const free=
+    Number(match[2]);
+
+
+  if(
+    buy<=0||
+    free<0
+  )return 1;
+
+
+  return buy/
+    (buy+free);
+
+}
+
+
+function autoCalculateMainRate(){
+
+  const tp=
+    Number(
+      document
+        .getElementById(
+          "pTpRate"
+        )
+        ?.value||
+      0
+    );
+
+
+  const offer=
+    document
+      .getElementById(
+        "pOffer"
+      )
+      ?.value||
+    "";
+
+
+  const priceEl=
+    document.getElementById(
+      "pPrice"
+    );
+
+
+  if(!priceEl)return;
+
+
+  if(
+    tp>0&&
+    offer
+  ){
+
+    const rate=
+      tp*
+      getOfferFactor(
+        offer
+      );
+
+
+    priceEl.value=
+      rate.toFixed(2);
+
+  }
+
+}
+
+
+/* =====================================================
+   SAVE PRODUCT
+===================================================== */
+
+async function saveProduct(){
+
+  const code=
+    document
+      .getElementById(
+        "pCode"
+      )
+      .value
+      .trim();
+
+
+  const name=
+    document
+      .getElementById(
+        "pName"
+      )
+      .value
+      .trim();
+
+
+  const pack=
+    document
+      .getElementById(
+        "pPack"
+      )
+      .value
+      .trim();
+
+
+  const priceInput=
+    document
+      .getElementById(
+        "pPrice"
+      )
+      .value
+      .trim();
+
+
+  const cartonInput=
+    document
+      .getElementById(
+        "pCartonRate"
+      )
+      .value
+      .trim();
+
+
+  const mrpInput=
+    document
+      .getElementById(
+        "pMrp"
+      )
+      .value
+      .trim();
+
+
+  const tpInput=
+    document
+      .getElementById(
+        "pTpRate"
+      )
+      .value
+      .trim();
+
+
+  const offer=
+    document
+      .getElementById(
+        "pOffer"
+      )
+      .value
+      .trim();
+
+
+  const stockInput=
+    document
+      .getElementById(
+        "pStock"
+      )
+      .value
+      .trim();
+
+
+  if(!name){
+
+    alert(
+      "Product name দিন"
+    );
+
+    return;
+
+  }
+
+
+  if(priceInput===""){
+
+    alert(
+      "মূল রেট দিন"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    UUID তৈরি করা হচ্ছে যাতে
+    Offline Product পরে একই ID দিয়ে
+    Online-এ Sync হতে পারে।
+  */
+
+  const id=
+    editingProductId||
+    (
+      window.crypto?.randomUUID
+      ?
+      crypto.randomUUID()
+      :
+      "local-"+Date.now()+"-"+Math.random()
+        .toString(36)
+        .slice(2,8)
+    );
+
+
+  const payload={
+
+    id:id,
+
+    code:code,
+
+    name:name,
+
+    pack:pack,
+
+    price:
+      Number(priceInput),
+
+    carton_rate:
+      cartonInput===""
+        ?0
+        :Number(cartonInput),
+
+    mrp:
+      mrpInput===""
+        ?0
+        :Number(mrpInput),
+
+    tp_rate:
+      tpInput===""
+        ?0
+        :Number(tpInput),
+
+    offer:offer,
+
+    stock:
+      stockInput===""
+        ?0
+        :Number(stockInput)
+
+  };
+
+
+  /*
+    =================================================
+    LOCAL SAVE
+    =================================================
+  */
+
+  const index=
+    products.findIndex(
+      p=>
+        String(p.id)===
+        String(id)
+    );
+
+
+  if(index>=0){
+
+    products[index]={
+      ...products[index],
+      ...payload
+    };
+
+  }else{
+
+    products.push(
+      payload
+    );
+
+  }
+
+
+  saveLocalProducts();
+
+  updateDashboard();
+
+  renderProductResults();
+
+  renderProductManagerList();
+
+
+  /*
+    =================================================
+    OFFLINE
+    =================================================
+  */
+
+  if(!navigator.onLine){
+
+    addPendingProduct({
+
+      action:
+        editingProductId
+          ?"update"
+          :"insert",
+
+      id:id,
+
+      data:payload,
+
+      created_at:
+        new Date().toISOString()
+
+    });
+
+
+    clearProductForm();
+
+    editingProductId=null;
+
+
+    document
+      .getElementById(
+        "productEditPanel"
+      )
+      .classList
+      .remove("editing");
+
+
+    closeModal(
+      "productModal"
+    );
+
+
+    showToast(
+      "📴 Product Offline-এ Save হয়েছে — Internet এলে Sync হবে"
+    );
+
+
+    updateSyncInfo();
+
+    return;
+
+  }
+
+
+  /*
+    =================================================
+    ONLINE
+    =================================================
+  */
+
+  try{
+
+    let result;
+
+
+    if(editingProductId){
+
+      result=
+        await supabaseClient
+        .from("products")
+        .update(payload)
+        .eq(
+          "id",
+          editingProductId
+        );
+
+    }else{
+
+      result=
+        await supabaseClient
+        .from("products")
+        .insert(payload);
+
+    }
+
+
+    if(result.error)
+      throw result.error;
+
+
+    await loadProducts();
+
+
+    showToast(
+      "✅ Product Online-এ Save হয়েছে"
+    );
+
+
+  }catch(e){
+
+    console.error(
+      "Product Save Error:",
+      e
+    );
+
+
+    /*
+      Online থাকলেও Server fail করলে
+      Local + Pending Queue থাকবে।
+    */
+
+    addPendingProduct({
+
+      action:
+        editingProductId
+          ?"update"
+          :"insert",
+
+      id:id,
+
+      data:payload,
+
+      created_at:
+        new Date().toISOString()
+
+    });
+
+
+    showToast(
+      "📴 Server Save হয়নি — Local-এ রাখা হয়েছে, পরে Sync হবে"
+    );
+
+  }
+
+
+  renderProductManagerList();
+
+  clearProductForm();
+
+  editingProductId=null;
+
+
+  document
+    .getElementById(
+      "productEditPanel"
+    )
+    .classList
+    .remove("editing");
+
+
+  updateSyncInfo();
+
+}
+
+
+/* =====================================================
+   DELETE PRODUCT
+===================================================== */
+
+async function deleteProduct(id){
+
+  const p=
+    products.find(
+      x=>
+        String(x.id)===
+        String(id)
+    );
+
+
+  if(!p)return;
+
+
+  if(!confirm(
+    `"${p.name}" ডিলিট করবেন?`
+  ))return;
+
+
+  /*
+    Local থেকে সঙ্গে সঙ্গে Delete
+  */
+
+  products=
+    products.filter(
+      x=>
+        String(x.id)!==
+        String(id)
+    );
+
+
+  saveLocalProducts();
+
+  renderProductManagerList();
+
+  renderProductResults();
+
+  updateDashboard();
+
+
+  /*
+    যদি Product আগে Offline-এ নতুন
+    তৈরি হয়ে থাকে, তাহলে তার insert
+    queue আর delete queue দুটো রাখার
+    দরকার নেই।
+  */
+
+  let pending=
+    getPendingProducts();
+
+
+  const hasInsert=
+    pending.some(
+      x=>
+        String(x.id)===
+        String(id)&&
+        x.action==="insert"
+    );
+
+
+  pending=
+    pending.filter(
+      x=>
+        String(x.id)!==
+        String(id)
+    );
+
+
+  /*
+    যদি Server-এ আগে থেকেই থাকা Product হয়
+    তাহলে Delete Sync করা হবে।
+  */
+
+  if(!hasInsert){
+
+    pending.push({
+
+      action:"delete",
+
+      id:id,
+
+      created_at:
+        new Date().toISOString()
+
+    });
+
+  }
+
+
+  savePendingProducts(
+    pending
+  );
+
+
+  if(!navigator.onLine){
+
+    showToast(
+      "📴 Product Offline-এ Delete হয়েছে — Online হলে Sync হবে"
+    );
+
+    updateSyncInfo();
+
+    return;
+
+  }
+
+
+  await syncPendingProducts();
+
+}
+
+
+/* =====================================================
+   PRODUCT MANAGER LIST
+===================================================== */
+
+function renderProductManagerList(){
+
+  const box=
+    document.getElementById(
+      "productManagerList"
+    );
+
+
+  if(!box)return;
+
+
+  if(!products.length){
+
+    box.innerHTML=
+      '<div class="empty">Product নেই</div>';
+
+    return;
+
+  }
+
+
+  const pendingIds=
+    new Set(
+      getPendingProducts()
+        .map(
+          x=>
+            String(x.id)
+        )
+    );
+
+
+  box.innerHTML=
+    products
+      .slice(0,150)
+      .map(p=>`
+
+        <div class="history-row">
+
+          <div class="history-head">
+
+            <div>
+
+              <b>
+                ${escapeHtml(p.name)}
+              </b>
+
+
+              <div class="small">
+
+                ${escapeHtml(p.code||"")}
+
+                · Pack
+                ${escapeHtml(p.pack||"")}
+
+                · মূল
+                ${money(mainRate(p))}
+
+                · Carton
+                ${money(cartonRate(p))}
+
+                · MRP
+                ${money(p.mrp)}
+
+                · TP Rate
+                ${money(p.tp_rate)}
+
+                ${
+                  p.offer
+                  ?
+                  ` · Offer ${escapeHtml(p.offer)} Free`
+                  :
+                  ""
+                }
+
+                · Stock
+                ${Number(p.stock||0)}
+
+              </div>
+
+
+              ${
+                pendingIds.has(
+                  String(p.id)
+                )
+                ?
+                `
+                <div style="margin-top:5px">
+                  <span class="badge pending">
+                    ⏳ Sync Pending
+                  </span>
+                </div>
+                `
+                :
+                ""
+              }
+
+            </div>
+
+          </div>
+
+
+          <div class="history-actions">
+
+            <button
+              class="btn btn-light"
+              onclick="editProduct('${escapeHtml(String(p.id))}')">
+
+              ✏️ Edit
+
+            </button>
+
+
+            <button
+              class="btn btn-danger"
+              onclick="deleteProduct('${escapeHtml(String(p.id))}')">
+
+              🗑 Delete
+
+            </button>
+
+          </div>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+
+/* =====================================================
+   PRODUCT SYNC
+===================================================== */
+
+async function syncPendingProducts(){
+
+  if(!navigator.onLine)
+    return;
+
+
+  if(isSyncing)
+    return;
+
+
+  const pending=
+    getPendingProducts();
+
+
+  if(!pending.length){
+
+    updateSyncInfo();
+
+    return;
+
+  }
+
+
+  isSyncing=true;
+
+
+  setOnlineStatus(
+    "🔄 Sync হচ্ছে..."
+  );
+
+
+  let remaining=[];
+
+
+  try{
+
+    for(
+      const job of pending
+    ){
+
+      try{
+
+        /*
+          INSERT
+        */
+
+        if(
+          job.action==="insert"
+        ){
+
+          const {
+            data,
+            error
+          }=
+            await supabaseClient
+            .from("products")
+            .insert(
+              job.data
+            )
+            .select()
+            .single();
+
+
+          if(error)
+            throw error;
+
+
+          const index=
+            products.findIndex(
+              p=>
+                String(p.id)===
+                String(job.id)
+            );
+
+
+          if(index>=0){
+
+            products[index]=
+              data;
+
+          }else{
+
+            products.push(
+              data
+            );
+
+          }
+
+        }
+
+
+        /*
+          UPDATE
+        */
+
+        else if(
+          job.action==="update"
+        ){
+
+          const {
+            data,
+            error
+          }=
+            await supabaseClient
+            .from("products")
+            .update(
+              job.data
+            )
+            .eq(
+              "id",
+              job.id
+            )
+            .select()
+            .single();
+
+
+          if(error)
+            throw error;
+
+
+          const index=
+            products.findIndex(
+              p=>
+                String(p.id)===
+                String(job.id)
+            );
+
+
+          if(index>=0){
+
+            products[index]=
+              data;
+
+          }
+
+        }
+
+
+        /*
+          DELETE
+        */
+
+        else if(
+          job.action==="delete"
+        ){
+
+          const {
+            error
+          }=
+            await supabaseClient
+            .from("products")
+            .delete()
+            .eq(
+              "id",
+              job.id
+            );
+
+
+          /*
+            যদি Server-এ Product না থাকে,
+            Delete কাজটি কার্যত সম্পন্ন।
+          */
+
+          if(
+            error&&
+            error.code!=="PGRST116"
+          ){
+
+            throw error;
+
+          }
+
+
+          products=
+            products.filter(
+              p=>
+                String(p.id)!==
+                String(job.id)
+            );
+
+        }
+
+      }catch(error){
+
+        console.error(
+          "Product Sync Error:",
+          error
+        );
+
+
+        remaining.push(
+          job
+        );
+
+      }
+
+    }
+
+  }finally{
+
+    isSyncing=false;
+
+  }
+
+
+  savePendingProducts(
+    remaining
+  );
+
+
+  saveLocalProducts();
+
+
+  updateDashboard();
+
+  renderProductResults();
+
+  renderProductManagerList();
+
+
+  setOnlineStatus();
+
+
+  updateSyncInfo();
+
+
+  if(
+    pending.length&&
+    remaining.length===0
+  ){
+
+    showToast(
+      "✅ সব Pending Product Online-এ Sync হয়েছে"
+    );
+
+  }else if(
+    remaining.length>0
+  ){
+
+    showToast(
+      "⚠️ কিছু Product Sync বাকি আছে"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   SYNC INFO
+===================================================== */
+
+function updateSyncInfo(){
+
+  const box=
+    document.getElementById(
+      "syncInfo"
+    );
+
+
+  if(!box)return;
+
+
+  const count=
+    getPendingProducts()
+      .length;
+
+
+  if(!count){
+
+    box.style.display="none";
+
+    box.textContent="";
+
+    return;
+
+  }
+
+
+  box.style.display="block";
+
+
+  box.innerHTML=
+    "⏳ "+count+
+    "টি Product Online Sync-এর অপেক্ষায় আছে";
+
+}
+
+
+/* =====================================================
+   NOTIFICATIONS
+===================================================== */
+
+function addNotification(
+  title,
+  text
+){
+
+  notifications.unshift({
+
+    id:
+      Date.now(),
+
+    title:title,
+
+    text:text,
+
+    created_at:
+      new Date().toISOString()
+
+  });
+
+
+  notifications=
+    notifications.slice(
+      0,
+      50
+    );
+
+
+  localStorage.setItem(
+    LOCAL_NOTICES_KEY,
+    JSON.stringify(
+      notifications
+    )
+  );
+
+
+  renderNotifications();
+
+}
+
+
+function loadNotifications(){
+
+  try{
+
+    const data=
+      JSON.parse(
+        localStorage.getItem(
+          LOCAL_NOTICES_KEY
+        )||"[]"
+      );
+
+
+    notifications=
+      Array.isArray(data)
+        ?data
+        :[];
+
+  }catch{
+
+    notifications=[];
+
+  }
+
+}
+
+
+function renderNotifications(){
+
+  const box=
+    document.getElementById(
+      "notificationList"
+    );
+
+
+  if(!box)return;
+
+
+  box.innerHTML=
+    notifications.length
+
+    ?
+
+    notifications
+      .map(n=>`
+
+        <div class="notice">
+
+          <b>
+            ${escapeHtml(n.title)}
+          </b>
+
+          <div class="small">
+            ${escapeHtml(n.text)}
+          </div>
+
+        </div>
+
+      `)
+      .join("")
+
+    :
+
+    '<div class="empty">কোনো Notification নেই</div>';
+
+}
+
+
+function openNotifications(){
+
+  renderNotifications();
+
+  openModal(
+    "notificationModal"
+  );
+
+}
+
+
+/* =====================================================
+   MARKET / SHOP
+===================================================== */
+
+let marketShops=[];
+
+let editingMarketShopId=null;
+
+
+function getMarketShopsKey(){
+
+  return currentUser?.id
+    ?
+    MARKET_SHOPS_KEY+
+    currentUser.id
+    :
+    null;
+
+}
+
+
+function loadMarketShops(){
+
+  const key=
+    getMarketShopsKey();
+
+
+  if(!key){
+
+    marketShops=[];
+
+    populateMarketSelect();
+
+    populateShopSelect();
+
+    return;
+
+  }
+
+
+  try{
+
+    marketShops=
+      JSON.parse(
+        localStorage.getItem(
+          key
+        )||"[]"
+      );
+
+
+    if(!Array.isArray(
+      marketShops
+    )){
+
+      marketShops=[];
+
+    }
+
+  }catch{
+
+    marketShops=[];
+
+  }
+
+
+  populateMarketSelect();
+
+  populateShopSelect();
+
+}
+
+
+function saveMarketShops(){
+
+  const key=
+    getMarketShopsKey();
+
+
+  if(!key){
+
+    alert(
+      "User session পাওয়া যায়নি। আবার Login করুন।"
+    );
+
+    return;
+
+  }
+
+
+  localStorage.setItem(
+    key,
+    JSON.stringify(
+      marketShops
+    )
+  );
+
+
+  populateMarketSelect();
+
+  populateShopSelect();
+
+}
+
+
+function openMarketShopManager(){
+
+  loadMarketShops();
+
+  clearMarketShopForm();
+
+  renderMarketShopList();
+
+  openModal(
+    "marketShopModal"
+  );
+
+}
+
+
+function clearMarketShopForm(){
+
+  editingMarketShopId=null;
+
+
+  [
+    "msMarket",
+    "msShop",
+    "msShopCode",
+    "msAddress",
+    "msMobile",
+    "msRepresentative"
+
+  ].forEach(id=>
+
+    document
+      .getElementById(id)
+      .value=""
+
+  );
+
+}
+
+
+function saveMarketShop(){
+
+  const market=
+    document
+      .getElementById(
+        "msMarket"
+      )
+      .value
+      .trim();
+
+
+  const shop=
+    document
+      .getElementById(
+        "msShop"
+      )
+      .value
+      .trim();
+
+
+  if(!market){
+
+    alert(
+      "মার্কেটের নাম দিন"
+    );
+
+    return;
+
+  }
+
+
+  if(!shop){
+
+    alert(
+      "দোকানের নাম দিন"
+    );
+
+    return;
+
+  }
+
+
+  const item={
+
+    id:
+      editingMarketShopId||
+      (
+        "ms-"+
+        Date.now()+
+        "-"+
+        Math.random()
+          .toString(36)
+          .slice(2,7)
+      ),
+
+    market:market,
+
+    shop:shop,
+
+    shop_code:
+      document
+        .getElementById(
+          "msShopCode"
+        )
+        .value
+        .trim(),
+
+    address:
+      document
+        .getElementById(
+          "msAddress"
+        )
+        .value
+        .trim(),
+
+    mobile:
+      document
+        .getElementById(
+          "msMobile"
+        )
+        .value
+        .trim(),
+
+    representative:
+      document
+        .getElementById(
+          "msRepresentative"
+        )
+        .value
+        .trim(),
+
+    updated_at:
+      new Date().toISOString()
+
+  };
+
+
+  if(editingMarketShopId){
+
+    const i=
+      marketShops.findIndex(
+        x=>
+          x.id===
+          editingMarketShopId
+      );
+
+
+    if(i>=0){
+
+      marketShops[i]={
+        ...marketShops[i],
+        ...item
+      };
+
+    }
+
+  }else{
+
+    marketShops.unshift(
+      item
+    );
+
+  }
+
+
+  saveMarketShops();
+
+  renderMarketShopList();
+
+  clearMarketShopForm();
+
+
+  showToast(
+    "✅ Market/Shop Offline-এ Save হয়েছে"
+  );
+
+}
+
+
+function editMarketShop(id){
+
+  const x=
+    marketShops.find(
+      v=>
+        String(v.id)===
+        String(id)
+    );
+
+
+  if(!x)return;
+
+
+  editingMarketShopId=
+    x.id;
+
+
+  document
+    .getElementById(
+      "msMarket"
+    )
+    .value=
+      x.market||"";
+
+
+  document
+    .getElementById(
+      "msShop"
+    )
+    .value=
+      x.shop||"";
+
+
+  document
+    .getElementById(
+      "msShopCode"
+    )
+    .value=
+      x.shop_code||"";
+
+
+  document
+    .getElementById(
+      "msAddress"
+    )
+    .value=
+      x.address||"";
+
+
+  document
+    .getElementById(
+      "msMobile"
+    )
+    .value=
+      x.mobile||"";
+
+
+  document
+    .getElementById(
+      "msRepresentative"
+    )
+    .value=
+      x.representative||"";
+
+
+  document
+    .getElementById(
+      "msMarket"
+    )
+    .focus();
+
+}
+
+
+function deleteMarketShop(id){
+
+  const x=
+    marketShops.find(
+      v=>
+        String(v.id)===
+        String(id)
+    );
+
+
+  if(!x)return;
+
+
+  if(!confirm(
+    `"${x.market} — ${x.shop}" ডিলিট করবেন?`
+  ))return;
+
+
+  marketShops=
+    marketShops.filter(
+      v=>
+        String(v.id)!==
+        String(id)
+    );
+
+
+  saveMarketShops();
+
+  renderMarketShopList();
+
+  clearMarketShopForm();
+
+
+  showToast(
+    "🗑️ তথ্য Delete হয়েছে"
+  );
+
+}
+
+
+function renderMarketShopList(){
+
+  const box=
+    document.getElementById(
+      "marketShopList"
+    );
+
+
+  if(!box)return;
+
+
+  const q=
+    (
+      document
+        .getElementById(
+          "marketShopSearch"
+        )
+        ?.value||
+      ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+  const list=
+    marketShops.filter(x=>
+      !q||
+      [
+        x.market,
+        x.shop,
+        x.shop_code,
+        x.address,
+        x.mobile
+      ].some(v=>
+        String(v||"")
+          .toLowerCase()
+          .includes(q)
+      )
+    );
+
+
+  box.innerHTML=
+    list.length
+
+    ?
+
+    list.map(x=>`
+
+      <div class="list-row">
+
+        <div class="list-row-head">
+
+          <div>
+
+            <b>
+              ${escapeHtml(x.shop)}
+            </b>
+
+            <div class="small">
+              📍 ${escapeHtml(x.market)}
+            </div>
+
+
+            ${
+              x.shop_code
+              ?
+              `
+              <div class="small">
+                🏷️ কোড:
+                ${escapeHtml(x.shop_code)}
+              </div>
+              `
+              :
+              ""
+            }
+
+
+            <div class="small">
+              ${escapeHtml(x.address||"")}
+            </div>
+
+
+            ${
+              x.mobile
+              ?
+              `
+              <div class="small">
+                📞 ${escapeHtml(x.mobile)}
+              </div>
+              `
+              :
+              ""
+            }
+
+          </div>
+
+
+          <span class="badge">
+            Saved
+          </span>
+
+        </div>
+
+
+        <div class="list-row-actions">
+
+          <button
+            class="btn btn-light"
+            onclick="editMarketShop('${escapeHtml(String(x.id))}')">
+
+            ✏️ Edit
+
+          </button>
+
+
+          <button
+            class="btn btn-danger"
+            onclick="deleteMarketShop('${escapeHtml(String(x.id))}')">
+
+            🗑 Delete
+
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("")
+
+    :
+
+    '<div class="empty">কোনো Market/Shop তালিকা নেই</div>';
+
+}
+
+
+function populateMarketSelect(
+  selected="",
+  autoSelect=false
+){
+
+  const s=
+    document.getElementById(
+      "marketSelect"
+    );
+
+
+  if(!s)return;
+
+
+  const markets=
+    [
+      ...new Set(
+        marketShops
+          .map(x=>x.market)
+          .filter(Boolean)
+      )
+    ]
+    .sort(
+      (a,b)=>
+        a.localeCompare(
+          b,
+          "bn"
+        )
+    );
+
+
+  s.innerHTML=
+    '<option value="">-- মার্কেট নির্বাচন করুন --</option>'+
+    markets.map(m=>`
+
+      <option value="${escapeHtml(m)}">
+        ${escapeHtml(m)}
+      </option>
+
+    `).join("");
+
+
+  if(selected){
+
+    s.value=selected;
+
+  }else if(
+    autoSelect&&
+    markets.length===1
+  ){
+
+    s.value=
+      markets[0];
+
+  }
+
+}
+
+
+function populateShopSelect(
+  selected="",
+  autoSelect=false
+){
+
+  const s=
+    document.getElementById(
+      "shopSelect"
+    );
+
+
+  if(!s)return;
+
+
+  const market=
+    document
+      .getElementById(
+        "marketSelect"
+      )
+      ?.value||
+    "";
+
+
+  const list=
+    marketShops.filter(
+      x=>
+        !market||
+        x.market===market
+    );
+
+
+  s.innerHTML=
+    '<option value="">-- দোকান নির্বাচন করুন --</option>'+
+    list.map(x=>`
+
+      <option value="${escapeHtml(String(x.id))}">
+
+        ${escapeHtml(x.shop)}
+
+        ${
+          x.shop_code
+          ?
+          ` — ${escapeHtml(x.shop_code)}`
+          :
+          ""
+        }
+
+      </option>
+
+    `).join("");
+
+
+  if(selected){
+
+    s.value=selected;
+
+  }else if(
+    autoSelect&&
+    list.length===1
+  ){
+
+    s.value=
+      String(list[0].id);
+
+  }
+
+
+  if(
+    autoSelect&&
+    list.length===1
+  ){
+
+    selectSavedShop();
+
+  }
+
+}
+
+
+function filterShopList(
+  autoSelect=false
+){
+
+  populateShopSelect(
+    "",
+    autoSelect
+  );
+
+}
+
+
+function selectSavedShop(){
+
+  const id=
+    document
+      .getElementById(
+        "shopSelect"
+      )
+      ?.value;
+
+
+  if(!id)return;
+
+
+  const x=
+    marketShops.find(
+      v=>
+        String(v.id)===
+        String(id)
+    );
+
+
+  if(!x)return;
+
+
+  document
+    .getElementById(
+      "marketSelect"
+    )
+    .value=
+      x.market||"";
+
+
+  document
+    .getElementById(
+      "shop"
+    )
+    .value=
+      x.shop||"";
+
+
+  document
+    .getElementById(
+      "shopCode"
+    )
+    .value=
+      x.shop_code||"";
+
+
+  document
+    .getElementById(
+      "address"
+    )
+    .value=
+      x.address||"";
+
+
+  document
+    .getElementById(
+      "mobile"
+    )
+    .value=
+      x.mobile||"";
+
+
+  document
+    .getElementById(
+      "representative"
+    )
+    .value=
+      x.representative||"";
+
+}
+
+
+function findSavedShopId(
+  shop,
+  market,
+  address
+){
+
+  const x=
+    marketShops.find(
+      v=>
+        v.shop===shop&&
+        (!market||
+          v.market===market)&&
+        (!address||
+          v.address===address)
+    );
+
+
+  return x?.id||"";
+
+}
+
+
+/* =====================================================
+   REALTIME
+===================================================== */
+
+function setupRealtime(){
+
+  if(
+    realtimeChannel||
+    !navigator.onLine
+  )return;
+
+
+  realtimeChannel=
+    supabaseClient
+      .channel(
+        "orders-live"
+      )
+      .on(
+        "postgres_changes",
+        {
+          event:"INSERT",
+          schema:"public",
+          table:"orders"
+        },
+        payload=>{
+
+          const row=
+            payload.new;
+
+
+          if(
+            !orders.some(
+              o=>
+                String(o.id)===
+                String(row.id)
+            )
+          ){
+
+            orders.unshift(
+              row
+            );
+
+
+            saveLocalOrders();
+
+            updateDashboard();
+
+            renderHistory();
+
+
+            addNotification(
+              "নতুন Online Order",
+              `${row.shop||"একটি দোকান"} থেকে নতুন অর্ডার এসেছে।`
+            );
+
+          }
+
+        }
+      )
+      .subscribe(status=>{
+
+        const el=
+          document.getElementById(
+            "onlineStatus"
+          );
+
+
+        if(
+          status==="SUBSCRIBED"
+        ){
+
+          el.textContent=
+            "🌐 অনলাইন";
+
+          el.className=
+            "online";
+
+        }
+
+      });
+
+}
+
+
+function startPolling(){
+
+  clearInterval(
+    pollingTimer
+  );
+
+
+  pollingTimer=
+    setInterval(
+      async()=>{
+
+        /*
+          Offline হলে Supabase call নয়
+        */
+
+        if(
+          !navigator.onLine
+        )return;
+
+
+        await syncPendingProducts();
+
+        await loadOrdersFromSupabase();
+
+      },
+      20000
+    );
+
+}
+
+
+/* =====================================================
+   ONLINE / OFFLINE EVENTS
+===================================================== */
+
+window.addEventListener(
+  "online",
+  async()=>{
+
+    setOnlineStatus(
+      "🔄 Sync হচ্ছে..."
+    );
+
+
+    showToast(
+      "🌐 Internet এসেছে"
+    );
+
+
+    /*
+      Pending Product Sync
+    */
+
+    await syncPendingProducts();
+
+
+    /*
+      সর্বশেষ Product/Order
+    */
+
+    await loadProducts();
+
+    await loadOrdersFromSupabase();
+
+
+    /*
+      Realtime আবার চালু
+    */
+
+    if(!realtimeChannel){
+
+      setupRealtime();
+
+    }
+
+
+    setOnlineStatus(
+      "🌐 অনলাইন"
+    );
+
+  }
+);
+
+
+window.addEventListener(
+  "offline",
+  ()=>{
+
+    setOnlineStatus(
+      "📴 অফলাইন"
+    );
+
+
+    updateSyncInfo();
+
+
+    showToast(
+      "📴 Offline Mode চালু — Local data ব্যবহার হচ্ছে"
+    );
+
+  }
+);
+
+
+/* =====================================================
+   BEFORE UNLOAD
+===================================================== */
+
+window.addEventListener(
+  "beforeunload",
+  ()=>{
+
+    if(realtimeChannel){
+
+      supabaseClient
+        .removeChannel(
+          realtimeChannel
+        );
+
+      realtimeChannel=null;
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   INITIAL STATUS
+===================================================== */
+
+setTimeout(()=>{
+
+  setOnlineStatus();
+
+  updateSyncInfo();
+
+},500);
+
+</script>
+
+</body>
+</html>

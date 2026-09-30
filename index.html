@@ -13,6 +13,7 @@
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f4f7f6;color:#18352a}
@@ -161,7 +162,7 @@ textarea{min-height:75px;resize:vertical}
 
 <div class="modal" id="historyModal"><div class="modal-box">
   <div class="modal-head"><h3>📋 Draft & Order History</h3><button class="close" onclick="closeModal('historyModal')">✕</button></div>
-  <input id="historySearch" class="search" placeholder="দোকান/মোবাইল দিয়ে খুঁজুন" oninput="renderHistory()"><div id="draftList" style="margin-top:12px"></div><hr style="border:0;border-top:1px solid #eee;margin:14px 0"><h4 style="margin:0 0 5px">📤 Sent Orders</h4><div id="historyList"></div>
+  <input id="historySearch" class="search" placeholder="দোকান/মোবাইল দিয়ে খুঁজুন" oninput="renderHistory()"><div id="draftList" style="margin-top:12px"></div><hr style="border:0;border-top:1px solid #eee;margin:14px 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><h4 style="margin:0 0 5px">📤 Sent Orders</h4><button class="btn btn-info" onclick="exportAllOrdersToExcel()">📊 All Excel</button></div><div id="historyList"></div>
 </div></div>
 
 <div class="modal" id="detailModal"><div class="modal-box">
@@ -303,6 +304,82 @@ function saveOrder(){
  else{const draft={...data,id:"draft-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),status:"draft",created_at:now,updated_at:now};draftOrders.unshift(draft);editingDraftId=draft.id;showToast("✅ Draft Save হয়েছে — এখনো Send হয়নি")}
  saveDrafts();updateDashboard();renderHistory();closeModal("orderModal")
 }
+function deleteDraft(draftId){
+  const draft=draftOrders.find(x=>String(x.id)===String(draftId));
+  if(!draft)return;
+  const label=draft.shop||"এই Draft";
+  if(!confirm(`"${label}" এর Draft Delete করতে চান?\n\nDelete করলে এই Draft আর ফিরে পাওয়া যাবে না।`))return;
+  draftOrders=draftOrders.filter(x=>String(x.id)!==String(draftId));
+  saveDrafts();
+  if(editingDraftId===draftId){editingDraftId=null;currentOrderItems=[];}
+  updateDashboard();
+  renderHistory();
+  showToast("🗑️ Draft Delete হয়েছে");
+}
+
+function safeFileName(value){
+  return String(value||"order").replace(/[\\/:*?"<>|#%{}$!@+`=]/g,"_").replace(/\s+/g,"_").slice(0,80)||"order";
+}
+
+function exportOrderToExcel(index, auto=false){
+  const o=orders[index];
+  if(!o){showToast("Order পাওয়া যায়নি");return false;}
+  if(typeof XLSX==="undefined"){
+    alert("Excel Export লাইব্রেরি লোড হয়নি। ইন্টারনেট চালু করে আবার চেষ্টা করুন।");
+    return false;
+  }
+  const items=Array.isArray(o.products)?o.products:[];
+  if(!items.length){showToast("এই Order-এ কোনো Product নেই");return false;}
+
+  // Product-wise: প্রতিটি Product আলাদা Row হবে।
+  const rows=items.map((p,n)=>{
+    const type=p.rate_type==="carton"?"Carton Rate":"মূল রেট";
+    const rate=Number(p.rate||(p.rate_type==="carton"?p.carton_rate:p.price)||0);
+    const qty=Number(p.quantity||0);
+    const bonus=Number(p.bonus||0);
+    return {
+      "SL":n+1,
+      "Order ID":o.id||"",
+      "Order Date":o.order_date||"",
+      "Delivery Date":o.delivery_date||"",
+      "Market":o.market||"",
+      "Shop":o.shop||"",
+      "Shop Code":o.shop_code||"",
+      "Mobile":o.mobile||"",
+      "Address":o.address||"",
+      "Representative":o.representative||"",
+      "Product Code":p.code||"",
+      "Product Name":p.name||"",
+      "Pack":p.pack||"",
+      "Quantity":qty,
+      "Bonus":bonus,
+      "Rate Type":type,
+      "Rate":rate,
+      "Product Total":Number(p.value||rate*qty),
+      "Offer / Free":p.offer||"",
+      "Note":o.note||""
+    };
+  });
+
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws["!cols"]=[
+    {wch:6},{wch:22},{wch:12},{wch:14},{wch:20},{wch:24},{wch:14},{wch:15},{wch:30},{wch:20},
+    {wch:16},{wch:32},{wch:12},{wch:12},{wch:10},{wch:14},{wch:12},{wch:16},{wch:15},{wch:35}
+  ];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
+  const fileName=`Order_${safeFileName(o.shop)}_${safeFileName(o.order_date||new Date().toISOString().slice(0,10))}.xlsx`;
+  XLSX.writeFile(wb,fileName);
+  if(!auto)showToast("✅ Product-wise Excel তৈরি হয়েছে");
+  return true;
+}
+
+function exportLatestOrderToExcel(order){
+  const idx=orders.findIndex(x=>String(x.id)===String(order?.id));
+  if(idx>=0)return exportOrderToExcel(idx,true);
+  return false;
+}
+
 async function sendCurrentDraft(){if(!editingDraftId){alert("আগে Save Draft করুন। তারপর Draft খুলে Send Order চাপুন।");return}const data=getOrderFormData();if(!data)return;const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft পাওয়া যায়নি");return}draftOrders[i]={...draftOrders[i],...data,updated_at:new Date().toISOString()};saveDrafts();await sendDraftOrder(editingDraftId)}
 async function sendDraftOrder(draftId){
  const draft=draftOrders.find(x=>x.id===draftId);if(!draft){alert("Draft পাওয়া যায়নি");return}
@@ -312,7 +389,7 @@ async function sendDraftOrder(draftId){
  const payload={user_id:currentUser.id,market:draft.market||"",shop:draft.shop,shop_code:draft.shop_code||"",address:draft.address,mobile:draft.mobile,representative:draft.representative,order_date:draft.order_date,delivery_date:draft.delivery_date,note:draft.note,products:(draft.products||[]).map(p=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0),quantity=Number(p.quantity||0);return {product_id:p.product_id||null,code:p.code||"",name:p.name||"",pack:p.pack||"",base_price:Number(p.base_price??p.price??0),price:selectedRate,carton_rate:Number(p.carton_rate||0),tp_rate:Number(p.tp_rate||0),offer:p.offer||"",rate_type:rateType,rate:selectedRate,quantity,bonus:Number(p.bonus||0),value:selectedRate*quantity}}),total:(draft.products||[]).reduce((sum,p)=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);return sum+selectedRate*Number(p.quantity||0)},0)};
  const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
  if(error){draft.status="pending_send";saveDrafts();alert("❌ অর্ডার Send হয়নি; Pending রাখা হয়েছে:\n"+error.message);return}
- draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data)orders.unshift(data);addNotification("অর্ডার Sent",`${draft.shop} এর অর্ডার Online-এ পাঠানো হয়েছে।`);updateDashboard();renderHistory();closeModal("orderModal");showToast("✅ অর্ডার সফলভাবে Online-এ Send হয়েছে")
+ draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data){orders.unshift(data);exportLatestOrderToExcel(data);}addNotification("অর্ডার Sent",`${draft.shop} এর অর্ডার Online-এ পাঠানো হয়েছে।`);updateDashboard();renderHistory();closeModal("orderModal");showToast("✅ অর্ডার সফলভাবে Online-এ Send হয়েছে")
 }
 async function syncPendingOrders(){if(syncRunning||!navigator.onLine||!currentUser)return;syncRunning=true;try{const pending=draftOrders.filter(d=>d.status==="pending_send");for(const d of pending){if(!navigator.onLine)break;d.autoSync=true;await sendDraftOrder(d.id);delete d.autoSync}}finally{syncRunning=false}}
 window.addEventListener("online",()=>{const el=document.getElementById("onlineStatus");if(el){el.textContent="Online — Sync হচ্ছে";el.className="online"}syncPendingOrders()});
@@ -321,10 +398,33 @@ function updateDashboard(){document.getElementById("dashProducts").textContent=p
 function openHistory(){renderHistory();openModal("historyModal")}
 function renderHistory(){
  const q=(document.getElementById("historySearch")?.value||"").trim().toLowerCase(),drafts=draftOrders.filter(d=>!q||String(d.shop||"").toLowerCase().includes(q)||String(d.mobile||"").toLowerCase().includes(q));
- document.getElementById("draftList").innerHTML='<h4 style="margin:0 0 5px">📝 Saved Drafts ('+drafts.length+')</h4>'+(drafts.length?drafts.map(d=>`<div class="draft-card"><div class="history-head"><b>${escapeHtml(d.shop)}</b><span class="badge draft">${d.status==="pending_send"?"PENDING":"DRAFT"}</span></div><div class="small">${escapeHtml(d.mobile||"")} · ${escapeHtml(d.order_date||"")} · ${d.products?.length||0} Product · ${money(d.total)}</div><div class="draft-actions"><button class="btn btn-light" onclick="openOrderModal('${escapeHtml(d.id)}')">✏️ Edit / Add</button><button class="btn btn-primary" onclick="sendDraftOrder('${escapeHtml(d.id)}')">📤 Send</button></div></div>`).join(""):'<div class="empty">কোনো Saved Draft নেই</div>');
+ document.getElementById("draftList").innerHTML='<h4 style="margin:0 0 5px">📝 Saved Drafts ('+drafts.length+')</h4>'+(drafts.length?drafts.map(d=>`<div class="draft-card"><div class="history-head"><b>${escapeHtml(d.shop)}</b><span class="badge draft">${d.status==="pending_send"?"PENDING":"DRAFT"}</span></div><div class="small">${escapeHtml(d.mobile||"")} · ${escapeHtml(d.order_date||"")} · ${d.products?.length||0} Product · ${money(d.total)}</div><div class="draft-actions"><button class="btn btn-light" onclick="openOrderModal('${escapeHtml(d.id)}')">✏️ Edit / Add</button><button class="btn btn-primary" onclick="sendDraftOrder('${escapeHtml(d.id)}')">📤 Send</button><button class="btn btn-danger" onclick="deleteDraft('${escapeHtml(d.id)}')">🗑️ Delete</button></div></div>`).join(""):'<div class="empty">কোনো Saved Draft নেই</div>');
  const sent=orders.filter(o=>!q||String(o.shop||"").toLowerCase().includes(q)||String(o.mobile||"").toLowerCase().includes(q));
- document.getElementById("historyList").innerHTML=sent.length?sent.map((o,i)=>`<div class="history-row"><div class="history-head"><div><b>${escapeHtml(o.shop||"")}</b><div class="small">${escapeHtml(o.mobile||"")} · ${escapeHtml(o.order_date||"")}</div></div><span class="badge sent">SENT</span></div><div style="margin-top:5px">${(o.products||[]).length} Product · <b>${money(o.total)}</b></div><div class="history-actions"><button class="btn btn-light" onclick="showOrderDetail(${i})">👁 বিস্তারিত</button></div></div>`).join(""):'<div class="empty">কোনো Sent Order নেই</div>'
+ document.getElementById("historyList").innerHTML=sent.length?sent.map((o,i)=>`<div class="history-row"><div class="history-head"><div><b>${escapeHtml(o.shop||"")}</b><div class="small">${escapeHtml(o.mobile||"")} · ${escapeHtml(o.order_date||"")}</div></div><span class="badge sent">SENT</span></div><div style="margin-top:5px">${(o.products||[]).length} Product · <b>${money(o.total)}</b></div><div class="history-actions"><button class="btn btn-light" onclick="showOrderDetail(${i})">👁 বিস্তারিত</button><button class="btn btn-info" onclick="exportOrderToExcel(${i})">📊 Excel</button></div></div>`).join(""):'<div class="empty">কোনো Sent Order নেই</div>'
 }
+function exportAllOrdersToExcel(){
+  if(!orders.length){showToast("কোনো Sent Order নেই");return;}
+  if(typeof XLSX==="undefined"){alert("Excel Export লাইব্রেরি লোড হয়নি। ইন্টারনেট চালু করে আবার চেষ্টা করুন।");return;}
+  const rows=[];
+  orders.forEach(o=>{
+    (Array.isArray(o.products)?o.products:[]).forEach((p,n)=>{
+      const type=p.rate_type==="carton"?"Carton Rate":"মূল রেট";
+      const rate=Number(p.rate||(p.rate_type==="carton"?p.carton_rate:p.price)||0);
+      const qty=Number(p.quantity||0);
+      rows.push({
+        "SL":rows.length+1,"Order ID":o.id||"","Order Date":o.order_date||"","Delivery Date":o.delivery_date||"",
+        "Market":o.market||"","Shop":o.shop||"","Shop Code":o.shop_code||"","Mobile":o.mobile||"","Address":o.address||"","Representative":o.representative||"",
+        "Product Code":p.code||"","Product Name":p.name||"","Pack":p.pack||"","Quantity":qty,"Bonus":Number(p.bonus||0),"Rate Type":type,"Rate":rate,"Product Total":Number(p.value||rate*qty),"Offer / Free":p.offer||"","Note":o.note||""
+      });
+    });
+  });
+  if(!rows.length){showToast("Sent Order-এ কোনো Product নেই");return;}
+  const ws=XLSX.utils.json_to_sheet(rows);ws["!cols"]=[{wch:6},{wch:22},{wch:12},{wch:14},{wch:20},{wch:24},{wch:14},{wch:15},{wch:30},{wch:20},{wch:16},{wch:32},{wch:12},{wch:12},{wch:10},{wch:14},{wch:12},{wch:16},{wch:15},{wch:35}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
+  XLSX.writeFile(wb,`Kohinoor_All_Orders_Product_Wise_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast("✅ সব Sent Order-এর Product-wise Excel তৈরি হয়েছে");
+}
+
 function showOrderDetail(index){const o=orders[index];if(!o)return;const items=Array.isArray(o.products)?o.products:[];document.getElementById("detailContent").innerHTML=`<div class="card" style="margin:0 0 10px;background:#f8fbfa"><b>মার্কেট:</b> ${escapeHtml(o.market||"")}<br><b>দোকান:</b> ${escapeHtml(o.shop)}<br><b>দোকানের কোড:</b> ${escapeHtml(o.shop_code||"")}<br><b>মোবাইল:</b> ${escapeHtml(o.mobile||"")}<br><b>ঠিকানা:</b> ${escapeHtml(o.address||"")}<br><b>Representative:</b> ${escapeHtml(o.representative||"")}<br><b>Order Date:</b> ${escapeHtml(o.order_date||"")}<br><b>Delivery:</b> ${escapeHtml(o.delivery_date||"")}</div>${items.map(p=>{const type=p.rate_type==="carton"?"carton":"main",rate=Number(p.rate||(type==="carton"?p.carton_rate:p.price)||0);return `<div class="order-item"><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Qty ${Number(p.quantity||0)} · Bonus ${Number(p.bonus||0)}</div><div class="small" style="margin-top:3px">Rate Type: <b>${type==="carton"?"Carton Rate":"মূল রেট"}</b> · Rate ${money(rate)}${p.offer?` · Offer ${escapeHtml(p.offer)} Free`:""}</div><div style="margin-top:4px">${money(p.value||rate*Number(p.quantity||0))}</div></div>`}).join("")}<div class="total">মোট: ${money(o.total)}</div><div class="small">${escapeHtml(o.note||"")}</div>`;openModal("detailModal")}
 
 function openProductManager(){editingProductId=null;clearProductForm();document.getElementById("productEditPanel").classList.remove("editing");renderProductManagerList();openModal("productModal")}

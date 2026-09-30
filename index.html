@@ -331,7 +331,7 @@ function exportOrderToExcel(index, auto=false){
   const items=Array.isArray(o.products)?o.products:[];
   if(!items.length){showToast("এই Order-এ কোনো Product নেই");return false;}
 
-  // Product-wise: প্রতিটি Product আলাদা Row হবে।
+  // শুধু Product-wise Excel: Market/Shop আলাদা করে দেখানো হবে না।
   const rows=items.map((p,n)=>{
     const type=p.rate_type==="carton"?"Carton Rate":"মূল রেট";
     const rate=Number(p.rate||(p.rate_type==="carton"?p.carton_rate:p.price)||0);
@@ -339,15 +339,6 @@ function exportOrderToExcel(index, auto=false){
     const bonus=Number(p.bonus||0);
     return {
       "SL":n+1,
-      "Order ID":o.id||"",
-      "Order Date":o.order_date||"",
-      "Delivery Date":o.delivery_date||"",
-      "Market":o.market||"",
-      "Shop":o.shop||"",
-      "Shop Code":o.shop_code||"",
-      "Mobile":o.mobile||"",
-      "Address":o.address||"",
-      "Representative":o.representative||"",
       "Product Code":p.code||"",
       "Product Name":p.name||"",
       "Pack":p.pack||"",
@@ -356,19 +347,15 @@ function exportOrderToExcel(index, auto=false){
       "Rate Type":type,
       "Rate":rate,
       "Product Total":Number(p.value||rate*qty),
-      "Offer / Free":p.offer||"",
-      "Note":o.note||""
+      "Offer / Free":p.offer||""
     };
   });
 
   const ws=XLSX.utils.json_to_sheet(rows);
-  ws["!cols"]=[
-    {wch:6},{wch:22},{wch:12},{wch:14},{wch:20},{wch:24},{wch:14},{wch:15},{wch:30},{wch:20},
-    {wch:16},{wch:32},{wch:12},{wch:12},{wch:10},{wch:14},{wch:12},{wch:16},{wch:15},{wch:35}
-  ];
+  ws["!cols"]=[{wch:6},{wch:18},{wch:34},{wch:12},{wch:12},{wch:10},{wch:14},{wch:12},{wch:16},{wch:15}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
-  const fileName=`Order_${safeFileName(o.shop)}_${safeFileName(o.order_date||new Date().toISOString().slice(0,10))}.xlsx`;
+  const fileName=`Product_Wise_Order_${safeFileName(o.order_date||new Date().toISOString().slice(0,10))}.xlsx`;
   XLSX.writeFile(wb,fileName);
   if(!auto)showToast("✅ Product-wise Excel তৈরি হয়েছে");
   return true;
@@ -404,25 +391,70 @@ function renderHistory(){
 }
 function exportAllOrdersToExcel(){
   if(!orders.length){showToast("কোনো Sent Order নেই");return;}
-  if(typeof XLSX==="undefined"){alert("Excel Export লাইব্রেরি লোড হয়নি। ইন্টারনেট চালু করে আবার চেষ্টা করুন।");return;}
-  const rows=[];
+  if(typeof XLSX==="undefined"){
+    alert("Excel Export লাইব্রেরি লোড হয়নি। ইন্টারনেট চালু করে আবার চেষ্টা করুন।");
+    return;
+  }
+
+  // সব Sent Order থেকে একই Product একসাথে যোগ করে Product-wise Summary তৈরি হবে।
+  // এখানে Market/Shop অনুযায়ী কোনো আলাদা Sheet বা Group থাকবে না।
+  const productMap=new Map();
   orders.forEach(o=>{
-    (Array.isArray(o.products)?o.products:[]).forEach((p,n)=>{
+    (Array.isArray(o.products)?o.products:[]).forEach(p=>{
+      const key=String(p.product_id||p.code||p.name||"").trim().toLowerCase();
+      if(!key)return;
       const type=p.rate_type==="carton"?"Carton Rate":"মূল রেট";
-      const rate=Number(p.rate||(p.rate_type==="carton"?p.carton_rate:p.price)||0);
+      const rate=Number(p.rate||(type==="Carton Rate"?p.carton_rate:p.price)||0);
       const qty=Number(p.quantity||0);
-      rows.push({
-        "SL":rows.length+1,"Order ID":o.id||"","Order Date":o.order_date||"","Delivery Date":o.delivery_date||"",
-        "Market":o.market||"","Shop":o.shop||"","Shop Code":o.shop_code||"","Mobile":o.mobile||"","Address":o.address||"","Representative":o.representative||"",
-        "Product Code":p.code||"","Product Name":p.name||"","Pack":p.pack||"","Quantity":qty,"Bonus":Number(p.bonus||0),"Rate Type":type,"Rate":rate,"Product Total":Number(p.value||rate*qty),"Offer / Free":p.offer||"","Note":o.note||""
-      });
+      const bonus=Number(p.bonus||0);
+      const value=Number(p.value||rate*qty);
+      if(!productMap.has(key)){
+        productMap.set(key,{
+          "Product Code":p.code||"",
+          "Product Name":p.name||"",
+          "Pack":p.pack||"",
+          "Quantity":0,
+          "Bonus":0,
+          "Rate Type":type,
+          "Rate":rate,
+          "Product Total":0,
+          "Order Count":0
+        });
+      }
+      const row=productMap.get(key);
+      row.Quantity+=qty;
+      row.Bonus+=bonus;
+      row.ProductTotalForSort=(row.ProductTotalForSort||0)+value;
+      row["Product Total"]+=value;
+      row["Order Count"]+=1;
+      // একই Product-এর মধ্যে বিভিন্ন Rate Type থাকলে Mixed দেখাবে।
+      if(row["Rate Type"]!==type)row["Rate Type"]="Mixed";
     });
   });
+
+  const rows=Array.from(productMap.values()).map((r,i)=>({
+    "SL":i+1,
+    "Product Code":r["Product Code"],
+    "Product Name":r["Product Name"],
+    "Pack":r["Pack"],
+    "Total Quantity":r["Quantity"],
+    "Total Bonus":r["Bonus"],
+    "Rate Type":r["Rate Type"],
+    "Rate":r["Rate"],
+    "Total Sales Value":Number(r["Product Total"]||0),
+    "Order Count":r["Order Count"]
+  }));
+
   if(!rows.length){showToast("Sent Order-এ কোনো Product নেই");return;}
-  const ws=XLSX.utils.json_to_sheet(rows);ws["!cols"]=[{wch:6},{wch:22},{wch:12},{wch:14},{wch:20},{wch:24},{wch:14},{wch:15},{wch:30},{wch:20},{wch:16},{wch:32},{wch:12},{wch:12},{wch:10},{wch:14},{wch:12},{wch:16},{wch:15},{wch:35}];
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
-  XLSX.writeFile(wb,`Kohinoor_All_Orders_Product_Wise_${new Date().toISOString().slice(0,10)}.xlsx`);
-  showToast("✅ সব Sent Order-এর Product-wise Excel তৈরি হয়েছে");
+  rows.sort((a,b)=>String(a["Product Name"]).localeCompare(String(b["Product Name"]),"bn"));
+  rows.forEach((r,i)=>r.SL=i+1);
+
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws["!cols"]=[{wch:6},{wch:18},{wch:34},{wch:12},{wch:16},{wch:14},{wch:14},{wch:12},{wch:20},{wch:14}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
+  XLSX.writeFile(wb,`Kohinoor_Product_Wise_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast("✅ Product-wise Excel তৈরি হয়েছে");
 }
 
 function showOrderDetail(index){const o=orders[index];if(!o)return;const items=Array.isArray(o.products)?o.products:[];document.getElementById("detailContent").innerHTML=`<div class="card" style="margin:0 0 10px;background:#f8fbfa"><b>মার্কেট:</b> ${escapeHtml(o.market||"")}<br><b>দোকান:</b> ${escapeHtml(o.shop)}<br><b>দোকানের কোড:</b> ${escapeHtml(o.shop_code||"")}<br><b>মোবাইল:</b> ${escapeHtml(o.mobile||"")}<br><b>ঠিকানা:</b> ${escapeHtml(o.address||"")}<br><b>Representative:</b> ${escapeHtml(o.representative||"")}<br><b>Order Date:</b> ${escapeHtml(o.order_date||"")}<br><b>Delivery:</b> ${escapeHtml(o.delivery_date||"")}</div>${items.map(p=>{const type=p.rate_type==="carton"?"carton":"main",rate=Number(p.rate||(type==="carton"?p.carton_rate:p.price)||0);return `<div class="order-item"><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Qty ${Number(p.quantity||0)} · Bonus ${Number(p.bonus||0)}</div><div class="small" style="margin-top:3px">Rate Type: <b>${type==="carton"?"Carton Rate":"মূল রেট"}</b> · Rate ${money(rate)}${p.offer?` · Offer ${escapeHtml(p.offer)} Free`:""}</div><div style="margin-top:4px">${money(p.value||rate*Number(p.quantity||0))}</div></div>`}).join("")}<div class="total">মোট: ${money(o.total)}</div><div class="small">${escapeHtml(o.note||"")}</div>`;openModal("detailModal")}

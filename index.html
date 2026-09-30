@@ -115,7 +115,7 @@ textarea{min-height:75px;resize:vertical}
   </section>
   <section class="card" id="productSearchCard">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">🔎 Product Search</h3><span class="small" id="onlineStatus">Local</span></div>
-    <input id="productSearch" class="search" style="margin-top:10px" placeholder="Search by product name/code" oninput="renderProductResults">
+    <input id="productSearch" class="search" style="margin-top:10px" placeholder="Search by product name/code" oninput="renderProductResults()">
     <div id="productResults" class="product-results"></div>
   </section>
 </main>
@@ -148,7 +148,7 @@ textarea{min-height:75px;resize:vertical}
 
 <div class="modal" id="productModal"><div class="modal-box">
   <div class="modal-head"><h3>📦 Product Manager</h3><button class="close" onclick="closeModal('productModal')">✕</button></div>
-  <div class="small" style="margin-bottom:10px">Here <b>Main Rate</b> was Regular selling rate, <b>Carton Rate</b> was Applicable carton rate and <b>MRP</b> Product for saved will be. MRP will not be sent with the order.</div>
+  <div class="small" style="margin-bottom:10px">Here <b>Main Rate</b> was Regular selling rate, <b>Carton Rate</b> was Applicable carton rate and <b>MRP</b> Product for saved will be. MRP will not be sent with the order।</div>
   <div id="productEditPanel" class="product-edit-panel"><div class="form-grid">
     <div class="field"><label>Code</label><input id="pCode" placeholder="03227"></div><div class="field"><label>Pack</label><input id="pPack" placeholder="60"></div>
     <div class="field full"><label>Name</label><input id="pName" placeholder="Product name"></div>
@@ -156,7 +156,7 @@ textarea{min-height:75px;resize:vertical}
     <div class="field"><label>Carton Rate</label><input id="pCartonRate" type="number" step="0.01" placeholder="80"></div>
     <div class="field"><label>MRP</label><input id="pMrp" type="number" step="0.01" placeholder="100"></div>
     <div class="field"><label>TP Rate</label><input id="pTpRate" type="number" step="0.01" placeholder="TP Rate" oninput="autoCalculateMainRate()"></div>
-    <div class="field"><label>Offer / Free</label><input id="pOffer" type="text" placeholder="Example: 5:1, 9:1, 10:1" oninput="autoCalculateMainRate()"><div class="small">Example 5:1 if given TP Rate × 5 ÷ 6 the Main Rate will be calculated automatically.</div></div>
+    <div class="field"><label>Offer / Free</label><input id="pOffer" type="text" placeholder="Example: 5:1, 9:1, 10:1" oninput="autoCalculateMainRate()"><div class="small">Example 5:1 if given TP Rate × 5 ÷ 6 according to Main Rate auto will be.</div></div>
     <div class="field"><label>Stock</label><input id="pStock" type="number" placeholder="100"></div>
   </div><div class="actions"><button class="btn btn-primary" onclick="saveProduct()">💾 Save Product</button><button class="btn btn-light" onclick="closeModal('productModal')">Cancel</button></div></div>
   <div id="productManagerList" style="margin-top:14px"></div>
@@ -188,27 +188,27 @@ textarea{min-height:75px;resize:vertical}
     <div class="field"><label>Mobile</label><input id="msMobile" placeholder="01XXXXXXXXX"></div><div class="field"><label>Representative</label><input id="msRepresentative" placeholder="Representative Name"></div>
   </div>
   <div class="actions"><button class="btn btn-primary" onclick="saveMarketShop()">💾 Save</button><button class="btn btn-light" onclick="clearMarketShopForm()">✚ New</button></div>
-  <input id="marketShopSearch" class="search" style="margin-top:12px" placeholder="Search by market/shop/address" oninput="renderMarketShopList"><div id="marketShopList" class="list-box"></div>
+  <input id="marketShopSearch" class="search" style="margin-top:12px" placeholder="Search by market/shop/address" oninput="renderMarketShopList()"><div id="marketShopList" class="list-box"></div>
 </div></div>
 
 <div class="modal" id="monthlyExcelModal">
   <div class="modal-box">
     <div class="modal-head"><h3>📊 Monthly Product Excel</h3><button class="close" onclick="closeModal('monthlyExcelModal')">✕</button></div>
-    <div class="small" style="margin-bottom:12px">The selected month will be stored in one Product-wise Excel file. Market / Shop will not be separated or shown.</div>
+    <div class="small" style="margin-bottom:12px">For the selected month, all <b>Sent Order</b> Product-wise together Excel will be. Market/Shop will not be separated or shown।</div>
     <div class="form-grid">
       <div class="field"><label>Select Month</label><input id="excelMonth" type="month"></div>
       <div class="field"><label>Sent Order count</label><input id="excelMonthOrderCount" readonly></div>
     </div>
-    <div id="monthlyFileStatus" class="notice" style="margin-top:12px">No monthly Excel file is connected for this month.</div>
     <div id="excelMonthSummary" class="total" style="margin-top:12px">Monthly Product Sales: ৳0.00 · 0 Product</div>
+    <div id="monthlyExcelStatus" class="notice" style="margin-top:10px">No monthly Excel file connected. Connect once and this same file will be updated after every sent order.</div>
     <div id="monthlySalesSheet" class="order-table-wrap" style="margin-top:12px"></div>
     <div class="actions">
-      <button class="btn btn-primary" onclick="connectMonthlyExcel()">📁 Create / Connect Monthly Excel</button>
-      <button class="btn btn-light" onclick="refreshMonthlySalesSheet()">🔄 Refresh</button>
-      <button class="btn btn-info" onclick="exportMonthlyProductExcel()">📥 Export a Copy</button>
+      <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
+      <button class="btn btn-info" onclick="connectOrOpenMonthlyExcel()">📂 Connect / Open Monthly Excel</button>
+      <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
+      <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export New Excel</button>
       <button class="btn btn-light" onclick="closeModal('monthlyExcelModal')">Close</button>
     </div>
-    <div class="small" style="margin-top:10px">After you connect the file once, every sent order for this month will be added automatically to the same Excel file. A new month uses a new file.</div>
   </div>
 </div>
 
@@ -225,10 +225,21 @@ const SUPABASE_PUBLISHABLE_KEY="sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 const DRAFTS_KEY="kohinoor_order_drafts_v3",LOCAL_NOTICES_KEY="kohinoor_notifications_v3",LOCAL_PRODUCTS_KEY="kohinoor_products_cache_v3";
 let currentUser=null,products=[],orders=[],draftOrders=[],notifications=[],currentOrderItems=[],editingDraftId=null,realtimeChannel=null,pollingTimer=null,editingProductId=null,syncRunning=false;
+
+// Persistent monthly Excel file connection (Android/Chrome File System Access API)
+let monthlyFileHandle=null;
+const MONTHLY_FILE_DB='kohinoor_monthly_excel_db_v2', MONTHLY_FILE_STORE='handles';
+function openMonthlyFileDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open(MONTHLY_FILE_DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(MONTHLY_FILE_STORE))r.result.createObjectStore(MONTHLY_FILE_STORE)};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+async function saveMonthlyFileHandle(handle,month){try{const db=await openMonthlyFileDB();const tx=db.transaction(MONTHLY_FILE_STORE,'readwrite');tx.objectStore(MONTHLY_FILE_STORE).put({handle,month},'current');return new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}catch(e){console.warn('Could not persist Excel handle',e)}}
+async function loadMonthlyFileHandle(){try{const db=await openMonthlyFileDB();return await new Promise((res,rej)=>{const tx=db.transaction(MONTHLY_FILE_STORE,'readonly'),r=tx.objectStore(MONTHLY_FILE_STORE).get('current');r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error)})}catch(e){return null}}
+async function verifyMonthlyFilePermission(handle,request=false){if(!handle)return false;try{let p=await handle.queryPermission({mode:'readwrite'});if(p==='granted')return true;if(request){p=await handle.requestPermission({mode:'readwrite'});return p==='granted'}}catch(e){}return false}
+async function restoreMonthlyFileHandle(){const saved=await loadMonthlyFileHandle();if(!saved?.handle)return false;monthlyFileHandle=saved.handle;const ok=await verifyMonthlyFilePermission(monthlyFileHandle,false);if(ok){showToast('✓ Monthly Excel file connected');return true}return false}
+
 const MARKET_SHOPS_KEY="kohinoor_market_shop_list_v2_user_";let marketShops=[],editingMarketShopId=null;
 
 document.addEventListener("DOMContentLoaded",async()=>{
  setTodayDates();loadDrafts();loadNotifications();
+  restoreMonthlyFileHandle();
  try{products=JSON.parse(localStorage.getItem(LOCAL_PRODUCTS_KEY)||"[]")}catch(e){products=[]}
  updateDashboard();renderProductResults();renderNotifications();
  let sessionData=null;
@@ -324,7 +335,7 @@ function openOrderModal(draftId=null){
 function saveOrder(){
  const data=getOrderFormData();if(!data)return;const now=new Date().toISOString();
  if(editingDraftId){const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft not found");return}draftOrders[i]={...draftOrders[i],...data,updated_at:now,status:"draft"};showToast("✅ Draft updated")}
- else{const draft={...data,id:"draft-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),status:"draft",created_at:now,updated_at:now};draftOrders.unshift(draft);editingDraftId=draft.id;showToast("✅ Draft saved — not sent yet")}
+ else{const draft={...data,id:"draft-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),status:"draft",created_at:now,updated_at:now};draftOrders.unshift(draft);editingDraftId=draft.id;showToast("✅ Draft saved — yet Send failed")}
  saveDrafts();updateDashboard();renderHistory();closeModal("orderModal")
 }
 function deleteDraft(draftId){
@@ -337,7 +348,7 @@ function deleteDraft(draftId){
   if(editingDraftId===draftId){editingDraftId=null;currentOrderItems=[];}
   updateDashboard();
   renderHistory();
-  showToast("🗑️ Draft deleted");
+  showToast("🗑️ Draft Delete done");
 }
 
 function safeFileName(value){
@@ -390,16 +401,16 @@ function exportLatestOrderToExcel(order){
   return false;
 }
 
-async function sendCurrentDraft(){if(!editingDraftId){alert("Save the draft first, then open the draft and click Send Order.");return}const data=getOrderFormData();if(!data)return;const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft not found");return}draftOrders[i]={...draftOrders[i],...data,updated_at:new Date().toISOString()};saveDrafts();await sendDraftOrder(editingDraftId)}
+async function sendCurrentDraft(){if(!editingDraftId){alert("Save the draft first। Then Draft open Send Order click।");return}const data=getOrderFormData();if(!data)return;const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft not found");return}draftOrders[i]={...draftOrders[i],...data,updated_at:new Date().toISOString()};saveDrafts();await sendDraftOrder(editingDraftId)}
 async function sendDraftOrder(draftId){
  const draft=draftOrders.find(x=>x.id===draftId);if(!draft){alert("Draft not found");return}
  if(!navigator.onLine){draft.status="pending_send";saveDrafts();renderHistory();showToast("Offline: Added to send queue. It will be sent automatically when the internet returns");return}
  if(!draft.autoSync&&!confirm(`"${draft.shop}" of Order Send online?`))return;
- if(!currentUser){alert("Please log in before sending an online order.");return}
+ if(!currentUser){alert("Online Order send before Login do।");return}
  const payload={user_id:currentUser.id,market:draft.market||"",shop:draft.shop,shop_code:draft.shop_code||"",address:draft.address,mobile:draft.mobile,representative:draft.representative,order_date:draft.order_date,delivery_date:draft.delivery_date,note:draft.note,products:(draft.products||[]).map(p=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0),quantity=Number(p.quantity||0);return {product_id:p.product_id||null,code:p.code||"",name:p.name||"",pack:p.pack||"",base_price:Number(p.base_price??p.price??0),price:selectedRate,carton_rate:Number(p.carton_rate||0),tp_rate:Number(p.tp_rate||0),offer:p.offer||"",rate_type:rateType,rate:selectedRate,quantity,bonus:Number(p.bonus||0),value:selectedRate*quantity}}),total:(draft.products||[]).reduce((sum,p)=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);return sum+selectedRate*Number(p.quantity||0)},0)};
  const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
  if(error){draft.status="pending_send";saveDrafts();alert("❌ Order was not sent; kept as pending:\n"+error.message);return}
- draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data){orders.unshift(data);await updateMonthlyWorkbook(data);}addNotification("Order Sent",`${draft.shop} order has been sent online.`);updateDashboard();renderHistory();if(document.getElementById("monthlyExcelModal")?.classList.contains("show"))refreshMonthlySalesSheet();closeModal("orderModal");showToast("✅ Order sent online successfully")
+ draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data){orders.unshift(data); updateMonthlyExcelAfterOrder().then(ok=>{if(ok)showToast('✓ Order sent and monthly Excel updated');else showToast('✓ Order sent. Monthly Excel needs permission');});}addNotification("Order Sent",`${draft.shop} order has been sent online.`);updateDashboard();renderHistory();if(document.getElementById("monthlyExcelModal")?.classList.contains("show"))refreshMonthlySalesSheet();closeModal("orderModal");showToast("✅ Order sent online successfully")
 }
 async function syncPendingOrders(){if(syncRunning||!navigator.onLine||!currentUser)return;syncRunning=true;try{const pending=draftOrders.filter(d=>d.status==="pending_send");for(const d of pending){if(!navigator.onLine)break;d.autoSync=true;await sendDraftOrder(d.id);delete d.autoSync}}finally{syncRunning=false}}
 window.addEventListener("online",()=>{const el=document.getElementById("onlineStatus");if(el){el.textContent="Online — Sync is happening";el.className="online"}syncPendingOrders()});
@@ -535,163 +546,8 @@ async function saveProduct(){
  if(result.error){alert("Product Save failed:\n"+result.error.message+"\n\nCheck whether the Products table has the required columns.");return}
  await loadProducts();renderProductManagerList();clearProductForm();editingProductId=null;document.getElementById("productEditPanel").classList.remove("editing");showToast("✅ Product saved")
 }
-async function deleteProduct(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;if(!confirm(`"${p.name}" Delete this item?`))return;const {error}=await supabaseClient.from("products").delete().eq("id",id);if(error){alert("❌ Delete failed:\n"+error.message);return}await loadProducts();renderProductManagerList();showToast("✅ Product deleted")}
+async function deleteProduct(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;if(!confirm(`"${p.name}" Delete will do?`))return;const {error}=await supabaseClient.from("products").delete().eq("id",id);if(error){alert("❌ Delete failed:\n"+error.message);return}await loadProducts();renderProductManagerList();showToast("✅ Product deleted")}
 function renderProductManagerList(){const box=document.getElementById("productManagerList");if(!products.length){box.innerHTML='<div class="empty">No products</div>';return}box.innerHTML=products.slice(0,150).map(p=>`<div class="history-row"><div class="history-head"><div><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Main ${money(mainRate(p))} · Carton ${money(cartonRate(p))} · MRP ${money(p.mrp)} · TP Rate ${money(p.tp_rate)}${p.offer?` · Offer ${escapeHtml(p.offer)} Free`:""} · Stock ${Number(p.stock||0)}</div></div></div><div class="history-actions"><button class="btn btn-light" onclick="editProduct('${escapeHtml(String(p.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteProduct('${escapeHtml(String(p.id))}')">🗑 Delete</button></div></div>`).join("")}
-
-// Persistent monthly Excel file support.
-// The browser stores the selected file handle so the same workbook can be updated
-// throughout the month without downloading a new file every day.
-const MONTHLY_FILE_DB = "kohinoor_monthly_excel_db";
-const MONTHLY_FILE_STORE = "handles";
-let monthlyFileHandle = null;
-let monthlyFileMonth = "";
-
-function openMonthlyFileDB(){
-  return new Promise((resolve,reject)=>{
-    const req=indexedDB.open(MONTHLY_FILE_DB,1);
-    req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(MONTHLY_FILE_STORE))req.result.createObjectStore(MONTHLY_FILE_STORE)};
-    req.onsuccess=()=>resolve(req.result);
-    req.onerror=()=>reject(req.error);
-  });
-}
-async function saveMonthlyFileHandle(month,handle){
-  const db=await openMonthlyFileDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(MONTHLY_FILE_STORE,"readwrite");
-    tx.objectStore(MONTHLY_FILE_STORE).put(handle,month);
-    tx.oncomplete=()=>{db.close();resolve()};
-    tx.onerror=()=>{db.close();reject(tx.error)};
-  });
-}
-async function loadMonthlyFileHandle(month){
-  try{
-    const db=await openMonthlyFileDB();
-    return await new Promise((resolve,reject)=>{
-      const tx=db.transaction(MONTHLY_FILE_STORE,"readonly");
-      const req=tx.objectStore(MONTHLY_FILE_STORE).get(month);
-      req.onsuccess=()=>{db.close();resolve(req.result||null)};
-      req.onerror=()=>{db.close();reject(req.error)};
-    });
-  }catch(e){console.warn("Could not restore monthly Excel handle",e);return null}
-}
-async function hasMonthlyWritePermission(handle,request=false){
-  if(!handle)return false;
-  try{
-    let p=await handle.queryPermission({mode:"readwrite"});
-    if(p==="granted")return true;
-    if(request){p=await handle.requestPermission({mode:"readwrite"});return p==="granted";}
-  }catch(e){console.warn("Excel permission check failed",e)}
-  return false;
-}
-function setMonthlyFileStatus(text,ok=false){
-  const el=document.getElementById("monthlyFileStatus");
-  if(!el)return;
-  el.textContent=text;
-  el.className="notice"+(ok?" ok":"");
-}
-async function selectMonthlyFile(month,requestPermission=false){
-  monthlyFileMonth=month;
-  monthlyFileHandle=await loadMonthlyFileHandle(month);
-  if(monthlyFileHandle){
-    const ok=await hasMonthlyWritePermission(monthlyFileHandle,requestPermission);
-    if(ok){setMonthlyFileStatus(`Connected: Kohinoor_Product_Sales_${month}.xlsx`,true);return true;}
-    setMonthlyFileStatus("This month's Excel file is saved. Click Create / Connect Monthly Excel once after refresh to restore write permission.");
-    return false;
-  }
-  setMonthlyFileStatus("No monthly Excel file is connected for this month.");
-  return false;
-}
-async function connectMonthlyExcel(){
-  const month=document.getElementById("excelMonth")?.value||getCurrentMonthKey();
-  if(!month)return;
-  if(typeof XLSX==="undefined"){alert("Excel library failed to load. Check your internet connection and try again.");return;}
-  if(!("showSaveFilePicker" in window)){
-    alert("Your browser does not support direct Excel file connection. Use Export a Copy instead.");
-    return;
-  }
-  try{
-    let handle=await loadMonthlyFileHandle(month);
-    if(handle && await hasMonthlyWritePermission(handle,true)){
-      monthlyFileHandle=handle;monthlyFileMonth=month;
-      await writeMonthlyWorkbook(month);
-      setMonthlyFileStatus(`Connected: Kohinoor_Product_Sales_${month}.xlsx`,true);
-      await refreshMonthlySalesSheet();
-      return;
-    }
-    handle=await window.showSaveFilePicker({
-      suggestedName:`Kohinoor_Product_Sales_${month}.xlsx`,
-      types:[{description:"Excel Workbook",accept:{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":[".xlsx"]}}]
-    });
-    monthlyFileHandle=handle;monthlyFileMonth=month;
-    await saveMonthlyFileHandle(month,handle);
-    if(!(await hasMonthlyWritePermission(handle,true)))throw new Error("Write permission was not granted.");
-    await writeMonthlyWorkbook(month);
-    setMonthlyFileStatus(`Connected: Kohinoor_Product_Sales_${month}.xlsx`,true);
-    await refreshMonthlySalesSheet();
-    showToast(`✅ ${month} monthly Excel connected. Future sent orders will update this same file.`);
-  }catch(e){
-    if(e?.name!=="AbortError")alert("Monthly Excel could not be connected: "+(e?.message||e));
-  }
-}
-async function writeMonthlyWorkbook(month=getCurrentMonthKey()){
-  if(!monthlyFileHandle || monthlyFileMonth!==month)return false;
-  if(!(await hasMonthlyWritePermission(monthlyFileHandle,false)))return false;
-  let wb=null;
-  try{
-    const f=await monthlyFileHandle.getFile();
-    const ab=await f.arrayBuffer();
-    if(ab.byteLength)wb=XLSX.read(ab,{type:"array"});
-  }catch(e){console.warn("Reading existing monthly workbook failed",e)}
-  if(!wb)wb=XLSX.utils.book_new();
-
-  const sheetName="Monthly Sales";
-  let ws=wb.Sheets[sheetName];
-  let rows=ws?XLSX.utils.sheet_to_json(ws,{defval:""}):[];
-  const headers=["Date","Order ID","Product Code","Product Name","Pack","Quantity","Bonus","Rate","Sales Value"];
-  const existingIds=new Set(rows.map(r=>String(r["Order ID"]||"")));
-  getOrdersForMonth(month).forEach(order=>{
-    const orderId=String(order.id||"");
-    if(!orderId || existingIds.has(orderId))return;
-    (Array.isArray(order.products)?order.products:[]).forEach(p=>{
-      const rate=Number(p.rate||(p.rate_type==="carton"?p.carton_rate:p.price)||0);
-      const qty=Number(p.quantity||0);
-      rows.push({
-        "Date":String(order.order_date||order.created_at||"").slice(0,10),
-        "Order ID":orderId,
-        "Product Code":p.code||"",
-        "Product Name":p.name||"",
-        "Pack":p.pack||"",
-        "Quantity":qty,
-        "Bonus":Number(p.bonus||0),
-        "Rate":rate,
-        "Sales Value":Number(p.value!=null?p.value:rate*qty)
-      });
-    });
-    existingIds.add(orderId);
-  });
-  rows.sort((a,b)=>String(a.Date||"").localeCompare(String(b.Date||""))||String(a["Product Name"]||"").localeCompare(String(b["Product Name"]||"")));
-  ws=XLSX.utils.json_to_sheet(rows, {header:headers});
-  ws["!cols"]=[{wch:12},{wch:34},{wch:16},{wch:32},{wch:12},{wch:12},{wch:10},{wch:14},{wch:18}];
-  wb.Sheets[sheetName]=ws;
-  if(!wb.SheetNames.includes(sheetName))XLSX.utils.book_append_sheet(wb,ws,sheetName);
-  else wb.SheetNames=[sheetName,...wb.SheetNames.filter(n=>n!==sheetName)];
-  const out=XLSX.write(wb,{bookType:"xlsx",type:"array"});
-  const writable=await monthlyFileHandle.createWritable();
-  await writable.write(out);await writable.close();
-  return true;
-}
-async function updateMonthlyWorkbook(order){
-  const month=String(order?.order_date||order?.created_at||getTodayLocalDate()).slice(0,7);
-  if(monthlyFileMonth!==month)await selectMonthlyFile(month,false);
-  if(!monthlyFileHandle)return false;
-  try{
-    // After a page refresh Chrome/Edge may keep the file handle but revoke the
-    // temporary write permission. The permission must be requested from a user
-    // gesture (the Monthly Product Excel button), so we do not try to pop a
-    // permission dialog here after the online order has already been sent.
-    return await writeMonthlyWorkbook(month);
-  }catch(e){console.warn("Automatic monthly Excel update failed",e);return false}
-}
 
 function getCurrentMonthKey(){
   const d=new Date();
@@ -822,111 +678,69 @@ function updateMonthlyExcelPreview(){
   renderMonthlySalesSheet(month);
 }
 
-async function openMonthlyExcel(){
+function openMonthlyExcel(){
   const input=document.getElementById("excelMonth");
   if(input){
-    if(!input.value)input.value=getCurrentMonthKey();
-    input.onchange=async()=>{await selectMonthlyFile(input.value,true);updateMonthlyExcelPreview();await refreshMonthlySalesSheet();};
+    input.value=getCurrentMonthKey();
+    input.onchange=updateMonthlyExcelPreview;
   }
   openModal("monthlyExcelModal");
-  const month=input?.value||getCurrentMonthKey();
-  await selectMonthlyFile(month,true);
-  await refreshMonthlySalesSheet();
+  refreshMonthlySalesSheet();
 }
 
-async function exportMonthlyProductExcel(){
-  const month=document.getElementById("excelMonth")?.value||getCurrentMonthKey();
-  if(!month){alert("Select Month");return}
-
-  // Refresh from Supabase before export so the report represents the
-  // complete permanently stored Sent Orders for the selected month.
-  if(currentUser && navigator.onLine){
-    try{
-      const start=`${month}-01`;
-      const d=new Date(`${month}-01T00:00:00`);
-      d.setMonth(d.getMonth()+1);
-      const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`;
-
-      const {data,error}=await supabaseClient
-        .from("orders")
-        .select("*")
-        .gte("order_date",start)
-        .lt("order_date",end)
-        .order("order_date",{ascending:true});
-
-      if(!error && Array.isArray(data)){
-        const existingIds=new Set(orders.map(o=>String(o.id)));
-        data.forEach(o=>{
-          if(existingIds.has(String(o.id))){
-            const i=orders.findIndex(x=>String(x.id)===String(o.id));
-            if(i>=0)orders[i]=o;
-          }else{
-            orders.push(o);
-          }
-        });
-      }
-    }catch(e){
-      console.warn("Monthly Excel refresh failed:",e);
-    }
-  }
-
+function monthlyExcelFilename(month){return `Kohinoor_Product_Wise_Sales_${month}.xlsx`;}
+function buildMonthlyWorkbook(month){
   const rows=buildMonthlyProductSales(month);
-  if(!rows.length){
-    alert(`${month} No Sent Orders found for this month.`);
-    return;
-  }
-
-  if(typeof XLSX==="undefined"){
-    alert("Excel library load failed. Check your internet connection and try again.");
-    return;
-  }
-
   const totalQty=rows.reduce((s,r)=>s+Number(r["Total Quantity"]||0),0);
   const totalBonus=rows.reduce((s,r)=>s+Number(r["Total Bonus"]||0),0);
   const totalValue=rows.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
-
-  // Product-wise master sheet. No market-wise grouping.
-  const sheetRows=[
-    ["Kohinoor Chemical PLC — Product-wise Monthly Sales"],
-    [`Month: ${month}`],
-    [`Sent Orders: ${getOrdersForMonth(month).length}`],
-    [],
-    ["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"],
-    ...rows.map(r=>[
-      r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],
-      r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]
-    ]),
-    [],
-    ["","","","","TOTAL",totalQty,totalBonus,totalValue]
-  ];
-
-  const ws=XLSX.utils.aoa_to_sheet(sheetRows);
-  ws["!cols"]=[
-    {wch:6},{wch:16},{wch:32},{wch:12},
-    {wch:14},{wch:16},{wch:14},{wch:20}
-  ];
-
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Product-wise Sales");
-
-  // A small summary sheet for the same permanent monthly report.
-  const summaryRows=[
-    ["Kohinoor Chemical PLC"],
-    ["Monthly Product-wise Sales Summary"],
-    ["Month",month],
-    ["Sent Orders",getOrdersForMonth(month).length],
-    ["Products",rows.length],
-    ["Total Quantity",totalQty],
-    ["Total Bonus",totalBonus],
-    ["Total Sales Value",totalValue]
-  ];
-  const ws2=XLSX.utils.aoa_to_sheet(summaryRows);
-  ws2["!cols"]=[{wch:24},{wch:25}];
-  XLSX.utils.book_append_sheet(wb,ws2,"Summary");
-
-  const filename=`Kohinoor_Product_Wise_Sales_${month}.xlsx`;
-  XLSX.writeFile(wb,filename);
-  showToast(`✅ ${month} month Product-wise Excel created`);
+  const sheetRows=[["Kohinoor Chemical PLC — Product-wise Monthly Sales"],[`Month: ${month}`],[`Sent Orders: ${getOrdersForMonth(month).length}`],[],["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"],...rows.map(r=>[r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]]),[],["","","","","TOTAL",totalQty,totalBonus,totalValue]];
+  const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(sheetRows);ws['!cols']=[{wch:6},{wch:16},{wch:32},{wch:12},{wch:14},{wch:16},{wch:14},{wch:20}];XLSX.utils.book_append_sheet(wb,ws,'Product-wise Sales');
+  const summaryRows=[["Kohinoor Chemical PLC"],["Monthly Product-wise Sales Summary"],["Month",month],["Sent Orders",getOrdersForMonth(month).length],["Products",rows.length],["Total Quantity",totalQty],["Total Bonus",totalBonus],["Total Sales Value",totalValue]];const ws2=XLSX.utils.aoa_to_sheet(summaryRows);ws2['!cols']=[{wch:24},{wch:25}];XLSX.utils.book_append_sheet(wb,ws2,'Summary');
+  return wb;
+}
+function setMonthlyExcelStatus(text,ok=false){const el=document.getElementById('monthlyExcelStatus');if(el){el.textContent=text;el.className='notice'+(ok?' ok':'')}}
+async function writePersistentMonthlyExcel(month){
+  if(!monthlyFileHandle)return false;
+  const permitted=await verifyMonthlyFilePermission(monthlyFileHandle,true);
+  if(!permitted){setMonthlyExcelStatus('Write permission is required. Tap “Restore Write Permission”.');return false}
+  const wb=buildMonthlyWorkbook(month);
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const writable=await monthlyFileHandle.createWritable();await writable.write(out);await writable.close();
+  await saveMonthlyFileHandle(monthlyFileHandle,month);
+  setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — automatically updated`,true);
+  return true;
+}
+async function connectOrOpenMonthlyExcel(){
+  const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
+  if(!('showSaveFilePicker' in window)){alert('Your browser does not support direct Excel file connection. Please use Chrome on Android.');return}
+  try{
+    if(monthlyFileHandle){
+      const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
+      if(ok){await writePersistentMonthlyExcel(month);showToast('✓ Same monthly Excel file updated');return}
+    }
+    const saved=await loadMonthlyFileHandle();
+    if(saved?.handle){monthlyFileHandle=saved.handle;const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);if(ok){await writePersistentMonthlyExcel(month);showToast('✓ Existing monthly Excel file reconnected');return}}
+    monthlyFileHandle=await window.showSaveFilePicker({suggestedName:monthlyExcelFilename(month),types:[{description:'Excel Workbook',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]});
+    const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);if(!ok)throw new Error('Write permission was not granted.');
+    await saveMonthlyFileHandle(monthlyFileHandle,month);await writePersistentMonthlyExcel(month);showToast('✓ Monthly Excel connected. It will update after every Order Send.');
+  }catch(e){if(e.name!=='AbortError')alert('Excel connection failed: '+e.message)}
+}
+async function requestMonthlyExcelPermission(){
+  if(!monthlyFileHandle){const restored=await restoreMonthlyFileHandle();if(!restored){alert('No saved monthly Excel file was found. Tap “Connect / Open Monthly Excel” first.');return}}
+  const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);if(ok){setMonthlyExcelStatus('Write permission restored. The same Excel file will update after Order Send.',true);await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey());showToast('✓ Write permission restored')}else alert('Write permission was not granted. Please select the Excel file again.');
+}
+async function updateMonthlyExcelAfterOrder(){
+  const month=getCurrentMonthKey();
+  if(!monthlyFileHandle){const saved=await loadMonthlyFileHandle();if(saved?.handle){monthlyFileHandle=saved.handle}}
+  if(!monthlyFileHandle)return false;
+  try{return await writePersistentMonthlyExcel(month)}catch(e){setMonthlyExcelStatus('Excel is connected but needs write permission. Open Monthly Product Excel and tap Restore Write Permission.');console.warn(e);return false}
+}
+async function exportMonthlyProductExcel(){
+  const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
+  if(!month){alert('Select Month');return}
+  if(currentUser&&navigator.onLine){try{const start=`${month}-01`;const d=new Date(`${month}-01T00:00:00`);d.setMonth(d.getMonth()+1);const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;const {data,error}=await supabaseClient.from('orders').select('*').gte('order_date',start).lt('order_date',end).order('order_date',{ascending:true});if(!error&&Array.isArray(data)){const ids=new Set(orders.map(o=>String(o.id)));data.forEach(o=>{if(ids.has(String(o.id))){const i=orders.findIndex(x=>String(x.id)===String(o.id));if(i>=0)orders[i]=o}else orders.push(o)})}}catch(e){console.warn(e)}}
+  const rows=buildMonthlyProductSales(month);if(!rows.length){alert(`${month} No Sent Orders found for this month.`);return}const wb=buildMonthlyWorkbook(month);XLSX.writeFile(wb,monthlyExcelFilename(month));showToast(`✓ ${month} Product-wise Excel exported`);
 }
 
 function addNotification(title,text){notifications.unshift({id:Date.now(),title,text,created_at:new Date().toISOString()});notifications=notifications.slice(0,50);localStorage.setItem(LOCAL_NOTICES_KEY,JSON.stringify(notifications));renderNotifications()}
@@ -941,7 +755,7 @@ function openMarketShopManager(){loadMarketShops();clearMarketShopForm();renderM
 function clearMarketShopForm(){editingMarketShopId=null;["msMarket","msShop","msShopCode","msAddress","msMobile","msRepresentative"].forEach(id=>document.getElementById(id).value="")}
 function saveMarketShop(){const market=document.getElementById("msMarket").value.trim(),shop=document.getElementById("msShop").value.trim();if(!market){alert("Enter Market Name");return}if(!shop){alert("Enter Shop Name");return}const item={id:editingMarketShopId||("ms-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)),market,shop,shop_code:document.getElementById("msShopCode").value.trim(),address:document.getElementById("msAddress").value.trim(),mobile:document.getElementById("msMobile").value.trim(),representative:document.getElementById("msRepresentative").value.trim(),updated_at:new Date().toISOString()};if(editingMarketShopId){const i=marketShops.findIndex(x=>x.id===editingMarketShopId);if(i>=0)marketShops[i]={...marketShops[i],...item}}else marketShops.unshift(item);saveMarketShops();renderMarketShopList();clearMarketShopForm();showToast("✅ Market/Shop saved")}
 function editMarketShop(id){const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;editingMarketShopId=x.id;document.getElementById("msMarket").value=x.market||"";document.getElementById("msShop").value=x.shop||"";document.getElementById("msShopCode").value=x.shop_code||"";document.getElementById("msAddress").value=x.address||"";document.getElementById("msMobile").value=x.mobile||"";document.getElementById("msRepresentative").value=x.representative||"";document.getElementById("msMarket").focus()}
-function deleteMarketShop(id){const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;if(!confirm(`"${x.market} — ${x.shop}" Delete this item?`))return;marketShops=marketShops.filter(v=>String(v.id)!==String(id));saveMarketShops();renderMarketShopList();clearMarketShopForm();showToast("🗑️ Information deleted")}
+function deleteMarketShop(id){const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;if(!confirm(`"${x.market} — ${x.shop}" Delete will do?`))return;marketShops=marketShops.filter(v=>String(v.id)!==String(id));saveMarketShops();renderMarketShopList();clearMarketShopForm();showToast("🗑️ Information deleted")}
 function renderMarketShopList(){const box=document.getElementById("marketShopList");if(!box)return;const q=(document.getElementById("marketShopSearch")?.value||"").trim().toLowerCase(),list=marketShops.filter(x=>!q||[x.market,x.shop,x.shop_code,x.address,x.mobile].some(v=>String(v||"").toLowerCase().includes(q)));box.innerHTML=list.length?list.map(x=>`<div class="list-row"><div class="list-row-head"><div><b>${escapeHtml(x.shop)}</b><div class="small">📍 ${escapeHtml(x.market)}</div>${x.shop_code?`<div class="small">🏷️ Code: ${escapeHtml(x.shop_code)}</div>`:""}<div class="small">${escapeHtml(x.address||"")}</div>${x.mobile?`<div class="small">📞 ${escapeHtml(x.mobile)}</div>`:""}</div><span class="badge">Saved</span></div><div class="list-row-actions"><button class="btn btn-light" onclick="editMarketShop('${escapeHtml(String(x.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteMarketShop('${escapeHtml(String(x.id))}')">🗑 Delete</button></div></div>`).join(""):'<div class="empty">No market/shop entries</div>'}
 function populateMarketSelect(selected="",autoSelect=false){const s=document.getElementById("marketSelect");if(!s)return;const markets=[...new Set(marketShops.map(x=>x.market).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"bn"));s.innerHTML='<option value="">-- Select Market --</option>'+markets.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");if(selected)s.value=selected;else if(autoSelect&&markets.length===1)s.value=markets[0]}
 function populateShopSelect(selected="",autoSelect=false){const s=document.getElementById("shopSelect");if(!s)return;const market=document.getElementById("marketSelect")?.value||"",list=marketShops.filter(x=>!market||x.market===market);s.innerHTML='<option value="">-- Select Shop --</option>'+list.map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.shop)}${x.shop_code?` — ${escapeHtml(x.shop_code)}`:""}</option>`).join("");if(selected)s.value=selected;else if(autoSelect&&list.length===1)s.value=String(list[0].id);if(autoSelect&&list.length===1)selectSavedShop()}
@@ -951,7 +765,7 @@ function findSavedShopId(shop,market,address){const x=marketShops.find(v=>v.shop
 
 function setupRealtime(){
  if(realtimeChannel)return;
- realtimeChannel=supabaseClient.channel("orders-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"orders"},payload=>{const row=payload.new;if(!orders.some(o=>String(o.id)===String(row.id))){orders.unshift(row);updateDashboard();renderHistory();addNotification("New Online Order",`${row.shop||"a Shop"} from New Order received.`)}}).subscribe(status=>{const el=document.getElementById("onlineStatus");if(status==="SUBSCRIBED"){el.textContent="Online";el.className="online"}else{el.textContent="Online connection waiting";el.className="offline"}});
+ realtimeChannel=supabaseClient.channel("orders-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"orders"},payload=>{const row=payload.new;if(!orders.some(o=>String(o.id)===String(row.id))){orders.unshift(row);updateDashboard();renderHistory();addNotification("New Online Order",`${row.shop||"a Shop"} from New Order received।`)}}).subscribe(status=>{const el=document.getElementById("onlineStatus");if(status==="SUBSCRIBED"){el.textContent="Online";el.className="online"}else{el.textContent="Online connection waiting";el.className="offline"}});
 }
 function startPolling(){clearInterval(pollingTimer);pollingTimer=setInterval(loadOrdersFromSupabase,20000)}
 window.addEventListener("beforeunload",()=>{if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel)});

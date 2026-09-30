@@ -97,10 +97,10 @@ textarea{min-height:75px;resize:vertical}
   <section class="card">
     <div class="stats">
       <div class="stat"><b id="dashProducts">0</b><span>Products</span></div>
-      <div class="stat"><b id="dashItems">0</b><span>Items</span></div>
-      <div class="stat"><b id="dashOrders">0</b><span>Sent Orders</span></div>
+      <div class="stat"><b id="dashItems">0</b><span>Products Sold Today</span></div>
+      <div class="stat"><b id="dashOrders">0</b><span>Sent Orders Today</span></div>
     </div>
-    <div class="small" style="margin-top:10px;text-align:center">Total Order Value: <b id="dashTotal">৳0.00</b></div>
+    <div class="small" style="margin-top:10px;text-align:center">Today's Sales Value: <b id="dashTotal">৳0.00</b></div>
   </section>
   <section class="card">
     <h3 style="margin-top:0">⚡ Quick Actions</h3>
@@ -200,8 +200,10 @@ textarea{min-height:75px;resize:vertical}
       <div class="field"><label>Sent Order count</label><input id="excelMonthOrderCount" readonly></div>
     </div>
     <div id="excelMonthSummary" class="total" style="margin-top:12px">Monthly Product Sales: ৳0.00 · 0 Product</div>
+    <div id="monthlySalesSheet" class="order-table-wrap" style="margin-top:12px"></div>
     <div class="actions">
-      <button class="btn btn-info" onclick="exportMonthlyProductExcel()">📥 Monthly Product Excel Create</button>
+      <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
+      <button class="btn btn-info" onclick="exportMonthlyProductExcel()">📥 Export Excel (Optional)</button>
       <button class="btn btn-light" onclick="closeModal('monthlyExcelModal')">Close</button>
     </div>
   </div>
@@ -394,12 +396,52 @@ async function sendDraftOrder(draftId){
  const payload={user_id:currentUser.id,market:draft.market||"",shop:draft.shop,shop_code:draft.shop_code||"",address:draft.address,mobile:draft.mobile,representative:draft.representative,order_date:draft.order_date,delivery_date:draft.delivery_date,note:draft.note,products:(draft.products||[]).map(p=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0),quantity=Number(p.quantity||0);return {product_id:p.product_id||null,code:p.code||"",name:p.name||"",pack:p.pack||"",base_price:Number(p.base_price??p.price??0),price:selectedRate,carton_rate:Number(p.carton_rate||0),tp_rate:Number(p.tp_rate||0),offer:p.offer||"",rate_type:rateType,rate:selectedRate,quantity,bonus:Number(p.bonus||0),value:selectedRate*quantity}}),total:(draft.products||[]).reduce((sum,p)=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);return sum+selectedRate*Number(p.quantity||0)},0)};
  const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
  if(error){draft.status="pending_send";saveDrafts();alert("❌ Order was not sent; kept as pending:\n"+error.message);return}
- draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data){orders.unshift(data);exportLatestOrderToExcel(data);}addNotification("Order Sent",`${draft.shop} of Order Online-in has been sent।`);updateDashboard();renderHistory();closeModal("orderModal");showToast("✅ Order sent online successfully")
+ draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data){orders.unshift(data);exportLatestOrderToExcel(data);}addNotification("Order Sent",`${draft.shop} order has been sent online.`);updateDashboard();renderHistory();if(document.getElementById("monthlyExcelModal")?.classList.contains("show"))refreshMonthlySalesSheet();closeModal("orderModal");showToast("✅ Order sent online successfully")
 }
 async function syncPendingOrders(){if(syncRunning||!navigator.onLine||!currentUser)return;syncRunning=true;try{const pending=draftOrders.filter(d=>d.status==="pending_send");for(const d of pending){if(!navigator.onLine)break;d.autoSync=true;await sendDraftOrder(d.id);delete d.autoSync}}finally{syncRunning=false}}
 window.addEventListener("online",()=>{const el=document.getElementById("onlineStatus");if(el){el.textContent="Online — Sync is happening";el.className="online"}syncPendingOrders()});
 async function loadOrdersFromSupabase(){if(!currentUser)return;const {data,error}=await supabaseClient.from("orders").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}orders=data||[];updateDashboard();renderHistory()}
-function updateDashboard(){document.getElementById("dashProducts").textContent=products.length;document.getElementById("dashOrders").textContent=orders.length;let items=0,total=0;orders.forEach(o=>{(Array.isArray(o.products)?o.products:[]).forEach(p=>{items+=Number(p.quantity||0);total+=Number(p.value||Number(p.rate||p.price||0)*Number(p.quantity||0))})});document.getElementById("dashItems").textContent=items;document.getElementById("dashTotal").textContent=money(total)}
+function getOrderLocalDate(order){
+  const raw=String(order?.order_date||order?.created_at||"");
+  return raw.slice(0,10);
+}
+
+function getTodayLocalDate(){
+  const d=new Date();
+  return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+}
+
+function updateDashboard(){
+  // Catalog count stays permanent. Sales counters are DAILY and automatically
+  // become zero on the next calendar day without deleting any Sent Order data.
+  document.getElementById("dashProducts").textContent=products.length;
+
+  const today=getTodayLocalDate();
+  const todayOrders=orders.filter(o=>getOrderLocalDate(o)===today);
+
+  // Count sold product types, NOT the ordered quantity.
+  // Example: Sandalina Qty 5 + Beautina Qty 2 = 2 Products Sold Today.
+  const soldProductKeys=new Set();
+  let total=0;
+
+  todayOrders.forEach(o=>{
+    (Array.isArray(o.products)?o.products:[]).forEach(p=>{
+      const key=String(p.product_id||p.code||p.name||"").trim();
+      if(key) soldProductKeys.add(key);
+
+      const qty=Number(p.quantity||0);
+      total+=Number(
+        p.value != null
+          ? p.value
+          : Number(p.rate||p.price||0)*qty
+      );
+    });
+  });
+
+  document.getElementById("dashItems").textContent=soldProductKeys.size;
+  document.getElementById("dashOrders").textContent=todayOrders.length;
+  document.getElementById("dashTotal").textContent=money(total);
+}
 function openHistory(){renderHistory();openModal("historyModal")}
 function renderHistory(){
  const q=(document.getElementById("historySearch")?.value||"").trim().toLowerCase(),drafts=draftOrders.filter(d=>!q||String(d.shop||"").toLowerCase().includes(q)||String(d.mobile||"").toLowerCase().includes(q));
@@ -552,6 +594,63 @@ function buildMonthlyProductSales(monthKey){
     }));
 }
 
+function buildMonthlyDailyProductSales(monthKey){
+  const monthOrders=getOrdersForMonth(monthKey);
+  const map=new Map();
+  monthOrders.forEach(order=>{
+    const date=String(order.order_date||order.created_at||"").slice(0,10);
+    const items=Array.isArray(order.products)?order.products:[];
+    items.forEach(p=>{
+      const code=String(p.code||"");
+      const name=String(p.name||"");
+      const key=`${date}|${String(p.product_id||code||name)}`;
+      const qty=Number(p.quantity||0);
+      const bonus=Number(p.bonus||0);
+      const value=Number(p.value!=null?p.value:Number(p.rate||p.price||0)*qty);
+      if(!map.has(key)) map.set(key,{date,code,name,pack:p.pack||"",quantity:0,bonus:0,sales_value:0});
+      const row=map.get(key);
+      row.quantity+=qty;
+      row.bonus+=bonus;
+      row.sales_value+=value;
+    });
+  });
+  return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.name.localeCompare(b.name,"en"));
+}
+
+function renderMonthlySalesSheet(monthKey){
+  const box=document.getElementById("monthlySalesSheet");
+  if(!box)return;
+  const rows=buildMonthlyDailyProductSales(monthKey);
+  if(!rows.length){
+    box.innerHTML='<div class="empty">No sent sales found for this month.</div>';
+    return;
+  }
+  let totalQty=0,totalBonus=0,totalValue=0;
+  const body=rows.map((r,i)=>{
+    totalQty+=r.quantity; totalBonus+=r.bonus; totalValue+=r.sales_value;
+    return `<tr><td>${i+1}</td><td>${escapeHtml(r.date)}</td><td>${escapeHtml(r.code)}</td><td class="product-cell">${escapeHtml(r.name)}</td><td>${escapeHtml(r.pack)}</td><td>${r.quantity}</td><td>${r.bonus}</td><td>${money(r.sales_value)}</td></tr>`;
+  }).join("");
+  box.innerHTML=`<table class="order-table" style="min-width:900px"><thead><tr><th>#</th><th>Date</th><th>Product Code</th><th>Product Name</th><th>Pack</th><th>Quantity</th><th>Bonus</th><th>Sales Value</th></tr></thead><tbody>${body}<tr><th colspan="5" style="text-align:right">TOTAL</th><th>${totalQty}</th><th>${totalBonus}</th><th>${money(totalValue)}</th></tr></tbody></table>`;
+}
+
+async function refreshMonthlySalesSheet(){
+  const input=document.getElementById("excelMonth");
+  const month=input?.value||getCurrentMonthKey();
+  if(!month)return;
+  if(currentUser && navigator.onLine){
+    try{
+      const start=`${month}-01`;
+      const d=new Date(`${month}-01T00:00:00`); d.setMonth(d.getMonth()+1);
+      const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`;
+      const {data,error}=await supabaseClient.from("orders").select("*").gte("order_date",start).lt("order_date",end).order("order_date",{ascending:true});
+      if(!error && Array.isArray(data)) orders=orders.filter(o=>String(o.order_date||o.created_at||"").slice(0,7)!==month).concat(data);
+    }catch(e){console.warn("Monthly sales refresh failed:",e)}
+  }
+  updateMonthlyExcelPreview();
+  renderMonthlySalesSheet(month);
+  showToast(`✅ ${month} monthly sales sheet updated`);
+}
+
 function updateMonthlyExcelPreview(){
   const month=document.getElementById("excelMonth")?.value;
   if(!month)return;
@@ -562,6 +661,7 @@ function updateMonthlyExcelPreview(){
   const summary=document.getElementById("excelMonthSummary");
   if(countEl)countEl.value=String(list.length);
   if(summary)summary.textContent=`Monthly Product Sales: ${money(total)} · ${rows.length} Product`;
+  renderMonthlySalesSheet(month);
 }
 
 function openMonthlyExcel(){
@@ -570,8 +670,8 @@ function openMonthlyExcel(){
     input.value=getCurrentMonthKey();
     input.onchange=updateMonthlyExcelPreview;
   }
-  updateMonthlyExcelPreview();
   openModal("monthlyExcelModal");
+  refreshMonthlySalesSheet();
 }
 
 async function exportMonthlyProductExcel(){

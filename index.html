@@ -322,15 +322,39 @@ document.addEventListener("DOMContentLoaded", async () => {
   setTodayDates();
   loadDrafts();
   loadNotifications();
-  const ok = await checkAdmin();
-  if(!ok)return;
-  loadMarketShops();
-  await loadProducts();
-  await loadOrdersFromSupabase();
+
+  // Render cached data immediately, without waiting for network.
+  try { products = JSON.parse(localStorage.getItem(LOCAL_PRODUCTS_KEY) || "[]"); }
+  catch(e) { products = []; }
+  updateDashboard();
   renderProductResults();
   renderNotifications();
-  setupRealtime();
-  startPolling();
+
+  // Supabase session is persisted locally; profile/network calls are best-effort.
+  let sessionData = null;
+  try {
+    const result = await Promise.race([
+      supabaseClient.auth.getSession(),
+      new Promise(resolve => setTimeout(() => resolve({data:{session:null}, error:new Error("timeout")}), 4000))
+    ]);
+    sessionData = result?.data?.session || null;
+  } catch(e) {}
+  if (sessionData) {
+    currentUser = sessionData.user;
+    loadMarketShops();
+    loadUserProfile(currentUser); // do not block startup on profile request
+    loadProducts();               // local cache remains visible while refreshing
+    loadOrdersFromSupabase();
+    setupRealtime();
+    startPolling();
+    syncPendingOrders();
+  } else {
+    // Keep the offline shell usable; login is required only for online account features.
+    document.getElementById("onlineStatus").textContent =
+      navigator.onLine ? "Login প্রয়োজন" : "Offline";
+    document.getElementById("onlineStatus").className = "offline";
+    loadMarketShops();
+  }
 });
 
 async function checkAdmin(){
@@ -512,7 +536,7 @@ async function loadProducts(){
   const {data,error}=await supabaseClient.from("products").select("*").order("name",{ascending:true});
   if(error){
     console.error(error);
-    try{products=JSON.parse(localStorage.getItem(LOCAL_PRODUCTS_KEY)||"[]")}catch{products=[]}
+    // Keep the already-rendered local cache when offline or temporarily unavailable.
     updateDashboard();populateOrderProductSearch();return;
   }
   products=data||[];
@@ -682,7 +706,8 @@ async function sendCurrentDraft(){
 
 async function sendDraftOrder(draftId){
   const draft=draftOrders.find(x=>x.id===draftId);if(!draft){alert("Draft পাওয়া যায়নি");return}
-  if(!confirm(`"${draft.shop}" এর অর্ডার Online-এ Send করবেন?`))return;
+  if(!navigator.onLine){draft.status="pending_send";saveDrafts();renderHistory();showToast("Offline: Send Queue-তে রাখা হয়েছে। নেট এলে অটো Send হবে");return}
+  if(!draft.autoSync && !confirm(`"${draft.shop}" এর অর্ডার Online-এ Send করবেন?`))return;
   const payload={
     market:draft.market||"",shop:draft.shop,shop_code:draft.shop_code||"",address:draft.address,mobile:draft.mobile,representative:draft.representative,order_date:draft.order_date,delivery_date:draft.delivery_date,note:draft.note,
     products:(draft.products||[]).map(p=>{
@@ -692,11 +717,31 @@ async function sendDraftOrder(draftId){
     total:(draft.products||[]).reduce((sum,p)=>{const rateType=p.rate_type==="carton"?"carton":"main";const selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);return sum+selectedRate*Number(p.quantity||0)},0)
   };
   const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
-  if(error){alert("❌ অর্ডার Send হয়নি:\n"+error.message);return}
+  if(error){draft.status="pending_send";saveDrafts();alert("❌ অর্ডার Send হয়নি; Pending রাখা হয়েছে:\n"+error.message);return}
   draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data)orders.unshift(data);
   addNotification("অর্ডার Sent",`${draft.shop} এর অর্ডার Online-এ পাঠানো হয়েছে।`);
   updateDashboard();renderHistory();closeModal("orderModal");showToast("✅ অর্ডার সফলভাবে Online-এ Send হয়েছে");
 }
+
+// Queue orders explicitly marked for sending while offline; keep ordinary drafts untouched.
+let syncRunning = false;
+async function syncPendingOrders(){
+  if(syncRunning || !navigator.onLine || !currentUser) return;
+  syncRunning = true;
+  try {
+    const pending = draftOrders.filter(d => d.status === "pending_send");
+    for (const d of pending) {
+      if (!navigator.onLine) break;
+      d.autoSync = true;
+      await sendDraftOrder(d.id);
+      delete d.autoSync;
+    }
+  } finally { syncRunning = false; }
+}
+window.addEventListener("online", () => {
+  const el=document.getElementById("onlineStatus"); if(el){el.textContent="Online — Sync হচ্ছে";el.className="online";}
+  syncPendingOrders();
+});
 
 async function loadOrdersFromSupabase(){
   const {data,error}=await supabaseClient.from("orders").select("*").order("created_at",{ascending:false});

@@ -13,6 +13,7 @@
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box}
@@ -109,6 +110,7 @@ textarea{min-height:75px;resize:vertical}
       <button class="btn btn-light" onclick="focusProductSearch()">🔎 Product খুঁজুন</button>
       <button class="btn btn-light" onclick="openProductManager()">📦 Products</button>
       <button class="btn btn-light" onclick="openMarketShopManager()">📍 Market / Shop</button>
+      <button class="btn btn-info" onclick="openMonthlyExcel()">📊 মাসিক Product Excel</button>
     </div>
   </section>
   <section class="card" id="productSearchCard">
@@ -474,6 +476,182 @@ async function saveProduct(){
 }
 async function deleteProduct(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;if(!confirm(`"${p.name}" ডিলিট করবেন?`))return;const {error}=await supabaseClient.from("products").delete().eq("id",id);if(error){alert("❌ Delete হয়নি:\n"+error.message);return}await loadProducts();renderProductManagerList();showToast("✅ Product Delete হয়েছে")}
 function renderProductManagerList(){const box=document.getElementById("productManagerList");if(!products.length){box.innerHTML='<div class="empty">Product নেই</div>';return}box.innerHTML=products.slice(0,150).map(p=>`<div class="history-row"><div class="history-head"><div><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · মূল ${money(mainRate(p))} · Carton ${money(cartonRate(p))} · MRP ${money(p.mrp)} · TP Rate ${money(p.tp_rate)}${p.offer?` · Offer ${escapeHtml(p.offer)} Free`:""} · Stock ${Number(p.stock||0)}</div></div></div><div class="history-actions"><button class="btn btn-light" onclick="editProduct('${escapeHtml(String(p.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteProduct('${escapeHtml(String(p.id))}')">🗑 Delete</button></div></div>`).join("")}
+
+function getCurrentMonthKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+
+function getOrdersForMonth(monthKey){
+  return orders.filter(o=>{
+    const date=String(o.order_date||o.created_at||"").slice(0,7);
+    return date===monthKey;
+  });
+}
+
+function buildMonthlyProductSales(monthKey){
+  const monthOrders=getOrdersForMonth(monthKey);
+  const map=new Map();
+
+  monthOrders.forEach(order=>{
+    const items=Array.isArray(order.products)?order.products:[];
+    items.forEach(p=>{
+      const code=String(p.code||"");
+      const name=String(p.name||"");
+      const key=String(p.product_id||code||name);
+      if(!map.has(key)){
+        map.set(key,{
+          code,
+          name,
+          pack:p.pack||"",
+          order_count:0,
+          quantity:0,
+          bonus:0,
+          sales_value:0
+        });
+      }
+      const row=map.get(key);
+      row.order_count += 1;
+      row.quantity += Number(p.quantity||0);
+      row.bonus += Number(p.bonus||0);
+      row.sales_value += Number(
+        p.value != null
+          ? p.value
+          : Number(p.rate||p.price||0)*Number(p.quantity||0)
+      );
+    });
+  });
+
+  return [...map.values()]
+    .sort((a,b)=>String(a.name).localeCompare(String(b.name),"bn"))
+    .map((r,i)=>({
+      "Sl":i+1,
+      "Product Code":r.code,
+      "Product Name":r.name,
+      "Pack":r.pack,
+      "Order Count":r.order_count,
+      "Total Quantity":r.quantity,
+      "Total Bonus":r.bonus,
+      "Total Sales Value":Number(r.sales_value.toFixed(2))
+    }));
+}
+
+function updateMonthlyExcelPreview(){
+  const month=document.getElementById("excelMonth")?.value;
+  if(!month)return;
+  const list=getOrdersForMonth(month);
+  const rows=buildMonthlyProductSales(month);
+  const total=rows.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
+  const countEl=document.getElementById("excelMonthOrderCount");
+  const summary=document.getElementById("excelMonthSummary");
+  if(countEl)countEl.value=String(list.length);
+  if(summary)summary.textContent=`মাসিক Product Sales: ${money(total)} · ${rows.length} Product`;
+}
+
+function openMonthlyExcel(){
+  const input=document.getElementById("excelMonth");
+  if(input){
+    input.value=getCurrentMonthKey();
+    input.onchange=updateMonthlyExcelPreview;
+  }
+  updateMonthlyExcelPreview();
+  openModal("monthlyExcelModal");
+}
+
+async function exportMonthlyProductExcel(){
+  const month=document.getElementById("excelMonth")?.value||getCurrentMonthKey();
+  if(!month){alert("মাস নির্বাচন করুন");return}
+
+  // Refresh from Supabase before export so the report represents the
+  // complete permanently stored Sent Orders for the selected month.
+  if(currentUser && navigator.onLine){
+    try{
+      const start=`${month}-01`;
+      const d=new Date(`${month}-01T00:00:00`);
+      d.setMonth(d.getMonth()+1);
+      const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`;
+
+      const {data,error}=await supabaseClient
+        .from("orders")
+        .select("*")
+        .gte("order_date",start)
+        .lt("order_date",end)
+        .order("order_date",{ascending:true});
+
+      if(!error && Array.isArray(data)){
+        const existingIds=new Set(orders.map(o=>String(o.id)));
+        data.forEach(o=>{
+          if(existingIds.has(String(o.id))){
+            const i=orders.findIndex(x=>String(x.id)===String(o.id));
+            if(i>=0)orders[i]=o;
+          }else{
+            orders.push(o);
+          }
+        });
+      }
+    }catch(e){
+      console.warn("Monthly Excel refresh failed:",e);
+    }
+  }
+
+  const rows=buildMonthlyProductSales(month);
+  if(!rows.length){
+    alert(`${month} মাসে কোনো Sent Order পাওয়া যায়নি।`);
+    return;
+  }
+
+  if(typeof XLSX==="undefined"){
+    alert("Excel library load হয়নি। Internet connection দিয়ে আবার চেষ্টা করুন।");
+    return;
+  }
+
+  const totalQty=rows.reduce((s,r)=>s+Number(r["Total Quantity"]||0),0);
+  const totalBonus=rows.reduce((s,r)=>s+Number(r["Total Bonus"]||0),0);
+  const totalValue=rows.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
+
+  // Product-wise master sheet. No market-wise grouping.
+  const sheetRows=[
+    ["কহিনুর কেমিক্যাল পিএলসি — Product-wise Monthly Sales"],
+    [`মাস: ${month}`],
+    [`Sent Orders: ${getOrdersForMonth(month).length}`],
+    [],
+    ["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"],
+    ...rows.map(r=>[
+      r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],
+      r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]
+    ]),
+    [],
+    ["","","","","TOTAL",totalQty,totalBonus,totalValue]
+  ];
+
+  const ws=XLSX.utils.aoa_to_sheet(sheetRows);
+  ws["!cols"]=[
+    {wch:6},{wch:16},{wch:32},{wch:12},
+    {wch:14},{wch:16},{wch:14},{wch:20}
+  ];
+
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Product-wise Sales");
+
+  // A small summary sheet for the same permanent monthly report.
+  const summaryRows=[
+    ["কহিনুর কেমিক্যাল পিএলসি"],
+    ["মাসিক Product-wise Sales Summary"],
+    ["Month",month],
+    ["Sent Orders",getOrdersForMonth(month).length],
+    ["Products",rows.length],
+    ["Total Quantity",totalQty],
+    ["Total Bonus",totalBonus],
+    ["Total Sales Value",totalValue]
+  ];
+  const ws2=XLSX.utils.aoa_to_sheet(summaryRows);
+  ws2["!cols"]=[{wch:24},{wch:25}];
+  XLSX.utils.book_append_sheet(wb,ws2,"Summary");
+
+  const filename=`Kohinoor_Product_Wise_Sales_${month}.xlsx`;
+  XLSX.writeFile(wb,filename);
+  showToast(`✅ ${month} মাসের Product-wise Excel তৈরি হয়েছে`);
+}
 
 function addNotification(title,text){notifications.unshift({id:Date.now(),title,text,created_at:new Date().toISOString()});notifications=notifications.slice(0,50);localStorage.setItem(LOCAL_NOTICES_KEY,JSON.stringify(notifications));renderNotifications()}
 function loadNotifications(){try{notifications=JSON.parse(localStorage.getItem(LOCAL_NOTICES_KEY)||"[]")}catch{notifications=[]}}

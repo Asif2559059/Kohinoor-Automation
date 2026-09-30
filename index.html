@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#087f50">
-<meta name="application-name" content="কহিনুর কেমিক্যাল অর্ডার">
+<meta name="application-name" content="Kohinur Chemical PLC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="কহিনুর অর্ডার">
+<meta name="apple-mobile-web-app-title" content="Kohinur Order">
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
-<title>কহিনুর কেমিক্যাল পিএলসি — অর্ডার অটোমেশন</title>
+<title>Kohinur Chemical PLC — Order Automation </title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -85,14 +85,14 @@ textarea{min-height:75px;resize:vertical}
 </head>
 <body>
 <header class="header">
-  <div class="header-title"><strong>কহিনুর কেমিক্যাল পিএলসি</strong><small>অর্ডার অটোমেশন</small></div>
+  <div class="header-title"><strong>Kohinur Chemical PLC</strong><small>Order Automation</small></div>
   <button class="icon-btn" onclick="openNotifications()">🔔</button>
-  <button class="icon-btn" onclick="adminLogout()">🚪</button>
+  <button class="icon-btn" onclick="adminLogout()">🧰</button>
 </header>
 
 <main class="container">
   <section class="card" onclick="openProfileModal()" style="cursor:pointer">
-    <div class="profile"><div class="avatar" id="profileAvatar">A</div><div><strong id="profileName">লোড হচ্ছে...</strong></div></div>
+    <div class="profile"><div class="avatar" id="profileAvatar">A</div><div><strong id="profileName">Loading...</strong></div></div>
   </section>
   <section class="card">
     <div class="stats">
@@ -100,22 +100,22 @@ textarea{min-height:75px;resize:vertical}
       <div class="stat"><b id="dashItems">0</b><span>Items</span></div>
       <div class="stat"><b id="dashOrders">0</b><span>Sent Orders</span></div>
     </div>
-    <div class="small" style="margin-top:10px;text-align:center">মোট অর্ডার মূল্য: <b id="dashTotal">৳0.00</b></div>
+    <div class="small" style="margin-top:10px;text-align:center">Total Order Value: <b id="dashTotal">৳0.00</b></div>
   </section>
   <section class="card">
-    <h3 style="margin-top:0">⚡ দ্রুত কাজ</h3>
+    <h3 style="margin-top:0">💠 Main Menu </h3>
     <div class="grid">
-      <button class="btn btn-primary" onclick="openOrderModal()">➕ নতুন অর্ডার</button>
+      <button class="btn btn-primary" onclick="openOrderModal()">➕ New Order</button>
       <button class="btn btn-warning" onclick="openHistory()">📝 Draft / History</button>
-      <button class="btn btn-light" onclick="focusProductSearch()">🔎 Product খুঁজুন</button>
+      <button class="btn btn-light" onclick="focusProductSearch()">🔎 Product Search </button>
       <button class="btn btn-light" onclick="openProductManager()">📦 Products</button>
       <button class="btn btn-light" onclick="openMarketShopManager()">📍 Market / Shop</button>
-      <button class="btn btn-info" onclick="openMonthlyExcel()">📊 মাসিক Product Excel</button>
+      <button class="btn btn-info" onclick="openMonthlyExcel()">📊 Monthly Product Excel</button>
     </div>
   </section>
   <section class="card" id="productSearchCard">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">🔎 Product Search</h3><span class="small" id="onlineStatus">লোকাল</span></div>
-    <input id="productSearch" class="search" style="margin-top:10px" placeholder="পণ্যের নাম/কোড লিখে খুঁজুন" oninput="renderProductResults">
+    <input id="productSearch" class="search" style="margin-top:10px" placeholder="Product Search" oninput="renderProductResults">
     <div id="productResults" class="product-results"></div>
   </section>
 </main>
@@ -128,20 +128,20 @@ textarea{min-height:75px;resize:vertical}
 </div></nav>
 
 <div class="modal" id="orderModal"><div class="modal-box">
-  <div class="modal-head"><h3 id="orderModalTitle">➕ নতুন অর্ডার</h3><button class="close" onclick="closeModal('orderModal')">✕</button></div>
+  <div class="modal-head"><h3 id="orderModalTitle">➕ New Order </h3><button class="close" onclick="closeModal('orderModal')">✕</button></div>
   <div class="small" style="margin-bottom:10px">প্রথমে <b>Save Draft</b> করুন। Save করলে অনলাইনে যাবে না। পরে Draft খুলে Product যোগ/পরিবর্তন করে আবার Save করে <b>Send Order</b> চাপলে অনলাইনে যাবে।</div>
   <div class="form-grid">
-    <div class="field"><label>মার্কেট</label><select id="marketSelect" onchange="filterShopList(true)"><option value="">-- মার্কেট নির্বাচন করুন --</option></select></div>
-    <div class="field"><label>দোকানের নাম *</label><select id="shopSelect" onchange="selectSavedShop()"><option value="">-- দোকান নির্বাচন করুন --</option></select><input id="shop" placeholder="দোকানের নাম" style="margin-top:6px"></div>
-    <div class="field"><label>দোকানের কোড</label><input id="shopCode" placeholder="দোকানের কোড"></div>
-    <div class="field"><label>মোবাইল</label><input id="mobile" placeholder="01XXXXXXXXX"></div>
-    <div class="field full"><label>ঠিকানা</label><input id="address" placeholder="দোকানের ঠিকানা"></div>
-    <div class="field"><label>Representative</label><input id="representative" placeholder="প্রতিনিধির নাম"></div>
-    <div class="field"><label>অর্ডার তারিখ</label><input id="orderDate" type="date"></div>
-    <div class="field"><label>ডেলিভারি তারিখ</label><input id="deliveryDate" type="date"></div>
-    <div class="field full"><label>নোট</label><textarea id="note" placeholder="প্রয়োজনীয় নোট"></textarea></div>
+    <div class="field"><label>Market</label><select id="marketSelect" onchange="filterShopList(true)"><option value="">-- Market Select --</option></select></div>
+    <div class="field"><label>Outlet Name *</label><select id="shopSelect" onchange="selectSavedShop()"><option value="">-- Outlet Selection --</option></select><input id="shop" placeholder="Outlet Name" style="margin-top:6px"></div>
+    <div class="field"><label>Code</label><input id="shopCode" placeholder="Code"></div>
+    <div class="field"><label>Mobile</label><input id="mobile" placeholder="01XXXXXXXXX"></div>
+    <div class="field full"><label>Address</label><input id="address" placeholder="Ourlet Address"></div>
+    <div class="field"><label>Representative</label><input id="representative" placeholder="Representative Name"></div>
+    <div class="field"><label>Order Date</label><input id="orderDate" type="date"></div>
+    <div class="field"><label>Delivery Date </label><input id="deliveryDate" type="date"></div>
+    <div class="field full"><label>Note</label><textarea id="note" placeholder="Essential Note"></textarea></div>
   </div>
-  <div class="field" style="margin-top:12px"><label>🔎 Order-এর জন্য Product খুঁজুন</label><input id="orderProductSearch" class="search" placeholder="Product code বা নাম লিখে সার্চ করুন..." autocomplete="off" oninput="renderOrderProductResults()"><div id="orderProductResults" class="order-search-results"></div></div>
+  <div class="field" style="margin-top:12px"><label>🔎 Order-এর জন্য Product Searching </label><input id="orderProductSearch" class="search" placeholder="Product code বা নাম লিখে সার্চ করুন..." autocomplete="off" oninput="renderOrderProductResults()"><div id="orderProductResults" class="order-search-results"></div></div>
   <div id="orderItems" class="order-items"></div><div class="total">মোট: <span id="orderTotal">৳0.00</span></div>
   <div class="actions"><button class="btn btn-primary" onclick="saveOrder()">💾 Save Draft</button><button class="btn btn-info" onclick="sendCurrentDraft()">📤 Send Order</button><button class="btn btn-light" onclick="closeModal('orderModal')">Cancel</button></div>
 </div></div>

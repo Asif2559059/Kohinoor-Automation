@@ -595,7 +595,7 @@ async function selectMonthlyFile(month,requestPermission=false){
   if(monthlyFileHandle){
     const ok=await hasMonthlyWritePermission(monthlyFileHandle,requestPermission);
     if(ok){setMonthlyFileStatus(`Connected: Kohinoor_Product_Sales_${month}.xlsx`,true);return true;}
-    setMonthlyFileStatus("This month's Excel file is saved, but permission is not currently available. Click Create / Connect Monthly Excel to reconnect it.");
+    setMonthlyFileStatus("This month's Excel file is saved. Click Create / Connect Monthly Excel once after refresh to restore write permission.");
     return false;
   }
   setMonthlyFileStatus("No monthly Excel file is connected for this month.");
@@ -684,7 +684,13 @@ async function updateMonthlyWorkbook(order){
   const month=String(order?.order_date||order?.created_at||getTodayLocalDate()).slice(0,7);
   if(monthlyFileMonth!==month)await selectMonthlyFile(month,false);
   if(!monthlyFileHandle)return false;
-  try{return await writeMonthlyWorkbook(month)}catch(e){console.warn("Automatic monthly Excel update failed",e);return false}
+  try{
+    // After a page refresh Chrome/Edge may keep the file handle but revoke the
+    // temporary write permission. The permission must be requested from a user
+    // gesture (the Monthly Product Excel button), so we do not try to pop a
+    // permission dialog here after the online order has already been sent.
+    return await writeMonthlyWorkbook(month);
+  }catch(e){console.warn("Automatic monthly Excel update failed",e);return false}
 }
 
 function getCurrentMonthKey(){
@@ -820,11 +826,11 @@ async function openMonthlyExcel(){
   const input=document.getElementById("excelMonth");
   if(input){
     if(!input.value)input.value=getCurrentMonthKey();
-    input.onchange=async()=>{await selectMonthlyFile(input.value,false);updateMonthlyExcelPreview();await refreshMonthlySalesSheet();};
+    input.onchange=async()=>{await selectMonthlyFile(input.value,true);updateMonthlyExcelPreview();await refreshMonthlySalesSheet();};
   }
   openModal("monthlyExcelModal");
   const month=input?.value||getCurrentMonthKey();
-  await selectMonthlyFile(month,false);
+  await selectMonthlyFile(month,true);
   await refreshMonthlySalesSheet();
 }
 

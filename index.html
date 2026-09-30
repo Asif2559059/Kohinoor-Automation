@@ -2,799 +2,251 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#087f50">
-<meta name="application-name" content="Kohinoor Chemical Order">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Kohinoor Order">
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
-<link rel="apple-touch-icon" href="./icons/icon-192.png">
-<title>Kohinoor Chemical PLC — Order Automation</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Kohinoor Chemical PLC - Order Automation</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,"Arial",sans-serif;background:#f4f7f6;color:#18352a}
-button,input,select,textarea{font:inherit}button{cursor:pointer}
-.header{position:sticky;top:0;z-index:20;background:#087f50;color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px #0002}
-.header-title{flex:1}.header-title strong{display:block;font-size:16px}.header-title small{opacity:.85}
-.icon-btn{border:0;background:#ffffff20;color:#fff;border-radius:10px;padding:10px}
-.container{max-width:720px;margin:auto;padding:12px 12px 90px}
-.card{background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 3px 12px #0000000d}
-.profile{display:flex;align-items:center;gap:12px}
-.avatar{width:52px;height:52px;border-radius:50%;background:#d9f3e7;color:#087f50;display:grid;place-items:center;font-size:20px;font-weight:800;overflow:hidden}
-.avatar img{width:100%;height:100%;object-fit:cover}.small{font-size:12px;color:#6c7c75}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat{background:#f1faf6;border-radius:12px;padding:12px;text-align:center}.stat b{font-size:22px;display:block;color:#087f50}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.btn{border:0;border-radius:11px;padding:11px 13px;font-weight:700}
-.btn-primary{background:#087f50;color:#fff}.btn-light{background:#eef3f1;color:#21453a}.btn-danger{background:#d93025;color:#fff}.btn-warning{background:#f4b400;color:#222}.btn-info{background:#2878d7;color:#fff}
-.search{width:100%;padding:12px;border:1px solid #d9e2de;border-radius:11px;outline:none}
-.product-results{margin-top:8px;display:grid;gap:7px;max-height:280px;overflow:auto}
-.product-result{padding:11px;border:1px solid #e2ebe7;border-radius:10px;background:#fbfdfc;display:flex;justify-content:space-between;gap:8px;align-items:center}
-.product-result-info{flex:1;min-width:0}.product-result-rate{text-align:right;white-space:nowrap}
-.order-search-results{margin-top:7px;display:grid;gap:6px;max-height:260px;overflow:auto}
-.order-search-result{padding:11px;border:1px solid #dfe9e5;border-radius:10px;background:#fbfdfc;cursor:pointer}
-.order-search-result:hover{background:#eef9f4}
-.rate-box{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.rate-box .selected-rate{background:#f1faf6;border-radius:10px;padding:9px;font-weight:700;color:#087f50}
-.modal{position:fixed;inset:0;background:#0007;z-index:50;display:none;padding:12px;overflow:auto}.modal.show{display:block}
-.modal-box{max-width:720px;margin:30px auto;background:#fff;border-radius:18px;padding:15px;box-shadow:0 10px 40px #0004}
-.modal-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}.modal-head h3{flex:1;margin:0}
-.close{border:0;background:#eee;border-radius:9px;padding:8px 11px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.product-edit-panel{background:#fff;border:1px solid #dfe9e5;border-radius:12px;padding:10px;margin-bottom:12px}
-.product-edit-panel.editing{position:sticky;top:0;z-index:8;box-shadow:0 6px 18px #0002}
-.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}
-.field label{font-size:12px;font-weight:700;color:#476157}
-.field input,.field select,.field textarea{border:1px solid #d8e2de;border-radius:10px;padding:10px;background:#fff}
-textarea{min-height:75px;resize:vertical}
-.order-items{margin-top:12px;display:grid;gap:8px;overflow-x:auto}.order-table-wrap{width:100%;overflow-x:auto}
-.order-table{width:100%;min-width:850px;border-collapse:collapse;font-size:12px}
-.order-table th,.order-table td{border:1px solid #dfe9e5;padding:7px 6px;text-align:center;vertical-align:middle}
-.order-table th{background:#f1faf6;color:#21453a;font-weight:800;white-space:nowrap}
-.order-table input,.order-table select{width:100%;min-width:58px;padding:6px 5px;border:1px solid #d8e2de;border-radius:7px;background:#fff}
-.order-table .serial-cell{width:45px;min-width:45px;max-width:45px;text-align:center!important;font-weight:900;color:#087f50;font-size:13px}
-.order-table .product-cell{text-align:left;white-space:normal;min-width:180px;max-width:220px;font-weight:700}
-.order-table .pack-cell{min-width:70px}.order-table .rate-cell,.order-table .total-cell{min-width:85px;font-weight:700}
-.remove-btn{border:0;background:#fee2e2;color:#b42318;border-radius:7px;padding:6px 8px;font-weight:800}
-.order-item{border:1px solid #dfe9e5;border-radius:11px;padding:10px}.order-item-top{display:flex;justify-content:space-between;gap:8px}.order-item-name{font-weight:700}
-.qty-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:8px}
-.total{background:#eaf8f1;border-radius:12px;padding:13px;margin:12px 0;font-size:18px;font-weight:800;color:#075c3a}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.actions .full{grid-column:1/-1}
-.badge{display:inline-block;border-radius:20px;padding:4px 8px;font-size:11px;font-weight:700;background:#e7f6ee;color:#087f50}
-.badge.draft{background:#fff4d6;color:#8a6100}.badge.sent{background:#e8f1ff;color:#2764a5}
-.draft-card{border:1px solid #f0dfab;background:#fffdf5;border-radius:12px;padding:11px;margin:8px 0}
-.draft-actions{display:flex;gap:7px;margin-top:9px}.draft-actions button{flex:1}
-.history-row{border-bottom:1px solid #edf1ef;padding:12px 0}.history-row:last-child{border-bottom:0}
-.history-head{display:flex;justify-content:space-between;gap:8px}.history-actions{display:flex;gap:6px;margin-top:8px}
-.empty{text-align:center;color:#82918b;padding:20px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:#fff;border-top:1px solid #e2e8e5;display:flex;justify-content:center}
-.bottom-nav-inner{max-width:720px;width:100%;display:grid;grid-template-columns:repeat(4,1fr)}
-.nav-btn{border:0;background:#fff;padding:9px 4px;color:#567067;font-size:11px}.nav-btn b{display:block;font-size:19px}.nav-btn.active{color:#087f50}
-.status{font-weight:700}.online{color:#087f50}.offline{color:#b47700}
-.notification-list{max-height:400px;overflow:auto}.notice{padding:10px;border-bottom:1px solid #eee}
-.list-box{margin-top:12px;display:grid;gap:8px}.list-row{border:1px solid #dfe9e5;border-radius:11px;padding:10px;background:#fbfdfc}
-.list-row-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.list-row-actions{display:flex;gap:6px;margin-top:8px}.list-row-actions button{flex:1}
-.select-note{font-size:11px;color:#6c7c75;margin-top:4px}.toast{position:fixed;left:50%;bottom:75px;transform:translateX(-50%);background:#18352a;color:#fff;padding:11px 16px;border-radius:10px;z-index:100;display:none}
-@media(max-width:520px){.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.actions{grid-template-columns:1fr}.actions .full{grid-column:auto}.stats .stat{padding:9px 4px}.stat b{font-size:19px}.qty-row{grid-template-columns:1fr 1fr}.qty-row .field:last-child{grid-column:1/-1}.rate-box{grid-template-columns:1fr}.order-table{min-width:850px}}
-@media print{.header,.bottom-nav,.no-print{display:none!important}.container{padding:0}.card{box-shadow:none}}
+:root{--green:#087f50;--green2:#0b8f5b;--light:#eef7f3;--text:#19382e;--muted:#6f7d78;--blue:#287bd7;--yellow:#f7b900;--red:#d9363e}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f7f6;color:var(--text)}
+header{background:var(--green);color:white;padding:22px 18px 18px;position:sticky;top:0;z-index:5;box-shadow:0 2px 10px #0002}
+header h1{margin:0;font-size:25px}header p{margin:5px 0 0;font-size:17px;opacity:.9}
+main{max-width:900px;margin:auto;padding:18px 14px 90px}.card{background:white;border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 2px 12px #0000000d}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#eff8f4;border-radius:18px;text-align:center;padding:15px 8px}.stat b{display:block;font-size:29px;color:var(--green)}.stat span{font-size:15px}
+h2{margin:0 0 14px;font-size:22px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+button,input,select{font:inherit}button{border:0;border-radius:15px;padding:14px 16px;font-weight:700;cursor:pointer}.btn{width:100%;color:white;background:var(--green)}.blue{background:var(--blue)}.yellow{background:var(--yellow);color:#1e1e1e}.gray{background:#edf1ef;color:var(--text)}.red{background:var(--red);color:#fff}.outline{background:white;color:var(--green);border:2px solid var(--green)}
+label{display:block;font-weight:700;margin:10px 0 6px}input,select{width:100%;padding:13px;border:1px solid #d3ddda;border-radius:12px;background:white}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.product-row{border:1px solid #e0e7e4;border-radius:14px;padding:12px;margin:8px 0}.product-row .top{display:flex;justify-content:space-between;gap:8px;align-items:center}.qty{width:90px}.danger{color:var(--red);background:#fff0f1;padding:8px 10px;border-radius:10px}
+.hidden{display:none!important}.notice{padding:12px;border-radius:12px;background:#fff8df;color:#6d5500;margin:10px 0;font-size:14px}.ok{background:#eaf8f1;color:#17623f}.muted{color:var(--muted);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:9px;border-bottom:1px solid #e7ecea;text-align:left}th{background:#f1f6f4}
+.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:flex-end;z-index:20}.sheet{background:white;width:100%;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px}.sheet-head{display:flex;justify-content:space-between;align-items:center}.close{background:#eee;border-radius:50%;padding:9px 13px}.draft{border:1px solid #dfe7e3;border-radius:14px;padding:12px;margin:8px 0}
+nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(4,1fr);z-index:10}nav button{border-radius:0;background:white;color:#65716d;padding:9px 4px;font-size:13px}nav button.active{color:var(--green);font-weight:800}
+@media(max-width:520px){.grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(3,1fr)}.stat b{font-size:25px}}
 </style>
 </head>
 <body>
-<header class="header">
-  <div class="header-title"><strong>Kohinoor Chemical PLC</strong><small>Order Automation</small></div>
-  <button class="icon-btn" onclick="openNotifications()">🔔</button>
-  <button class="icon-btn" onclick="adminLogout()">🚪</button>
-</header>
+<header><h1>Kohinoor Chemical PLC</h1><p>Order Automation</p></header>
 
-<main class="container">
-  <section class="card" onclick="openProfileModal()" style="cursor:pointer">
-    <div class="profile"><div class="avatar" id="profileAvatar">A</div><div><strong id="profileName">Loading...</strong></div></div>
-  </section>
-  <section class="card">
-    <div class="stats">
-      <div class="stat"><b id="dashProducts">0</b><span>Products</span></div>
-      <div class="stat"><b id="dashItems">0</b><span>Products Sold Today</span></div>
-      <div class="stat"><b id="dashOrders">0</b><span>Sent Orders Today</span></div>
-    </div>
-    <div class="small" style="margin-top:10px;text-align:center">Today's Sales Value: <b id="dashTotal">৳0.00</b></div>
-  </section>
-  <section class="card">
-    <h3 style="margin-top:0">⚡ Quick Actions</h3>
-    <div class="grid">
-      <button class="btn btn-primary" onclick="openOrderModal()">➕ New Order</button>
-      <button class="btn btn-warning" onclick="openHistory()">📝 Draft / History</button>
-      <button class="btn btn-light" onclick="focusProductSearch()">🔎 Find Product</button>
-      <button class="btn btn-light" onclick="openProductManager()">📦 Products</button>
-      <button class="btn btn-light" onclick="openMarketShopManager()">📍 Market / Shop</button>
-      <button class="btn btn-info" onclick="openMonthlyExcel()">📊 Monthly Product Excel</button>
-    </div>
-  </section>
-  <section class="card" id="productSearchCard">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">🔎 Product Search</h3><span class="small" id="onlineStatus">Local</span></div>
-    <input id="productSearch" class="search" style="margin-top:10px" placeholder="Search by product name/code" oninput="renderProductResults">
-    <div id="productResults" class="product-results"></div>
-  </section>
-</main>
-
-<nav class="bottom-nav"><div class="bottom-nav-inner">
-  <button class="nav-btn active" onclick="scrollTopPage()"><b>🏠</b>Home</button>
-  <button class="nav-btn" onclick="openOrderModal()"><b>➕</b>Order</button>
-  <button class="nav-btn" onclick="openHistory()"><b>📋</b>History</button>
-  <button class="nav-btn" onclick="openProductManager()"><b>📦</b>Products</button>
-</div></nav>
-
-<div class="modal" id="orderModal"><div class="modal-box">
-  <div class="modal-head"><h3 id="orderModalTitle">➕ New Order</h3><button class="close" onclick="closeModal('orderModal')">✕</button></div>
-  <div class="small" style="margin-bottom:10px">First click <b>Save Draft</b>. Saving will not send the order online. Open the draft later, add/change products, save again, then click <b>Send Order</b> to send it online.</div>
-  <div class="form-grid">
-    <div class="field"><label>Market</label><select id="marketSelect" onchange="filterShopList(true)"><option value="">-- Select Market --</option></select></div>
-    <div class="field"><label>Shop Name *</label><select id="shopSelect" onchange="selectSavedShop()"><option value="">-- Select Shop --</option></select><input id="shop" placeholder="Shop Name" style="margin-top:6px"></div>
-    <div class="field"><label>Shop Code</label><input id="shopCode" placeholder="Shop Code"></div>
-    <div class="field"><label>Mobile</label><input id="mobile" placeholder="01XXXXXXXXX"></div>
-    <div class="field full"><label>Address</label><input id="address" placeholder="Shop Address"></div>
-    <div class="field"><label>Representative</label><input id="representative" placeholder="Representative Name"></div>
-    <div class="field"><label>Order Date</label><input id="orderDate" type="date"></div>
-    <div class="field"><label>Delivery Date</label><input id="deliveryDate" type="date"></div>
-    <div class="field full"><label>Note</label><textarea id="note" placeholder="Required note"></textarea></div>
+<main>
+<section id="home">
+<div class="card">
+  <div class="stats">
+    <div class="stat"><b id="productCount">0</b><span>Products</span></div>
+    <div class="stat"><b id="todayProductCount">0</b><span>Products Sold Today</span></div>
+    <div class="stat"><b id="sentCount">0</b><span>Sent Orders</span></div>
   </div>
-  <div class="field" style="margin-top:12px"><label>🔎 Search Product for Order</label><input id="orderProductSearch" class="search" placeholder="Search by product code or name..." autocomplete="off" oninput="renderOrderProductResults()"><div id="orderProductResults" class="order-search-results"></div></div>
-  <div id="orderItems" class="order-items"></div><div class="total">Total: <span id="orderTotal">৳0.00</span></div>
-  <div class="actions"><button class="btn btn-primary" onclick="saveOrder()">💾 Save Draft</button><button class="btn btn-info" onclick="sendCurrentDraft()">📤 Send Order</button><button class="btn btn-light" onclick="closeModal('orderModal')">Cancel</button></div>
-</div></div>
-
-<div class="modal" id="productModal"><div class="modal-box">
-  <div class="modal-head"><h3>📦 Product Manager</h3><button class="close" onclick="closeModal('productModal')">✕</button></div>
-  <div class="small" style="margin-bottom:10px">Here <b>Main Rate</b> was Regular selling rate, <b>Carton Rate</b> was Applicable carton rate and <b>MRP</b> Product for saved will be. MRP will not be sent with the order।</div>
-  <div id="productEditPanel" class="product-edit-panel"><div class="form-grid">
-    <div class="field"><label>Code</label><input id="pCode" placeholder="03227"></div><div class="field"><label>Pack</label><input id="pPack" placeholder="60"></div>
-    <div class="field full"><label>Name</label><input id="pName" placeholder="Product name"></div>
-    <div class="field"><label>Main Rate</label><input id="pPrice" type="number" step="0.01" placeholder="88"></div>
-    <div class="field"><label>Carton Rate</label><input id="pCartonRate" type="number" step="0.01" placeholder="80"></div>
-    <div class="field"><label>MRP</label><input id="pMrp" type="number" step="0.01" placeholder="100"></div>
-    <div class="field"><label>TP Rate</label><input id="pTpRate" type="number" step="0.01" placeholder="TP Rate" oninput="autoCalculateMainRate()"></div>
-    <div class="field"><label>Offer / Free</label><input id="pOffer" type="text" placeholder="Example: 5:1, 9:1, 10:1" oninput="autoCalculateMainRate()"><div class="small">Example 5:1 if given TP Rate × 5 ÷ 6 according to Main Rate auto will be.</div></div>
-    <div class="field"><label>Stock</label><input id="pStock" type="number" placeholder="100"></div>
-  </div><div class="actions"><button class="btn btn-primary" onclick="saveProduct()">💾 Save Product</button><button class="btn btn-light" onclick="closeModal('productModal')">Cancel</button></div></div>
-  <div id="productManagerList" style="margin-top:14px"></div>
-</div></div>
-
-<div class="modal" id="historyModal"><div class="modal-box">
-  <div class="modal-head"><h3>📋 Draft & Order History</h3><button class="close" onclick="closeModal('historyModal')">✕</button></div>
-  <input id="historySearch" class="search" placeholder="Search by shop/mobile" oninput="renderHistory()"><div id="draftList" style="margin-top:12px"></div><hr style="border:0;border-top:1px solid #eee;margin:14px 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><h4 style="margin:0 0 5px">📤 Sent Orders</h4><button class="btn btn-info" onclick="exportAllOrdersToExcel()">📊 All Excel</button></div><div id="historyList"></div>
-</div></div>
-
-<div class="modal" id="detailModal"><div class="modal-box">
-  <div class="modal-head"><h3>Order Details</h3><button class="close" onclick="closeModal('detailModal')">✕</button></div><div id="detailContent"></div>
-  <div class="actions no-print"><button class="btn btn-light" onclick="window.print()">🖨 Print</button><button class="btn btn-light" onclick="closeModal('detailModal')">Close</button></div>
-</div></div>
-
-<div class="modal" id="profileModal"><div class="modal-box">
-  <div class="modal-head"><h3>👤 Profile</h3><button class="close" onclick="closeModal('profileModal')">✕</button></div>
-  <div style="text-align:center"><div class="avatar" id="profileModalAvatar" style="margin:auto;width:100px;height:100px;font-size:30px">A</div><label class="btn btn-light" style="display:inline-block;margin-top:12px">📷 Change Photo<input id="profilePhotoInput" type="file" accept="image/*" onchange="uploadProfilePhoto(event)" style="display:none"></label></div>
-  <div class="field full" style="margin-top:16px"><label>Username</label><input id="profileUsername" placeholder="Your User Name"></div>
-  <div class="actions"><button class="btn btn-primary" onclick="saveProfileInfo()">💾 Save Profile</button><button class="btn btn-light" onclick="closeModal('profileModal')">Close</button></div>
-</div></div>
-
-<div class="modal" id="marketShopModal"><div class="modal-box">
-  <div class="modal-head"><h3>📍 Market & Shop List</h3><button class="close" onclick="closeModal('marketShopModal')">✕</button></div>
-  <div class="small" style="margin-bottom:10px">Add new markets and shops here. Existing information can be edited or deleted. Data is stored on this device.</div>
-  <div class="form-grid">
-    <div class="field"><label>Market Name *</label><input id="msMarket" placeholder="Example: Mirpur Market"></div><div class="field"><label>Shop Name *</label><input id="msShop" placeholder="Example: Rahim Store"></div>
-    <div class="field"><label>Shop Code</label><input id="msShopCode" placeholder="Example: S-001"></div><div class="field full"><label>Address</label><input id="msAddress" placeholder="Shop Address"></div>
-    <div class="field"><label>Mobile</label><input id="msMobile" placeholder="01XXXXXXXXX"></div><div class="field"><label>Representative</label><input id="msRepresentative" placeholder="Representative Name"></div>
-  </div>
-  <div class="actions"><button class="btn btn-primary" onclick="saveMarketShop()">💾 Save</button><button class="btn btn-light" onclick="clearMarketShopForm()">✚ New</button></div>
-  <input id="marketShopSearch" class="search" style="margin-top:12px" placeholder="Search by market/shop/address" oninput="renderMarketShopList"><div id="marketShopList" class="list-box"></div>
-</div></div>
-
-<div class="modal" id="monthlyExcelModal">
-  <div class="modal-box">
-    <div class="modal-head"><h3>📊 Monthly Product Excel</h3><button class="close" onclick="closeModal('monthlyExcelModal')">✕</button></div>
-    <div class="small" style="margin-bottom:12px">For the selected month, all <b>Sent Order</b> Product-wise together Excel will be. Market/Shop will not be separated or shown।</div>
-    <div class="form-grid">
-      <div class="field"><label>Select Month</label><input id="excelMonth" type="month"></div>
-      <div class="field"><label>Sent Order count</label><input id="excelMonthOrderCount" readonly></div>
-    </div>
-    <div id="excelMonthSummary" class="total" style="margin-top:12px">Monthly Product Sales: ৳0.00 · 0 Product</div>
-    <div id="monthlySalesSheet" class="order-table-wrap" style="margin-top:12px"></div>
-    <div class="actions">
-      <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
-      <button class="btn btn-info" onclick="exportMonthlyProductExcel()">📥 Export Excel (Optional)</button>
-      <button class="btn btn-light" onclick="closeModal('monthlyExcelModal')">Close</button>
-    </div>
-  </div>
+  <p style="text-align:center;margin:16px 0 0">Today's Sales Value: <b id="todayValue">৳0.00</b></p>
 </div>
 
-<div class="modal" id="notificationModal"><div class="modal-box">
-  <div class="modal-head"><h3>🔔 Notifications</h3><button class="close" onclick="closeModal('notificationModal')">✕</button></div><div id="notificationList" class="notification-list"></div>
+<div class="card">
+<h2>⚡ Quick Actions</h2>
+<div class="grid">
+<button class="btn" onclick="openOrder()">➕ New Order</button>
+<button class="yellow" onclick="openHistory()">📝 Draft / History</button>
+<button class="gray" onclick="focusSearch()">🔎 Find Product</button>
+<button class="gray" onclick="openProducts()">📦 Products</button>
+<button class="gray" onclick="alert('Market / Shop fields are available inside New Order.')">📍 Market / Shop</button>
+<button class="blue" onclick="openMonthlyExcel()">📊 Monthly Product Excel</button>
+</div>
+</div>
+
+<div class="card">
+<h2>🔎 Product Search</h2>
+<input id="search" placeholder="Search by product name or code" oninput="renderSearch()">
+<div id="searchResults"></div>
+</div>
+
+<div class="card">
+<h2>📁 Monthly Sales File</h2>
+<div id="fileStatus" class="notice">No monthly Excel file is connected yet. Create/connect it once for this month.</div>
+<div class="grid">
+<button class="btn" onclick="connectMonthlyFile()">📄 Create / Connect This Month's Excel</button>
+<button class="outline" onclick="openMonthlyExcel()">📊 Open Monthly Excel</button>
+</div>
+<p class="muted">After the first setup, Order Send updates the same monthly workbook. You do not need to download a new Excel file every day.</p>
+</div>
+</section>
+
+<section id="productsPage" class="hidden">
+<div class="card"><h2>📦 Products</h2><div id="productList"></div></div>
+</section>
+</main>
+
+<nav>
+<button class="active" id="navHome" onclick="showPage('home')">🏠<br>Home</button>
+<button onclick="openOrder()">➕<br>Order</button>
+<button onclick="openHistory()">📋<br>History</button>
+<button onclick="openProducts()">📦<br>Products</button>
+</nav>
+
+<div id="orderModal" class="modal hidden">
+<div class="sheet">
+<div class="sheet-head"><h2>New Order</h2><button class="close" onclick="closeModal('orderModal')">✕</button></div>
+<div class="row">
+<div><label>Market / Shop</label><input id="market" placeholder="Market / Shop"></div>
+<div><label>Representative</label><input id="rep" placeholder="Representative"></div>
+</div>
+<label>Product Search</label><input id="orderSearch" placeholder="Search product..." oninput="renderOrderProducts()">
+<div id="orderProducts"></div>
+<div class="grid">
+<button class="gray" onclick="saveDraft()">💾 Save Draft</button>
+<button class="btn" onclick="sendOrder()">📤 Send Order</button>
+</div>
+<p id="orderTotal" style="text-align:center;font-weight:800;margin:14px 0">Order Value: ৳0.00</p>
 </div></div>
-<div id="toast" class="toast"></div>
+
+<div id="historyModal" class="modal hidden">
+<div class="sheet">
+<div class="sheet-head"><h2>Draft / Order History</h2><button class="close" onclick="closeModal('historyModal')">✕</button></div>
+<h3>Drafts</h3><div id="draftList"></div>
+<h3>Sent Orders</h3><div id="historyList"></div>
+</div></div>
 
 <script>
-if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(err=>console.error("PWA service worker error:",err));});}
+const KEY='kohinoor_automation_v4';
+const FILEKEY='kohinoor_monthly_file_v1';
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ products:[
+  {code:'BC1.200',name:'BC1 200',price:100},{code:'BC1.400',name:'BC1 400',price:150},
+  {code:'BC2.400',name:'BC2 400',price:180},{code:'BC3.400',name:'BC3 400',price:200},
+  {code:'BC.MF.400',name:'MF 400',price:220}
+ ],
+ drafts:[],orders:[]
+};
+let cart={};
+let fileHandle=null;
+let currentMonth=monthKey(new Date());
 
-const SUPABASE_URL="https://utzkpsohkoiawvuupgeb.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_PJj7uWbW3pd3VQvSI0jNyA_xY3CFKAt";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-const DRAFTS_KEY="kohinoor_order_drafts_v3",LOCAL_NOTICES_KEY="kohinoor_notifications_v3",LOCAL_PRODUCTS_KEY="kohinoor_products_cache_v3";
-let currentUser=null,products=[],orders=[],draftOrders=[],notifications=[],currentOrderItems=[],editingDraftId=null,realtimeChannel=null,pollingTimer=null,editingProductId=null,syncRunning=false;
-const MARKET_SHOPS_KEY="kohinoor_market_shop_list_v2_user_";let marketShops=[],editingMarketShopId=null;
+function save(){localStorage.setItem(KEY,JSON.stringify(data));}
+function monthKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function money(n){return '৳'+Number(n||0).toFixed(2);}
+function today(){return new Date().toISOString().slice(0,10);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
 
-document.addEventListener("DOMContentLoaded",async()=>{
- setTodayDates();loadDrafts();loadNotifications();
- try{products=JSON.parse(localStorage.getItem(LOCAL_PRODUCTS_KEY)||"[]")}catch(e){products=[]}
- updateDashboard();renderProductResults();renderNotifications();
- let sessionData=null;
- try{const result=await Promise.race([supabaseClient.auth.getSession(),new Promise(resolve=>setTimeout(()=>resolve({data:{session:null},error:new Error("timeout")}),4000))]);sessionData=result?.data?.session||null}catch(e){}
- if(sessionData){
-   currentUser=sessionData.user;loadMarketShops();loadUserProfile(currentUser);loadProducts();loadOrdersFromSupabase();setupRealtime();startPolling();syncPendingOrders();
- }else{
-   document.getElementById("onlineStatus").textContent=navigator.onLine?"Login required":"Offline";document.getElementById("onlineStatus").className="offline";loadMarketShops();
- }
-});
-
-async function checkAdmin(){try{const {data,error}=await supabaseClient.auth.getSession();if(error||!data.session){window.location.replace("signin.html");return false}currentUser=data.session.user;await loadUserProfile(currentUser);return true}catch(e){window.location.replace("signin.html");return false}}
-async function adminLogout(){await supabaseClient.auth.signOut();window.location.replace("signin.html")}
-function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function money(n){return "৳"+Number(n||0).toFixed(2)}
-function mainRate(p){return Number(p?.price||0)}function cartonRate(p){return Number(p?.carton_rate||0)}
-function showToast(msg){const el=document.getElementById("toast");el.textContent=msg;el.style.display="block";clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.style.display="none",2500)}
-function openModal(id){const el=document.getElementById(id);el.classList.add("show");setTimeout(()=>{el.scrollTop=0;const box=el.querySelector(".modal-box");if(box)box.scrollTop=0},0)}
-function closeModal(id){document.getElementById(id).classList.remove("show")}
-function scrollTopPage(){window.scrollTo({top:0,behavior:"smooth"})}
-function focusProductSearch(){document.getElementById("productSearchCard").scrollIntoView({behavior:"smooth"});setTimeout(()=>document.getElementById("productSearch").focus(),250)}
-function setTodayDates(){const d=new Date(),today=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);if(document.getElementById("orderDate"))document.getElementById("orderDate").value=today;if(document.getElementById("deliveryDate"))document.getElementById("deliveryDate").value=today}
-
-async function loadUserProfile(user){
- const fallbackName=user.email?.split("@")[0]||"User";
- try{const {data,error}=await supabaseClient.from("user_profiles").select("username,avatar_url").eq("id",user.id).maybeSingle();if(error)throw error;const p=data||{},name=p.username||fallbackName;document.getElementById("profileName").textContent=name;setProfileAvatar(document.getElementById("profileAvatar"),p.avatar_url,name)}
- catch(e){document.getElementById("profileName").textContent=fallbackName;setProfileAvatar(document.getElementById("profileAvatar"),"",fallbackName)}
+function render(){
+ document.getElementById('productCount').textContent=data.products.length;
+ const orders=data.orders.filter(o=>o.date===today());
+ document.getElementById('sentCount').textContent=data.orders.length;
+ const unique=new Set(orders.flatMap(o=>o.items.map(x=>x.code)));
+ document.getElementById('todayProductCount').textContent=unique.size;
+ document.getElementById('todayValue').textContent=money(orders.reduce((s,o)=>s+o.total,0));
+ renderSearch(); renderProducts(); renderFileStatus();
 }
-function setProfileAvatar(el,url,name){if(!el)return;if(url)el.innerHTML='<img src="'+escapeHtml(url)+'" alt="profile">';else el.textContent=(name||"A").trim().charAt(0).toUpperCase()||"A"}
-async function openProfileModal(){
- if(!currentUser)return;
- try{const {data,error}=await supabaseClient.from("user_profiles").select("username,avatar_url").eq("id",currentUser.id).maybeSingle();if(error)throw error;const p=data||{},name=p.username||currentUser.email?.split("@")[0]||"User";document.getElementById("profileUsername").value=name;setProfileAvatar(document.getElementById("profileModalAvatar"),p.avatar_url,name)}
- catch(e){const name=currentUser.email?.split("@")[0]||"User";document.getElementById("profileUsername").value=name;setProfileAvatar(document.getElementById("profileModalAvatar"),"",name)}
- openModal("profileModal")
+function renderSearch(){
+ const q=(document.getElementById('search')?.value||'').toLowerCase();
+ const list=data.products.filter(p=>(p.name+' '+p.code).toLowerCase().includes(q)).slice(0,20);
+ document.getElementById('searchResults').innerHTML=list.map(p=>`<div class="product-row"><b>${esc(p.name)}</b> <span class="muted">${esc(p.code)}</span><br>${money(p.price)}</div>`).join('')||'<p class="muted">No product found.</p>';
 }
-async function saveProfileInfo(){
- if(!currentUser){alert("User session not found. Please Login again.");return}
- const username=document.getElementById("profileUsername").value.trim();if(!username){alert("Enter a Username");return}
- try{const {data:existing,error:readError}=await supabaseClient.from("user_profiles").select("id,avatar_url").eq("id",currentUser.id).maybeSingle();if(readError)throw readError;if(existing){const {error}=await supabaseClient.from("user_profiles").update({username}).eq("id",currentUser.id);if(error)throw error}else{const {error}=await supabaseClient.from("user_profiles").insert({id:currentUser.id,username});if(error)throw error}await loadUserProfile(currentUser);setProfileAvatar(document.getElementById("profileModalAvatar"),existing?.avatar_url||"",username);closeModal("profileModal");showToast("✅ Username updated successfully")}
- catch(e){console.error(e);alert("Username could not be saved:\n"+e.message)}
+function renderProducts(){
+ document.getElementById('productList').innerHTML=data.products.map(p=>`<div class="product-row"><b>${esc(p.name)}</b><br><span class="muted">${esc(p.code)} · ${money(p.price)}</span></div>`).join('');
 }
-function resizeImageToDataUrl(file,maxSize=500,quality=.82){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(w>maxSize||h>maxSize){const r=Math.min(maxSize/w,maxSize/h);w=Math.round(w*r);h=Math.round(h*r)}const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);resolve(c.toDataURL("image/jpeg",quality))};img.onerror=reject;img.src=reader.result};reader.onerror=reject;reader.readAsDataURL(file)})}
-async function uploadProfilePhoto(event){
- const file=event.target.files?.[0];if(!file||!currentUser)return;
- try{const dataUrl=await resizeImageToDataUrl(file);const {data:existing}=await supabaseClient.from("user_profiles").select("username,status").eq("id",currentUser.id).maybeSingle();const username=existing?.username||currentUser.email?.split("@")[0]||"User";const {error}=await supabaseClient.from("user_profiles").upsert({id:currentUser.id,email:currentUser.email,username,status:existing?.status||"Active",avatar_url:dataUrl},{onConflict:"id"});if(error)throw error;await loadUserProfile(currentUser);setProfileAvatar(document.getElementById("profileModalAvatar"),dataUrl,username);event.target.value="";showToast("✅ Profile photo saved")}catch(e){alert("Photo could not be saved: "+e.message)}
+function showPage(id){
+ document.getElementById('home').classList.toggle('hidden',id!=='home');
+ document.getElementById('productsPage').classList.toggle('hidden',id!=='productsPage');
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+ if(id==='home')document.getElementById('navHome').classList.add('active');
 }
-
-async function loadProducts(){
- const {data,error}=await supabaseClient.from("products").select("*").order("name",{ascending:true});
- if(error){console.error(error);updateDashboard();populateOrderProductSearch();return}
- products=data||[];localStorage.setItem(LOCAL_PRODUCTS_KEY,JSON.stringify(products));updateDashboard();populateOrderProductSearch();renderProductResults()
+function openProducts(){showPage('productsPage');}
+function focusSearch(){showPage('home');setTimeout(()=>document.getElementById('search').focus(),100);}
+function openOrder(){cart={};renderOrderProducts();document.getElementById('orderModal').classList.remove('hidden');}
+function renderOrderProducts(){
+ const q=(document.getElementById('orderSearch')?.value||'').toLowerCase();
+ const list=data.products.filter(p=>(p.name+' '+p.code).toLowerCase().includes(q)).slice(0,30);
+ document.getElementById('orderProducts').innerHTML=list.map(p=>{
+  const qty=cart[p.code]||0;
+  return `<div class="product-row"><div class="top"><div><b>${esc(p.name)}</b><br><span class="muted">${esc(p.code)} · ${money(p.price)}</span></div>
+  <input class="qty" type="number" min="0" value="${qty}" onchange="setQty('${esc(p.code)}',this.value)"></div></div>`;
+ }).join('');
+ updateTotal();
 }
-function renderProductResults(){
- const q=document.getElementById("productSearch").value.trim().toLowerCase(),box=document.getElementById("productResults"),list=products.filter(p=>!q||String(p.name||"").toLowerCase().includes(q)||String(p.code||"").toLowerCase().includes(q)).slice(0,30);
- box.innerHTML=list.length?list.map(p=>`<div class="product-result"><div class="product-result-info"><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")}</div></div><div class="product-result-rate"><div><b>Main ${money(mainRate(p))}</b></div><div class="small">MRP ${money(p.mrp)}</div><div class="small">Carton ${money(cartonRate(p))}${p.offer?` · ${escapeHtml(p.offer)} Free`:""}</div></div></div>`).join(""):'<div class="empty">Product not found</div>'
+function setQty(code,val){let n=Math.max(0,Number(val)||0);if(n)cart[code]=n;else delete cart[code];updateTotal();}
+function updateTotal(){
+ const total=data.products.reduce((s,p)=>s+(cart[p.code]||0)*p.price,0);
+ document.getElementById('orderTotal').textContent='Order Value: '+money(total);
 }
-function populateOrderProductSearch(){renderOrderProductResults()}
-function renderOrderProductResults(){
- const input=document.getElementById("orderProductSearch"),box=document.getElementById("orderProductResults");if(!input||!box)return;
- const q=input.value.trim().toLowerCase();let list=products.filter(p=>!q||String(p.name||"").toLowerCase().includes(q)||String(p.code||"").toLowerCase().includes(q));list=q?list.slice(0,50):list.slice(0,20);
- box.innerHTML=list.length?list.map(p=>`<div class="order-search-result" onclick="addProductById('${escapeHtml(String(p.id))}')"><div style="display:flex;justify-content:space-between;gap:8px"><div style="flex:1"><b>${escapeHtml(p.code||"")} — ${escapeHtml(p.name||"")}</b><div class="small">Pack ${escapeHtml(p.pack||"")} · Stock ${Number(p.stock||0)}</div></div><div style="text-align:right;white-space:nowrap"><b>Main ${money(mainRate(p))}</b><div class="small">Carton ${money(cartonRate(p))}</div></div></div></div>`).join(""):'<div class="empty" style="padding:12px">Product not found</div>'
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+function cartItems(){return data.products.filter(p=>cart[p.code]>0).map(p=>({code:p.code,name:p.name,qty:cart[p.code],price:p.price,value:cart[p.code]*p.price}));}
+function saveDraft(){
+ const items=cartItems();if(!items.length)return alert('Add at least one product.');
+ data.drafts.unshift({id:crypto.randomUUID(),date:today(),market:document.getElementById('market').value,rep:document.getElementById('rep').value,items});
+ save();render();alert('Draft saved.');closeModal('orderModal');
 }
-function addProductById(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;addProductToOrder(p);document.getElementById("orderProductSearch").value="";renderOrderProductResults()}
-function addProductToOrder(p){const existing=currentOrderItems.find(x=>String(x.product_id||"")===String(p.id||"")||(x.code&&p.code&&x.code===p.code));if(existing)existing.quantity=Number(existing.quantity||0)+1;else currentOrderItems.push({product_id:p.id,code:p.code||"",name:p.name||"",pack:p.pack||"",price:mainRate(p),base_price:mainRate(p),carton_rate:cartonRate(p),tp_rate:Number(p.tp_rate||0),offer:p.offer||"",rate_type:"main",rate:mainRate(p),quantity:1,bonus:0,value:mainRate(p)});renderOrderItems()}
-function renderOrderItems(){
- const box=document.getElementById("orderItems"),totalBox=document.getElementById("orderTotal");if(!box)return;
- if(!currentOrderItems.length){box.innerHTML='<div class="empty">No products added yet</div>';if(totalBox)totalBox.textContent=money(0);return}
- let grandTotal=0;
- const rows=currentOrderItems.map((item,index)=>{const rateType=item.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(item.carton_rate||0):Number(item.price||0),qty=Math.max(1,Number(item.quantity||1)),bonus=Math.max(0,Number(item.bonus||0)),rowTotal=selectedRate*qty;grandTotal+=rowTotal;return `<tr><td class="serial-cell">${index+1}</td><td class="product-cell">${escapeHtml(item.name||"")}</td><td><input type="number" min="1" value="${qty}" onchange="changeItemQty(${index},this.value)"></td><td class="pack-cell">${escapeHtml(item.pack||"")}</td><td><input type="number" min="0" value="${bonus}" onchange="changeItemBonus(${index},this.value)"></td><td><select onchange="changeItemRateType(${index},this.value)"><option value="main" ${rateType==="main"?"selected":""}>Main</option><option value="carton" ${rateType==="carton"?"selected":""}>Carton</option></select></td><td class="rate-cell">${money(selectedRate)}</td><td class="total-cell">${money(rowTotal)}</td><td><button class="remove-btn" onclick="removeOrderItem(${index})" title="Remove Product">✕</button></td></tr>`}).join("");
- box.innerHTML=`<div class="order-table-wrap"><table class="order-table"><thead><tr><th>#</th><th>Product</th><th>Quantity</th><th>Pack</th><th>Bonus</th><th>Rate Type</th><th>Rate</th><th>Total</th><th>✕</th></tr></thead><tbody>${rows}</tbody></table></div>`;
- if(totalBox)totalBox.textContent=money(grandTotal)
+function sendOrder(){
+ const items=cartItems();if(!items.length)return alert('Add at least one product.');
+ const order={id:crypto.randomUUID(),date:today(),time:new Date().toLocaleTimeString(),market:document.getElementById('market').value,rep:document.getElementById('rep').value,items,total:items.reduce((s,x)=>s+x.value,0)};
+ data.orders.unshift(order);save();render();
+ closeModal('orderModal');
+ updateMonthlyWorkbook(order).then(()=>alert('Order sent. Monthly Excel updated.')).catch(e=>alert('Order saved, but Excel update needs permission: '+e.message));
 }
-function changeItemRateType(i,type){if(!currentOrderItems[i])return;currentOrderItems[i].rate_type=type==="carton"?"carton":"main";renderOrderItems()}
-function changeItemQty(i,v){currentOrderItems[i].quantity=Math.max(1,Number(v||1));renderOrderItems()}
-function changeItemBonus(i,v){currentOrderItems[i].bonus=Math.max(0,Number(v||0));renderOrderItems()}
-function removeOrderItem(i){currentOrderItems.splice(i,1);renderOrderItems()}
-
-function getOrderFormData(){
- const shop=document.getElementById("shop").value.trim();if(!shop){alert("Enter Shop Name");return null}if(!currentOrderItems.length){alert("Add at least 1 product");return null}
- const productsForOrder=currentOrderItems.map(item=>{const rateType=item.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(item.carton_rate||0):Number(item.price||0);return {product_id:item.product_id||null,code:item.code||"",name:item.name||"",pack:item.pack||"",base_price:Number(item.price||0),price:selectedRate,carton_rate:Number(item.carton_rate||0),rate_type:rateType,rate:selectedRate,quantity:Number(item.quantity||0),bonus:Number(item.bonus||0),value:selectedRate*Number(item.quantity||0)}});
- const total=productsForOrder.reduce((s,x)=>s+Number(x.value||0),0);
- return {market:document.getElementById("marketSelect")?.value.trim()||"",shop,shop_code:document.getElementById("shopCode").value.trim()||"",address:document.getElementById("address").value.trim(),mobile:document.getElementById("mobile").value.trim(),representative:document.getElementById("representative").value.trim(),order_date:document.getElementById("orderDate").value,delivery_date:document.getElementById("deliveryDate").value,note:document.getElementById("note").value.trim(),products:productsForOrder,total}
+function openHistory(){
+ document.getElementById('draftList').innerHTML=data.drafts.map(d=>`<div class="draft"><b>${esc(d.date)} · ${esc(d.market||'No shop')}</b><br>${d.items.map(x=>esc(x.name)+' × '+x.qty).join(', ')}<br><button class="btn" onclick="sendDraft('${d.id}')">📤 Send Draft</button> <button class="red" onclick="deleteDraft('${d.id}')">🗑 Delete Draft</button></div>`).join('')||'<p class="muted">No drafts.</p>';
+ document.getElementById('historyList').innerHTML=data.orders.slice(0,30).map(o=>`<div class="draft"><b>${esc(o.date)} ${esc(o.time)}</b><br>${esc(o.market||'No shop')} · ${o.items.map(x=>esc(x.name)+' × '+x.qty).join(', ')}<br><b>${money(o.total)}</b></div>`).join('')||'<p class="muted">No sent orders.</p>';
+ document.getElementById('historyModal').classList.remove('hidden');
 }
-function saveDrafts(){localStorage.setItem(DRAFTS_KEY,JSON.stringify(draftOrders))}
-function loadDrafts(){try{draftOrders=JSON.parse(localStorage.getItem(DRAFTS_KEY)||"[]")}catch{draftOrders=[]}}
-
-function openOrderModal(draftId=null){
- editingDraftId=draftId;currentOrderItems=[];document.getElementById("orderModalTitle").textContent=draftId?"✏️ Draft Edit":"➕ New Order";document.getElementById("orderProductSearch").value="";
- if(draftId){const d=draftOrders.find(x=>x.id===draftId);if(!d){alert("Draft not found");return}populateMarketSelect(d.market||"");populateShopSelect(findSavedShopId(d.shop||"",d.market||"",d.address||""));document.getElementById("shop").value=d.shop||"";document.getElementById("shopCode").value=d.shop_code||"";document.getElementById("address").value=d.address||"";document.getElementById("mobile").value=d.mobile||"";document.getElementById("representative").value=d.representative||"";document.getElementById("orderDate").value=d.order_date||"";document.getElementById("deliveryDate").value=d.delivery_date||"";document.getElementById("note").value=d.note||"";currentOrderItems=(d.products||[]).map(x=>({...x,price:Number(x.base_price??x.price??0),base_price:Number(x.base_price??x.price??0),carton_rate:Number(x.carton_rate||0),tp_rate:Number(x.tp_rate||0),offer:x.offer||"",rate_type:x.rate_type||"main",rate:Number(x.rate||(x.rate_type==="carton"?Number(x.carton_rate||0):Number(x.price||0))),quantity:Number(x.quantity||0),bonus:Number(x.bonus||0)}))}
- else{document.getElementById("marketSelect").value="";document.getElementById("shopSelect").value="";document.getElementById("shop").value="";document.getElementById("shopCode").value="";populateMarketSelect("",true);populateShopSelect("",true);document.getElementById("address").value="";document.getElementById("mobile").value="";document.getElementById("representative").value="";document.getElementById("note").value="";setTodayDates()}
- renderOrderProductResults();renderOrderItems();openModal("orderModal")
-}
-function saveOrder(){
- const data=getOrderFormData();if(!data)return;const now=new Date().toISOString();
- if(editingDraftId){const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft not found");return}draftOrders[i]={...draftOrders[i],...data,updated_at:now,status:"draft"};showToast("✅ Draft updated")}
- else{const draft={...data,id:"draft-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),status:"draft",created_at:now,updated_at:now};draftOrders.unshift(draft);editingDraftId=draft.id;showToast("✅ Draft saved — yet Send failed")}
- saveDrafts();updateDashboard();renderHistory();closeModal("orderModal")
-}
-function deleteDraft(draftId){
-  const draft=draftOrders.find(x=>String(x.id)===String(draftId));
-  if(!draft)return;
-  const label=draft.shop||"this Draft";
-  if(!confirm(`"${label}" Do you want to delete the Draft?\n\nThis Draft cannot be recovered after deletion.`))return;
-  draftOrders=draftOrders.filter(x=>String(x.id)!==String(draftId));
-  saveDrafts();
-  if(editingDraftId===draftId){editingDraftId=null;currentOrderItems=[];}
-  updateDashboard();
-  renderHistory();
-  showToast("🗑️ Draft Delete done");
+function deleteDraft(id){if(!confirm('Delete this draft?'))return;data.drafts=data.drafts.filter(x=>x.id!==id);save();openHistory();}
+function sendDraft(id){
+ const d=data.drafts.find(x=>x.id===id);if(!d)return;
+ const order={id:crypto.randomUUID(),date:today(),time:new Date().toLocaleTimeString(),market:d.market,rep:d.rep,items:d.items,total:d.items.reduce((s,x)=>s+x.value,0)};
+ data.orders.unshift(order);data.drafts=data.drafts.filter(x=>x.id!==id);save();render();closeModal('historyModal');
+ updateMonthlyWorkbook(order).then(()=>alert('Draft sent. Monthly Excel updated.')).catch(e=>alert('Draft sent, but Excel update needs permission: '+e.message));
 }
 
-function safeFileName(value){
-  return String(value||"order").replace(/[\\/:*?"<>|#%{}$!@+`=]/g,"_").replace(/\s+/g,"_").slice(0,80)||"order";
+async function connectMonthlyFile(){
+ if(!window.XLSX)return alert('Excel library did not load. Check your internet connection.');
+ const name=`Kohinoor Sales ${currentMonth}.xlsx`;
+ if(!('showSaveFilePicker' in window)){alert('Your browser does not support direct Excel file connection. The app will keep monthly data inside the browser, and you can export the month manually.');return exportMonthlyExcel();}
+ try{
+  fileHandle=await window.showSaveFilePicker({suggestedName:name,types:[{description:'Excel Workbook',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]});
+  await saveHandle();
+  await writeWorkbook();
+  renderFileStatus();
+  alert('Monthly Excel file connected. From now on, Order Send will update this same file.');
+ }catch(e){if(e.name!=='AbortError')alert(e.message);}
+}
+async function saveHandle(){try{await fileHandle.requestPermission({mode:'readwrite'});}catch{}}
+function renderFileStatus(){
+ const el=document.getElementById('fileStatus');
+ el.textContent=fileHandle?'Connected: '+`Kohinoor Sales ${currentMonth}.xlsx`:'No monthly Excel file is connected yet. Create/connect it once for this month.';
+ el.className='notice '+(fileHandle?'ok':'');
+}
+async function openMonthlyExcel(){
+ if(fileHandle){try{await writeWorkbook();}catch(e){} try{await fileHandle.requestPermission({mode:'readwrite'});}catch{}}
+ else exportMonthlyExcel();
+}
+function monthlyRows(){
+ const rows=[];
+ data.orders.filter(o=>monthKey(new Date(o.date))===currentMonth).forEach(o=>{
+  o.items.forEach(x=>rows.push({Date:o.date,'Order ID':o.id,'Market / Shop':o.market||'',Product Code:x.code,'Product Name':x.name,Quantity:x.qty,'Sales Value':x.value}));
+ });
+ return rows;
+}
+function buildWorkbook(existing){
+ let wb=existing||XLSX.utils.book_new();
+ const rows=monthlyRows();
+ const ws=XLSX.utils.json_to_sheet(rows.length?rows:[{Date:'', 'Order ID':'','Market / Shop':'','Product Code':'','Product Name':'','Quantity':0,'Sales Value':0}]);
+ ws['!cols']=[{wch:12},{wch:25},{wch:22},{wch:16},{wch:25},{wch:12},{wch:16}];
+ if(wb.Sheets['Monthly Sales'])delete wb.Sheets['Monthly Sales'];
+ XLSX.utils.book_append_sheet(wb,ws,'Monthly Sales');
+ return wb;
+}
+async function writeWorkbook(){
+ if(!fileHandle)return;
+ const perm=await fileHandle.queryPermission({mode:'readwrite'}).catch(()=> 'prompt');
+ if(perm!=='granted'){const p=await fileHandle.requestPermission({mode:'readwrite'});if(p!=='granted')throw new Error('Write permission was not granted.');}
+ let existing=null;
+ try{const f=await fileHandle.getFile();const ab=await f.arrayBuffer();if(ab.byteLength)existing=XLSX.read(ab,{type:'array'});}catch(e){}
+ const wb=buildWorkbook(existing);
+ const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+ const writable=await fileHandle.createWritable();await writable.write(out);await writable.close();
+}
+function exportMonthlyExcel(){
+ const wb=buildWorkbook();XLSX.writeFile(wb,`Kohinoor Sales ${currentMonth}.xlsx`);
+}
+async function updateMonthlyWorkbook(order){
+ if(!fileHandle){return;}
+ await writeWorkbook();
 }
 
-function exportOrderToExcel(index, auto=false){
-  const o=orders[index];
-  if(!o){showToast("Order not found");return false;}
-  if(typeof XLSX==="undefined"){
-    alert("Excel export library failed to load. Check your internet connection and try again.");
-    return false;
-  }
-  const items=Array.isArray(o.products)?o.products:[];
-  if(!items.length){showToast("No products in this Order");return false;}
-
-  // Only Product-wise Excel: Market/Shop will not be separated or shown.
-  const rows=items.map((p,n)=>{
-    const type=p.rate_type==="carton"?"Carton Rate":"Main Rate";
-    const rate=Number(p.rate||(p.rate_type==="carton"?p.carton_rate:p.price)||0);
-    const qty=Number(p.quantity||0);
-    const bonus=Number(p.bonus||0);
-    return {
-      "SL":n+1,
-      "Product Code":p.code||"",
-      "Product Name":p.name||"",
-      "Pack":p.pack||"",
-      "Quantity":qty,
-      "Bonus":bonus,
-      "Rate Type":type,
-      "Rate":rate,
-      "Product Total":Number(p.value||rate*qty),
-      "Offer / Free":p.offer||""
-    };
-  });
-
-  const ws=XLSX.utils.json_to_sheet(rows);
-  ws["!cols"]=[{wch:6},{wch:18},{wch:34},{wch:12},{wch:12},{wch:10},{wch:14},{wch:12},{wch:16},{wch:15}];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
-  const fileName=`Product_Wise_Order_${safeFileName(o.order_date||new Date().toISOString().slice(0,10))}.xlsx`;
-  XLSX.writeFile(wb,fileName);
-  if(!auto)showToast("✅ Product-wise Excel created");
-  return true;
-}
-
-function exportLatestOrderToExcel(order){
-  const idx=orders.findIndex(x=>String(x.id)===String(order?.id));
-  if(idx>=0)return exportOrderToExcel(idx,true);
-  return false;
-}
-
-async function sendCurrentDraft(){if(!editingDraftId){alert("Save the draft first। Then Draft open Send Order click।");return}const data=getOrderFormData();if(!data)return;const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft not found");return}draftOrders[i]={...draftOrders[i],...data,updated_at:new Date().toISOString()};saveDrafts();await sendDraftOrder(editingDraftId)}
-async function sendDraftOrder(draftId){
- const draft=draftOrders.find(x=>x.id===draftId);if(!draft){alert("Draft not found");return}
- if(!navigator.onLine){draft.status="pending_send";saveDrafts();renderHistory();showToast("Offline: Added to send queue. It will be sent automatically when the internet returns");return}
- if(!draft.autoSync&&!confirm(`"${draft.shop}" of Order Send online?`))return;
- if(!currentUser){alert("Online Order send before Login do।");return}
- const payload={user_id:currentUser.id,market:draft.market||"",shop:draft.shop,shop_code:draft.shop_code||"",address:draft.address,mobile:draft.mobile,representative:draft.representative,order_date:draft.order_date,delivery_date:draft.delivery_date,note:draft.note,products:(draft.products||[]).map(p=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0),quantity=Number(p.quantity||0);return {product_id:p.product_id||null,code:p.code||"",name:p.name||"",pack:p.pack||"",base_price:Number(p.base_price??p.price??0),price:selectedRate,carton_rate:Number(p.carton_rate||0),tp_rate:Number(p.tp_rate||0),offer:p.offer||"",rate_type:rateType,rate:selectedRate,quantity,bonus:Number(p.bonus||0),value:selectedRate*quantity}}),total:(draft.products||[]).reduce((sum,p)=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);return sum+selectedRate*Number(p.quantity||0)},0)};
- const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
- if(error){draft.status="pending_send";saveDrafts();alert("❌ Order was not sent; kept as pending:\n"+error.message);return}
- draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data){orders.unshift(data);exportLatestOrderToExcel(data);}addNotification("Order Sent",`${draft.shop} order has been sent online.`);updateDashboard();renderHistory();if(document.getElementById("monthlyExcelModal")?.classList.contains("show"))refreshMonthlySalesSheet();closeModal("orderModal");showToast("✅ Order sent online successfully")
-}
-async function syncPendingOrders(){if(syncRunning||!navigator.onLine||!currentUser)return;syncRunning=true;try{const pending=draftOrders.filter(d=>d.status==="pending_send");for(const d of pending){if(!navigator.onLine)break;d.autoSync=true;await sendDraftOrder(d.id);delete d.autoSync}}finally{syncRunning=false}}
-window.addEventListener("online",()=>{const el=document.getElementById("onlineStatus");if(el){el.textContent="Online — Sync is happening";el.className="online"}syncPendingOrders()});
-async function loadOrdersFromSupabase(){if(!currentUser)return;const {data,error}=await supabaseClient.from("orders").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}orders=data||[];updateDashboard();renderHistory()}
-function getOrderLocalDate(order){
-  const raw=String(order?.order_date||order?.created_at||"");
-  return raw.slice(0,10);
-}
-
-function getTodayLocalDate(){
-  const d=new Date();
-  return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
-}
-
-function updateDashboard(){
-  // Catalog count stays permanent. Sales counters are DAILY and automatically
-  // become zero on the next calendar day without deleting any Sent Order data.
-  document.getElementById("dashProducts").textContent=products.length;
-
-  const today=getTodayLocalDate();
-  const todayOrders=orders.filter(o=>getOrderLocalDate(o)===today);
-
-  // Count sold product types, NOT the ordered quantity.
-  // Example: Sandalina Qty 5 + Beautina Qty 2 = 2 Products Sold Today.
-  const soldProductKeys=new Set();
-  let total=0;
-
-  todayOrders.forEach(o=>{
-    (Array.isArray(o.products)?o.products:[]).forEach(p=>{
-      const key=String(p.product_id||p.code||p.name||"").trim();
-      if(key) soldProductKeys.add(key);
-
-      const qty=Number(p.quantity||0);
-      total+=Number(
-        p.value != null
-          ? p.value
-          : Number(p.rate||p.price||0)*qty
-      );
-    });
-  });
-
-  document.getElementById("dashItems").textContent=soldProductKeys.size;
-  document.getElementById("dashOrders").textContent=todayOrders.length;
-  document.getElementById("dashTotal").textContent=money(total);
-}
-function openHistory(){renderHistory();openModal("historyModal")}
-function renderHistory(){
- const q=(document.getElementById("historySearch")?.value||"").trim().toLowerCase(),drafts=draftOrders.filter(d=>!q||String(d.shop||"").toLowerCase().includes(q)||String(d.mobile||"").toLowerCase().includes(q));
- document.getElementById("draftList").innerHTML='<h4 style="margin:0 0 5px">📝 Saved Drafts ('+drafts.length+')</h4>'+(drafts.length?drafts.map(d=>`<div class="draft-card"><div class="history-head"><b>${escapeHtml(d.shop)}</b><span class="badge draft">${d.status==="pending_send"?"PENDING":"DRAFT"}</span></div><div class="small">${escapeHtml(d.mobile||"")} · ${escapeHtml(d.order_date||"")} · ${d.products?.length||0} Product · ${money(d.total)}</div><div class="draft-actions"><button class="btn btn-light" onclick="openOrderModal('${escapeHtml(d.id)}')">✏️ Edit / Add</button><button class="btn btn-primary" onclick="sendDraftOrder('${escapeHtml(d.id)}')">📤 Send</button><button class="btn btn-danger" onclick="deleteDraft('${escapeHtml(d.id)}')">🗑️ Delete</button></div></div>`).join(""):'<div class="empty">No saved drafts</div>');
- const sent=orders.filter(o=>!q||String(o.shop||"").toLowerCase().includes(q)||String(o.mobile||"").toLowerCase().includes(q));
- document.getElementById("historyList").innerHTML=sent.length?sent.map((o,i)=>`<div class="history-row"><div class="history-head"><div><b>${escapeHtml(o.shop||"")}</b><div class="small">${escapeHtml(o.mobile||"")} · ${escapeHtml(o.order_date||"")}</div></div><span class="badge sent">SENT</span></div><div style="margin-top:5px">${(o.products||[]).length} Product · <b>${money(o.total)}</b></div><div class="history-actions"><button class="btn btn-light" onclick="showOrderDetail(${i})">👁 Details</button><button class="btn btn-info" onclick="exportOrderToExcel(${i})">📊 Excel</button></div></div>`).join(""):'<div class="empty">No sent orders</div>'
-}
-function exportAllOrdersToExcel(){
-  if(!orders.length){showToast("No sent orders");return;}
-  if(typeof XLSX==="undefined"){
-    alert("Excel export library failed to load. Check your internet connection and try again.");
-    return;
-  }
-
-  // All Sent Orders for the selected month are combined into a Product-wise Summary.
-  // Market/Shop will not be separated into different sheets or groups.
-  const productMap=new Map();
-  orders.forEach(o=>{
-    (Array.isArray(o.products)?o.products:[]).forEach(p=>{
-      const key=String(p.product_id||p.code||p.name||"").trim().toLowerCase();
-      if(!key)return;
-      const type=p.rate_type==="carton"?"Carton Rate":"Main Rate";
-      const rate=Number(p.rate||(type==="Carton Rate"?p.carton_rate:p.price)||0);
-      const qty=Number(p.quantity||0);
-      const bonus=Number(p.bonus||0);
-      const value=Number(p.value||rate*qty);
-      if(!productMap.has(key)){
-        productMap.set(key,{
-          "Product Code":p.code||"",
-          "Product Name":p.name||"",
-          "Pack":p.pack||"",
-          "Quantity":0,
-          "Bonus":0,
-          "Rate Type":type,
-          "Rate":rate,
-          "Product Total":0,
-          "Order Count":0
-        });
-      }
-      const row=productMap.get(key);
-      row.Quantity+=qty;
-      row.Bonus+=bonus;
-      row.ProductTotalForSort=(row.ProductTotalForSort||0)+value;
-      row["Product Total"]+=value;
-      row["Order Count"]+=1;
-      // If the same Product has different Rate Types, they will be shown as mixed in the summary.
-      if(row["Rate Type"]!==type)row["Rate Type"]="Mixed";
-    });
-  });
-
-  const rows=Array.from(productMap.values()).map((r,i)=>({
-    "SL":i+1,
-    "Product Code":r["Product Code"],
-    "Product Name":r["Product Name"],
-    "Pack":r["Pack"],
-    "Total Quantity":r["Quantity"],
-    "Total Bonus":r["Bonus"],
-    "Rate Type":r["Rate Type"],
-    "Rate":r["Rate"],
-    "Total Sales Value":Number(r["Product Total"]||0),
-    "Order Count":r["Order Count"]
-  }));
-
-  if(!rows.length){showToast("There are no products in Sent Orders");return;}
-  rows.sort((a,b)=>String(a["Product Name"]).localeCompare(String(b["Product Name"]),"bn"));
-  rows.forEach((r,i)=>r.SL=i+1);
-
-  const ws=XLSX.utils.json_to_sheet(rows);
-  ws["!cols"]=[{wch:6},{wch:18},{wch:34},{wch:12},{wch:16},{wch:14},{wch:14},{wch:12},{wch:20},{wch:14}];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
-  XLSX.writeFile(wb,`Kohinoor_Product_Wise_${new Date().toISOString().slice(0,10)}.xlsx`);
-  showToast("✅ Product-wise Excel created");
-}
-
-function showOrderDetail(index){const o=orders[index];if(!o)return;const items=Array.isArray(o.products)?o.products:[];document.getElementById("detailContent").innerHTML=`<div class="card" style="margin:0 0 10px;background:#f8fbfa"><b>Market:</b> ${escapeHtml(o.market||"")}<br><b>Shop:</b> ${escapeHtml(o.shop)}<br><b>Shop Code:</b> ${escapeHtml(o.shop_code||"")}<br><b>Mobile:</b> ${escapeHtml(o.mobile||"")}<br><b>Address:</b> ${escapeHtml(o.address||"")}<br><b>Representative:</b> ${escapeHtml(o.representative||"")}<br><b>Order Date:</b> ${escapeHtml(o.order_date||"")}<br><b>Delivery:</b> ${escapeHtml(o.delivery_date||"")}</div>${items.map(p=>{const type=p.rate_type==="carton"?"carton":"main",rate=Number(p.rate||(type==="carton"?p.carton_rate:p.price)||0);return `<div class="order-item"><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Qty ${Number(p.quantity||0)} · Bonus ${Number(p.bonus||0)}</div><div class="small" style="margin-top:3px">Rate Type: <b>${type==="carton"?"Carton Rate":"Main Rate"}</b> · Rate ${money(rate)}${p.offer?` · Offer ${escapeHtml(p.offer)} Free`:""}</div><div style="margin-top:4px">${money(p.value||rate*Number(p.quantity||0))}</div></div>`}).join("")}<div class="total">Total: ${money(o.total)}</div><div class="small">${escapeHtml(o.note||"")}</div>`;openModal("detailModal")}
-
-function openProductManager(){editingProductId=null;clearProductForm();document.getElementById("productEditPanel").classList.remove("editing");renderProductManagerList();openModal("productModal")}
-function clearProductForm(){["pCode","pName","pPack","pPrice","pCartonRate","pMrp","pTpRate","pOffer","pStock"].forEach(id=>document.getElementById(id).value="")}
-function editProduct(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;editingProductId=id;document.getElementById("pCode").value=p.code||"";document.getElementById("pName").value=p.name||"";document.getElementById("pPack").value=p.pack||"";document.getElementById("pPrice").value=p.price||0;document.getElementById("pCartonRate").value=p.carton_rate||0;document.getElementById("pMrp").value=p.mrp||0;document.getElementById("pTpRate").value=p.tp_rate||0;document.getElementById("pOffer").value=p.offer||"";document.getElementById("pStock").value=p.stock||0;const modal=document.getElementById("productModal"),panel=document.getElementById("productEditPanel");panel.classList.add("editing");openModal("productModal");requestAnimationFrame(()=>{panel.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>{modal.scrollTop=0;document.getElementById("pCode").focus({preventScroll:true})},350)})}
-function getOfferFactor(offer){const text=String(offer||"").trim();if(!text)return 1;const match=text.match(/^(\d+(?:\.\d+)?)\s*[:+\-]\s*(\d+(?:\.\d+)?)$/);if(!match)return 1;const buy=Number(match[1]),free=Number(match[2]);if(buy<=0||free<0)return 1;return buy/(buy+free)}
-function autoCalculateMainRate(){const tp=Number(document.getElementById("pTpRate")?.value||0),offer=document.getElementById("pOffer")?.value||"",priceEl=document.getElementById("pPrice");if(!priceEl)return;if(tp>0&&offer)priceEl.value=(tp*getOfferFactor(offer)).toFixed(2)}
-async function saveProduct(){
- const payload={code:document.getElementById("pCode").value.trim(),name:document.getElementById("pName").value.trim(),pack:document.getElementById("pPack").value.trim(),price:Number(document.getElementById("pPrice").value||0),carton_rate:Number(document.getElementById("pCartonRate").value||0),mrp:Number(document.getElementById("pMrp").value||0),tp_rate:Number(document.getElementById("pTpRate").value||0),offer:document.getElementById("pOffer").value||"",stock:Number(document.getElementById("pStock").value||0)};
- if(!payload.name){alert("Enter Product name");return}
- let result;
- if(editingProductId)result=await supabaseClient.from("products").update(payload).eq("id",editingProductId);else result=await supabaseClient.from("products").insert(payload);
- if(result.error){alert("Product Save failed:\n"+result.error.message+"\n\nCheck whether the Products table has the required columns.");return}
- await loadProducts();renderProductManagerList();clearProductForm();editingProductId=null;document.getElementById("productEditPanel").classList.remove("editing");showToast("✅ Product saved")
-}
-async function deleteProduct(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;if(!confirm(`"${p.name}" Delete will do?`))return;const {error}=await supabaseClient.from("products").delete().eq("id",id);if(error){alert("❌ Delete failed:\n"+error.message);return}await loadProducts();renderProductManagerList();showToast("✅ Product deleted")}
-function renderProductManagerList(){const box=document.getElementById("productManagerList");if(!products.length){box.innerHTML='<div class="empty">No products</div>';return}box.innerHTML=products.slice(0,150).map(p=>`<div class="history-row"><div class="history-head"><div><b>${escapeHtml(p.name)}</b><div class="small">${escapeHtml(p.code||"")} · Pack ${escapeHtml(p.pack||"")} · Main ${money(mainRate(p))} · Carton ${money(cartonRate(p))} · MRP ${money(p.mrp)} · TP Rate ${money(p.tp_rate)}${p.offer?` · Offer ${escapeHtml(p.offer)} Free`:""} · Stock ${Number(p.stock||0)}</div></div></div><div class="history-actions"><button class="btn btn-light" onclick="editProduct('${escapeHtml(String(p.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteProduct('${escapeHtml(String(p.id))}')">🗑 Delete</button></div></div>`).join("")}
-
-function getCurrentMonthKey(){
-  const d=new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-}
-
-function getOrdersForMonth(monthKey){
-  return orders.filter(o=>{
-    const date=String(o.order_date||o.created_at||"").slice(0,7);
-    return date===monthKey;
-  });
-}
-
-function buildMonthlyProductSales(monthKey){
-  const monthOrders=getOrdersForMonth(monthKey);
-  const map=new Map();
-
-  monthOrders.forEach(order=>{
-    const items=Array.isArray(order.products)?order.products:[];
-    items.forEach(p=>{
-      const code=String(p.code||"");
-      const name=String(p.name||"");
-      const key=String(p.product_id||code||name);
-      if(!map.has(key)){
-        map.set(key,{
-          code,
-          name,
-          pack:p.pack||"",
-          order_count:0,
-          quantity:0,
-          bonus:0,
-          sales_value:0
-        });
-      }
-      const row=map.get(key);
-      row.order_count += 1;
-      row.quantity += Number(p.quantity||0);
-      row.bonus += Number(p.bonus||0);
-      row.sales_value += Number(
-        p.value != null
-          ? p.value
-          : Number(p.rate||p.price||0)*Number(p.quantity||0)
-      );
-    });
-  });
-
-  return [...map.values()]
-    .sort((a,b)=>String(a.name).localeCompare(String(b.name),"bn"))
-    .map((r,i)=>({
-      "Sl":i+1,
-      "Product Code":r.code,
-      "Product Name":r.name,
-      "Pack":r.pack,
-      "Order Count":r.order_count,
-      "Total Quantity":r.quantity,
-      "Total Bonus":r.bonus,
-      "Total Sales Value":Number(r.sales_value.toFixed(2))
-    }));
-}
-
-function buildMonthlyDailyProductSales(monthKey){
-  const monthOrders=getOrdersForMonth(monthKey);
-  const map=new Map();
-  monthOrders.forEach(order=>{
-    const date=String(order.order_date||order.created_at||"").slice(0,10);
-    const items=Array.isArray(order.products)?order.products:[];
-    items.forEach(p=>{
-      const code=String(p.code||"");
-      const name=String(p.name||"");
-      const key=`${date}|${String(p.product_id||code||name)}`;
-      const qty=Number(p.quantity||0);
-      const bonus=Number(p.bonus||0);
-      const value=Number(p.value!=null?p.value:Number(p.rate||p.price||0)*qty);
-      if(!map.has(key)) map.set(key,{date,code,name,pack:p.pack||"",quantity:0,bonus:0,sales_value:0});
-      const row=map.get(key);
-      row.quantity+=qty;
-      row.bonus+=bonus;
-      row.sales_value+=value;
-    });
-  });
-  return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.name.localeCompare(b.name,"en"));
-}
-
-function renderMonthlySalesSheet(monthKey){
-  const box=document.getElementById("monthlySalesSheet");
-  if(!box)return;
-  const rows=buildMonthlyDailyProductSales(monthKey);
-  if(!rows.length){
-    box.innerHTML='<div class="empty">No sent sales found for this month.</div>';
-    return;
-  }
-  let totalQty=0,totalBonus=0,totalValue=0;
-  const body=rows.map((r,i)=>{
-    totalQty+=r.quantity; totalBonus+=r.bonus; totalValue+=r.sales_value;
-    return `<tr><td>${i+1}</td><td>${escapeHtml(r.date)}</td><td>${escapeHtml(r.code)}</td><td class="product-cell">${escapeHtml(r.name)}</td><td>${escapeHtml(r.pack)}</td><td>${r.quantity}</td><td>${r.bonus}</td><td>${money(r.sales_value)}</td></tr>`;
-  }).join("");
-  box.innerHTML=`<table class="order-table" style="min-width:900px"><thead><tr><th>#</th><th>Date</th><th>Product Code</th><th>Product Name</th><th>Pack</th><th>Quantity</th><th>Bonus</th><th>Sales Value</th></tr></thead><tbody>${body}<tr><th colspan="5" style="text-align:right">TOTAL</th><th>${totalQty}</th><th>${totalBonus}</th><th>${money(totalValue)}</th></tr></tbody></table>`;
-}
-
-async function refreshMonthlySalesSheet(){
-  const input=document.getElementById("excelMonth");
-  const month=input?.value||getCurrentMonthKey();
-  if(!month)return;
-  if(currentUser && navigator.onLine){
-    try{
-      const start=`${month}-01`;
-      const d=new Date(`${month}-01T00:00:00`); d.setMonth(d.getMonth()+1);
-      const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`;
-      const {data,error}=await supabaseClient.from("orders").select("*").gte("order_date",start).lt("order_date",end).order("order_date",{ascending:true});
-      if(!error && Array.isArray(data)) orders=orders.filter(o=>String(o.order_date||o.created_at||"").slice(0,7)!==month).concat(data);
-    }catch(e){console.warn("Monthly sales refresh failed:",e)}
-  }
-  updateMonthlyExcelPreview();
-  renderMonthlySalesSheet(month);
-  showToast(`✅ ${month} monthly sales sheet updated`);
-}
-
-function updateMonthlyExcelPreview(){
-  const month=document.getElementById("excelMonth")?.value;
-  if(!month)return;
-  const list=getOrdersForMonth(month);
-  const rows=buildMonthlyProductSales(month);
-  const total=rows.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
-  const countEl=document.getElementById("excelMonthOrderCount");
-  const summary=document.getElementById("excelMonthSummary");
-  if(countEl)countEl.value=String(list.length);
-  if(summary)summary.textContent=`Monthly Product Sales: ${money(total)} · ${rows.length} Product`;
-  renderMonthlySalesSheet(month);
-}
-
-function openMonthlyExcel(){
-  const input=document.getElementById("excelMonth");
-  if(input){
-    input.value=getCurrentMonthKey();
-    input.onchange=updateMonthlyExcelPreview;
-  }
-  openModal("monthlyExcelModal");
-  refreshMonthlySalesSheet();
-}
-
-async function exportMonthlyProductExcel(){
-  const month=document.getElementById("excelMonth")?.value||getCurrentMonthKey();
-  if(!month){alert("Select Month");return}
-
-  // Refresh from Supabase before export so the report represents the
-  // complete permanently stored Sent Orders for the selected month.
-  if(currentUser && navigator.onLine){
-    try{
-      const start=`${month}-01`;
-      const d=new Date(`${month}-01T00:00:00`);
-      d.setMonth(d.getMonth()+1);
-      const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`;
-
-      const {data,error}=await supabaseClient
-        .from("orders")
-        .select("*")
-        .gte("order_date",start)
-        .lt("order_date",end)
-        .order("order_date",{ascending:true});
-
-      if(!error && Array.isArray(data)){
-        const existingIds=new Set(orders.map(o=>String(o.id)));
-        data.forEach(o=>{
-          if(existingIds.has(String(o.id))){
-            const i=orders.findIndex(x=>String(x.id)===String(o.id));
-            if(i>=0)orders[i]=o;
-          }else{
-            orders.push(o);
-          }
-        });
-      }
-    }catch(e){
-      console.warn("Monthly Excel refresh failed:",e);
-    }
-  }
-
-  const rows=buildMonthlyProductSales(month);
-  if(!rows.length){
-    alert(`${month} No Sent Orders found for this month.`);
-    return;
-  }
-
-  if(typeof XLSX==="undefined"){
-    alert("Excel library load failed। Check your internet connection and try again.");
-    return;
-  }
-
-  const totalQty=rows.reduce((s,r)=>s+Number(r["Total Quantity"]||0),0);
-  const totalBonus=rows.reduce((s,r)=>s+Number(r["Total Bonus"]||0),0);
-  const totalValue=rows.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
-
-  // Product-wise master sheet. No market-wise grouping.
-  const sheetRows=[
-    ["Kohinoor Chemical PLC — Product-wise Monthly Sales"],
-    [`Month: ${month}`],
-    [`Sent Orders: ${getOrdersForMonth(month).length}`],
-    [],
-    ["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"],
-    ...rows.map(r=>[
-      r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],
-      r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]
-    ]),
-    [],
-    ["","","","","TOTAL",totalQty,totalBonus,totalValue]
-  ];
-
-  const ws=XLSX.utils.aoa_to_sheet(sheetRows);
-  ws["!cols"]=[
-    {wch:6},{wch:16},{wch:32},{wch:12},
-    {wch:14},{wch:16},{wch:14},{wch:20}
-  ];
-
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Product-wise Sales");
-
-  // A small summary sheet for the same permanent monthly report.
-  const summaryRows=[
-    ["Kohinoor Chemical PLC"],
-    ["Monthly Product-wise Sales Summary"],
-    ["Month",month],
-    ["Sent Orders",getOrdersForMonth(month).length],
-    ["Products",rows.length],
-    ["Total Quantity",totalQty],
-    ["Total Bonus",totalBonus],
-    ["Total Sales Value",totalValue]
-  ];
-  const ws2=XLSX.utils.aoa_to_sheet(summaryRows);
-  ws2["!cols"]=[{wch:24},{wch:25}];
-  XLSX.utils.book_append_sheet(wb,ws2,"Summary");
-
-  const filename=`Kohinoor_Product_Wise_Sales_${month}.xlsx`;
-  XLSX.writeFile(wb,filename);
-  showToast(`✅ ${month} month Product-wise Excel created`);
-}
-
-function addNotification(title,text){notifications.unshift({id:Date.now(),title,text,created_at:new Date().toISOString()});notifications=notifications.slice(0,50);localStorage.setItem(LOCAL_NOTICES_KEY,JSON.stringify(notifications));renderNotifications()}
-function loadNotifications(){try{notifications=JSON.parse(localStorage.getItem(LOCAL_NOTICES_KEY)||"[]")}catch{notifications=[]}}
-function renderNotifications(){const box=document.getElementById("notificationList");box.innerHTML=notifications.length?notifications.map(n=>`<div class="notice"><b>${escapeHtml(n.title)}</b><div class="small">${escapeHtml(n.text)}</div></div>`).join(""):'<div class="empty">No notifications</div>'}
-function openNotifications(){renderNotifications();openModal("notificationModal")}
-
-function getMarketShopsKey(){return currentUser?.id?MARKET_SHOPS_KEY+currentUser.id:null}
-function loadMarketShops(){const key=getMarketShopsKey();if(!key){marketShops=[];populateMarketSelect();populateShopSelect();return}try{marketShops=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(marketShops))marketShops=[]}catch{marketShops=[]}populateMarketSelect();populateShopSelect()}
-function saveMarketShops(){const key=getMarketShopsKey();if(!key){alert("User session not found. Please Login again.");return}localStorage.setItem(key,JSON.stringify(marketShops));populateMarketSelect();populateShopSelect()}
-function openMarketShopManager(){loadMarketShops();clearMarketShopForm();renderMarketShopList();openModal("marketShopModal")}
-function clearMarketShopForm(){editingMarketShopId=null;["msMarket","msShop","msShopCode","msAddress","msMobile","msRepresentative"].forEach(id=>document.getElementById(id).value="")}
-function saveMarketShop(){const market=document.getElementById("msMarket").value.trim(),shop=document.getElementById("msShop").value.trim();if(!market){alert("Enter Market Name");return}if(!shop){alert("Enter Shop Name");return}const item={id:editingMarketShopId||("ms-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)),market,shop,shop_code:document.getElementById("msShopCode").value.trim(),address:document.getElementById("msAddress").value.trim(),mobile:document.getElementById("msMobile").value.trim(),representative:document.getElementById("msRepresentative").value.trim(),updated_at:new Date().toISOString()};if(editingMarketShopId){const i=marketShops.findIndex(x=>x.id===editingMarketShopId);if(i>=0)marketShops[i]={...marketShops[i],...item}}else marketShops.unshift(item);saveMarketShops();renderMarketShopList();clearMarketShopForm();showToast("✅ Market/Shop saved")}
-function editMarketShop(id){const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;editingMarketShopId=x.id;document.getElementById("msMarket").value=x.market||"";document.getElementById("msShop").value=x.shop||"";document.getElementById("msShopCode").value=x.shop_code||"";document.getElementById("msAddress").value=x.address||"";document.getElementById("msMobile").value=x.mobile||"";document.getElementById("msRepresentative").value=x.representative||"";document.getElementById("msMarket").focus()}
-function deleteMarketShop(id){const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;if(!confirm(`"${x.market} — ${x.shop}" Delete will do?`))return;marketShops=marketShops.filter(v=>String(v.id)!==String(id));saveMarketShops();renderMarketShopList();clearMarketShopForm();showToast("🗑️ Information deleted")}
-function renderMarketShopList(){const box=document.getElementById("marketShopList");if(!box)return;const q=(document.getElementById("marketShopSearch")?.value||"").trim().toLowerCase(),list=marketShops.filter(x=>!q||[x.market,x.shop,x.shop_code,x.address,x.mobile].some(v=>String(v||"").toLowerCase().includes(q)));box.innerHTML=list.length?list.map(x=>`<div class="list-row"><div class="list-row-head"><div><b>${escapeHtml(x.shop)}</b><div class="small">📍 ${escapeHtml(x.market)}</div>${x.shop_code?`<div class="small">🏷️ Code: ${escapeHtml(x.shop_code)}</div>`:""}<div class="small">${escapeHtml(x.address||"")}</div>${x.mobile?`<div class="small">📞 ${escapeHtml(x.mobile)}</div>`:""}</div><span class="badge">Saved</span></div><div class="list-row-actions"><button class="btn btn-light" onclick="editMarketShop('${escapeHtml(String(x.id))}')">✏️ Edit</button><button class="btn btn-danger" onclick="deleteMarketShop('${escapeHtml(String(x.id))}')">🗑 Delete</button></div></div>`).join(""):'<div class="empty">No market/shop entries</div>'}
-function populateMarketSelect(selected="",autoSelect=false){const s=document.getElementById("marketSelect");if(!s)return;const markets=[...new Set(marketShops.map(x=>x.market).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"bn"));s.innerHTML='<option value="">-- Select Market --</option>'+markets.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");if(selected)s.value=selected;else if(autoSelect&&markets.length===1)s.value=markets[0]}
-function populateShopSelect(selected="",autoSelect=false){const s=document.getElementById("shopSelect");if(!s)return;const market=document.getElementById("marketSelect")?.value||"",list=marketShops.filter(x=>!market||x.market===market);s.innerHTML='<option value="">-- Select Shop --</option>'+list.map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.shop)}${x.shop_code?` — ${escapeHtml(x.shop_code)}`:""}</option>`).join("");if(selected)s.value=selected;else if(autoSelect&&list.length===1)s.value=String(list[0].id);if(autoSelect&&list.length===1)selectSavedShop()}
-function filterShopList(autoSelect=false){populateShopSelect("",autoSelect)}
-function selectSavedShop(){const id=document.getElementById("shopSelect")?.value;if(!id)return;const x=marketShops.find(v=>String(v.id)===String(id));if(!x)return;document.getElementById("marketSelect").value=x.market||"";document.getElementById("shop").value=x.shop||"";document.getElementById("shopCode").value=x.shop_code||"";document.getElementById("address").value=x.address||"";document.getElementById("mobile").value=x.mobile||"";document.getElementById("representative").value=x.representative||""}
-function findSavedShopId(shop,market,address){const x=marketShops.find(v=>v.shop===shop&&(!market||v.market===market)&&(!address||v.address===address));return x?.id||""}
-
-function setupRealtime(){
- if(realtimeChannel)return;
- realtimeChannel=supabaseClient.channel("orders-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"orders"},payload=>{const row=payload.new;if(!orders.some(o=>String(o.id)===String(row.id))){orders.unshift(row);updateDashboard();renderHistory();addNotification("New Online Order",`${row.shop||"a Shop"} from New Order received।`)}}).subscribe(status=>{const el=document.getElementById("onlineStatus");if(status==="SUBSCRIBED"){el.textContent="Online";el.className="online"}else{el.textContent="Online connection waiting";el.className="offline"}});
-}
-function startPolling(){clearInterval(pollingTimer);pollingTimer=setInterval(loadOrdersFromSupabase,20000)}
-window.addEventListener("beforeunload",()=>{if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel)});
+render();
 </script>
 </body>
 </html>

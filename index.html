@@ -204,7 +204,6 @@ textarea{min-height:75px;resize:vertical}
     <div class="actions">
       <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
       <button class="btn btn-info" onclick="connectOrOpenMonthlyExcel()">📂 Connect / Open Monthly Excel</button>
-      <button class="btn btn-light" onclick="openConnectedMonthlyExcel()">📂 Open Connected Excel</button>
       <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Google Sheet</button>
             <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
       <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export New Excel</button>
@@ -1079,66 +1078,51 @@ function mergeMonthlyWorkbookPreservingEdits(wb,month){
 function setMonthlyExcelStatus(text,ok=false){const el=document.getElementById('monthlyExcelStatus');if(el){el.textContent=text;el.className='notice'+(ok?' ok':'')}}
 
 async function writePersistentMonthlyExcel(month, allowRepick=true){
-  if(!monthlyFileHandle)return false;
-
-  // IMPORTANT:
-  // Never rebuild the workbook when the existing file cannot be read/written.
-  // Rebuilding is what destroys the user's Excel colors, fonts, borders and layout.
-  // If Android/Chrome says the file changed on disk, the only reliable recovery is
-  // to re-select the SAME existing .xlsx file and get a fresh FileSystemFileHandle.
-  let handle=monthlyFileHandle;
+  // Use the latest persisted handle first. This avoids an old Android/Chrome
+  // handle after the workbook was opened or changed in Files/Excel/Sheets.
+  try{await refreshMonthlyFileHandleFromDB()}catch(e){}
+  const handle=monthlyFileHandle;
+  if(!handle)return false;
 
   try{
-    if(!(await verifyMonthlyFilePermission(handle,true))){
-      setMonthlyExcelStatus('Write permission is required. Tap “Connect / Open Monthly Excel” and select the same existing Excel file.');
+    const permission=await verifyMonthlyFilePermission(handle,true);
+    if(!permission){
+      setMonthlyExcelStatus('Write permission is required. Tap Connect / Open Monthly Excel and select the SAME existing .xlsx file.');
       return false;
     }
 
-    let file, buffer, wb;
+    // Read the user's existing workbook. Never create a replacement workbook here.
+    let file,buffer,wb;
     try{
       file=await handle.getFile();
       buffer=await file.arrayBuffer();
       wb=XLSX.read(buffer,{type:'array',cellStyles:true,cellNF:true,cellHTML:true});
     }catch(readErr){
       console.warn('Could not read selected Excel file:',readErr);
-      if(allowRepick && 'showOpenFilePicker' in window){
-        setMonthlyExcelStatus('Excel changed outside the app. Please select the SAME existing Excel file again.');
-        const fresh=await pickExistingMonthlyExcel();
-        if(fresh){
-          return await writePersistentMonthlyExcel(month,false);
-        }
-      }
+      setMonthlyExcelStatus('Excel file could not be read. Close Excel/Sheets, then reconnect the SAME file.');
       return false;
     }
 
-    // Update values in the existing worksheet only. Existing cell styles are never
-    // replaced. New rows inherit formatting from the row immediately above.
     wb=mergeMonthlyWorkbookPreservingEdits(wb,month);
-
-    // xlsx-js-style is loaded at the top of this page. It preserves cell.s styles
-    // when writing the workbook back to .xlsx.
     const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true,cellNF:true,bookSST:false});
 
+    // Android Chrome may reject a write when the same workbook is open elsewhere.
+    // Give a clear instruction instead of creating a new file or changing layout.
+    let writable;
     try{
-      const writable=await handle.createWritable();
+      writable=await handle.createWritable({keepExistingData:false});
       await writable.write(out);
       await writable.close();
     }catch(writeErr){
+      try{if(writable)await writable.abort()}catch(e){}
       console.warn('Could not write selected Excel file:',writeErr);
-      if(allowRepick && 'showOpenFilePicker' in window){
-        setMonthlyExcelStatus('Excel file was changed by another app. Select the SAME existing Excel file again.');
-        const fresh=await pickExistingMonthlyExcel();
-        if(fresh){
-          return await writePersistentMonthlyExcel(month,false);
-        }
-      }
-      setMonthlyExcelStatus('Could not update the selected Excel file. Close the Excel/Sheets app if it is open, then tap Connect / Open Monthly Excel and select the SAME file again.');
+      setMonthlyExcelStatus('Could not update this Excel file. Close it in Excel/Sheets/Files, then tap Connect / Open Monthly Excel and select the SAME file again.');
       return false;
     }
 
     monthlyFileHandle=handle;
     await saveMonthlyFileHandle(handle,month);
-    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Same Excel file updated. Your existing colors and formatting are preserved.`,true);
+    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Same Excel file updated. Existing colors and formatting are preserved.`,true);
     return true;
   }catch(e){
     console.warn('Monthly Excel update failed:',e);
@@ -1154,68 +1138,34 @@ async function connectOrOpenMonthlyExcel(){
     return;
   }
   try{
-    // Always prefer selecting the user's existing workbook. This avoids stale
-    // Android/Chrome handles and never creates a replacement workbook by mistake.
+    // IMPORTANT: selecting a file only connects it. We do NOT rewrite the workbook
+    // during connection. The first actual write happens after Send Order.
     const handle=await pickExistingMonthlyExcel();
     if(!handle)return;
     const ok=await verifyMonthlyFilePermission(handle,true);
     if(!ok)throw new Error('Write permission was not granted for the selected Excel file.');
-    const wrote=await writePersistentMonthlyExcel(month,false);
-    if(!wrote)throw new Error('Could not update the selected Excel file. Close Excel/Sheets if it is open and try again.');
-    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — This same file will update after every Sent Order. Existing formatting is preserved.`,true);
+    await saveMonthlyFileHandle(handle,month);
+    monthlyFileHandle=handle;
+    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Ready. The SAME file will update after every Sent Order. Existing formatting is preserved.`,true);
     showToast('✓ Same existing Excel connected');
   }catch(e){
     if(e.name!=='AbortError')alert('Excel connection failed: '+e.message);
   }
 }
 
-async function openConnectedMonthlyExcel(){
-  try{
-    let handle=monthlyFileHandle;
-    if(!handle){
-      const saved=await loadMonthlyFileHandle();
-      handle=saved?.handle||null;
-      if(handle) monthlyFileHandle=handle;
-    }
-    if(!handle){
-      alert('আগে “Connect / Open Monthly Excel” চাপ দিয়ে আপনার একই Excel ফাইলটি নির্বাচন করুন।');
-      return;
-    }
-    const ok=await verifyMonthlyFilePermission(handle,true);
-    if(!ok){
-      alert('Excel ফাইলের permission পাওয়া যায়নি। “Restore Write Permission” চাপুন বা একই Excel ফাইলটি আবার Connect করুন।');
-      return;
-    }
-    const file=await handle.getFile();
-    const url=URL.createObjectURL(file);
-    const w=window.open(url,'_blank','noopener,noreferrer');
-    if(!w){
-      alert('Excel ফাইলটি খুলতে browser popup permission দিন।');
-      URL.revokeObjectURL(url);
-      return;
-    }
-    setTimeout(()=>URL.revokeObjectURL(url),60000);
-  }catch(e){
-    if(e.name!=='AbortError') alert('Excel খুলতে সমস্যা হয়েছে: '+(e.message||e));
-  }
-}
-
 async function requestMonthlyExcelPermission(){
   try{
-    if(monthlyFileHandle){
-      const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
-      if(ok){
-        const wrote=await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey(),true);
-        if(wrote){showToast('✓ Excel write permission restored');return;}
-      }
-    }
+    const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
     if('showOpenFilePicker' in window){
       const handle=await pickExistingMonthlyExcel();
       if(handle){
         const ok=await verifyMonthlyFilePermission(handle,true);
         if(!ok)throw new Error('Write permission was not granted.');
-        const wrote=await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey(),false);
-        if(wrote){showToast('✓ Same Excel reconnected and updated');return;}
+        monthlyFileHandle=handle;
+        await saveMonthlyFileHandle(handle,month);
+        setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Write permission restored.`,true);
+        showToast('✓ Excel write permission restored');
+        return;
       }
     }
     alert('Select your SAME existing Excel file. Do not create a new Excel file.');
@@ -1226,7 +1176,7 @@ async function updateMonthlyExcelAfterOrder(){
   const month=getCurrentMonthKey();
   if(!monthlyFileHandle){const saved=await loadMonthlyFileHandle();if(saved?.handle){monthlyFileHandle=saved.handle}}
   if(!monthlyFileHandle)return false;
-  try{return await writePersistentMonthlyExcel(month)}catch(e){setMonthlyExcelStatus('Excel is connected but needs write permission. Open Monthly Product Excel and tap Restore Write Permission.');console.warn(e);return false}
+  try{return await writePersistentMonthlyExcel(month,false)}catch(e){setMonthlyExcelStatus('Excel is connected but needs write permission. Open Monthly Product Excel and tap Restore Write Permission.');console.warn(e);return false}
 }
 
 async function exportMonthlyProductExcel(){

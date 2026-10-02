@@ -423,7 +423,7 @@ function exportOrderToExcel(index, auto=false){
   const ws=XLSX.utils.json_to_sheet(rows);
   ws["!cols"]=[{wch:6},{wch:18},{wch:34},{wch:12},{wch:12},{wch:10},{wch:14},{wch:12},{wch:16},{wch:15}];
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
+  XLSX.utils.book_append_sheet(wb,ws,"Product-wise Sales");
   const fileName=`Product_Wise_Order_${safeFileName(o.order_date||new Date().toISOString().slice(0,10))}.xlsx`;
   XLSX.writeFile(wb,fileName);
   if(!auto)showToast("✅ Product-wise Excel created");
@@ -586,8 +586,8 @@ function exportAllOrdersToExcel(){
   const ws=XLSX.utils.json_to_sheet(rows);
   ws["!cols"]=[{wch:6},{wch:18},{wch:34},{wch:12},{wch:16},{wch:14},{wch:14},{wch:12},{wch:20},{wch:14}];
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Product-wise");
-  XLSX.writeFile(wb,`Kohinoor_Product_Wise_${new Date().toISOString().slice(0,10)}.xlsx`);
+  XLSX.utils.book_append_sheet(wb,ws,"Product-wise Sales");
+  XLSX.writeFile(wb,`Kohinoor_Product_Wise_Sales_${new Date().toISOString().slice(0,10)}.xlsx`);
   showToast("✅ Product-wise Excel created");
 }
 
@@ -1198,8 +1198,28 @@ async function updateMonthlyExcelAfterOrder(){
 async function exportMonthlyProductExcel(){
   const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
   if(!month){alert('Select Month');return}
-  if(currentUser&&navigator.onLine){try{const start=`${month}-01`;const d=new Date(`${month}-01T00:00:00`);d.setMonth(d.getMonth()+1);const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;const {data,error}=await supabaseClient.from('orders').select('*').gte('order_date',start).lt('order_date',end).order('order_date',{ascending:true});if(!error&&Array.isArray(data)){orders=orders.filter(o=>String(o.order_date||o.created_at||"").slice(0,7)!==month).concat(data)}}catch(e){console.warn(e)}}
-  const made=createFreshMonthlyWorkbook(month);XLSX.writeFile(made.wb,monthlyExcelFilename(month));saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[]});showToast(`✓ ${month} Product-wise Excel exported`);
+
+  // Export ONE workbook with ONE sheet only. The sheet is always named
+  // "Product-wise Sales" so the downloaded Excel stays simple and
+  // does not create separate product/order sheets.
+  if(currentUser&&navigator.onLine){
+    try{
+      const start=`${month}-01`;
+      const d=new Date(`${month}-01T00:00:00`);
+      d.setMonth(d.getMonth()+1);
+      const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
+      const {data,error}=await supabaseClient.from('orders').select('*').gte('order_date',start).lt('order_date',end).order('order_date',{ascending:true});
+      if(!error&&Array.isArray(data)){
+        orders=orders.filter(o=>String(o.order_date||o.created_at||"").slice(0,7)!==month).concat(data);
+      }
+    }catch(e){console.warn(e)}
+  }
+
+  const made=createFreshMonthlyWorkbook(month);
+  // createFreshMonthlyWorkbook intentionally contains exactly one worksheet.
+  XLSX.writeFile(made.wb,monthlyExcelFilename(month));
+  saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[]});
+  showToast(`✓ ${month} Product-wise Sales Excel downloaded`);
 }
 
 function addNotification(title,text){notifications.unshift({id:Date.now(),title,text,created_at:new Date().toISOString()});notifications=notifications.slice(0,50);localStorage.setItem(LOCAL_NOTICES_KEY,JSON.stringify(notifications));renderNotifications()}

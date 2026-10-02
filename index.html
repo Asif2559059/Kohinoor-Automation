@@ -953,133 +953,92 @@ function mergeMonthlyWorkbookPreservingEdits(wb,month){
 
 function setMonthlyExcelStatus(text,ok=false){const el=document.getElementById('monthlyExcelStatus');if(el){el.textContent=text;el.className='notice'+(ok?' ok':'')}}
 
-async function writePersistentMonthlyExcel(month){
+async function writePersistentMonthlyExcel(month, allowRepick=true){
   if(!monthlyFileHandle)return false;
 
-  // First try the current handle. If Android/Chrome reports that its cached state
-  // changed on disk, reload the handle from IndexedDB and retry before asking the
-  // user to select anything. This prevents unnecessary new Excel downloads/files.
+  // IMPORTANT:
+  // Never rebuild the workbook when the existing file cannot be read/written.
+  // Rebuilding is what destroys the user's Excel colors, fonts, borders and layout.
+  // If Android/Chrome says the file changed on disk, the only reliable recovery is
+  // to re-select the SAME existing .xlsx file and get a fresh FileSystemFileHandle.
   let handle=monthlyFileHandle;
-  let retriedWithFreshHandle=false;
 
-  while(true){
-    try{
-      const permitted=await verifyMonthlyFilePermission(handle,true);
-      if(!permitted){
-        if(!retriedWithFreshHandle){
-          const fresh=await refreshMonthlyFileHandleFromDB();
-          if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
-        }
-        setMonthlyExcelStatus('Write permission is required. Tap “Connect / Open Monthly Excel” and select your existing Excel file.');
-        return false;
-      }
-
-      let wb;
-      try{
-        const file=await handle.getFile();
-        const buffer=await file.arrayBuffer();
-        wb=XLSX.read(buffer,{type:'array',cellStyles:true,cellNF:true,cellDates:true});
-        wb=mergeMonthlyWorkbookPreservingEdits(wb,month);
-      }catch(e){
-        // A stale FileSystemFileHandle can throw exactly the error shown on Android.
-        // Re-load the persisted handle once before falling back to a fresh workbook.
-        if(!retriedWithFreshHandle){
-          const fresh=await refreshMonthlyFileHandleFromDB();
-          if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
-        }
-        // NEVER replace an existing workbook with a fresh workbook here.
-        // If the handle is stale or the file changed on disk, doing that would
-        // rebuild the sheet and destroy the user's manually edited colours,
-        // fonts, borders and other formatting. Force a reconnect instead.
-        console.warn('Existing Excel could not be read; refusing to rebuild it.',e);
-        setMonthlyExcelStatus('The existing Excel file could not be read safely. Please reconnect the SAME Excel file. Your formatting will not be replaced.',false);
-        return false;
-      }
-
-      const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true});
-      try{
-        const writable=await handle.createWritable();
-        await writable.write(out);
-        await writable.close();
-      }catch(e){
-        // Retry once using a freshly restored persisted handle.
-        if(!retriedWithFreshHandle){
-          const fresh=await refreshMonthlyFileHandleFromDB();
-          if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
-        }
-        throw e;
-      }
-
-      monthlyFileHandle=handle;
-      await saveMonthlyFileHandle(handle,month);
-      setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Dynamic & auto-updating. Your manual Excel edits are preserved.`,true);
-      return true;
-    }catch(e){
-      console.warn('Monthly Excel write failed:',e);
-      if(!retriedWithFreshHandle){
-        const fresh=await refreshMonthlyFileHandleFromDB();
-        if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
-      }
-      setMonthlyExcelStatus('Excel file changed on disk. Tap “Connect / Open Monthly Excel” and select the same existing Excel file.');
+  try{
+    if(!(await verifyMonthlyFilePermission(handle,true))){
+      setMonthlyExcelStatus('Write permission is required. Tap “Connect / Open Monthly Excel” and select the same existing Excel file.');
       return false;
     }
+
+    let file, buffer, wb;
+    try{
+      file=await handle.getFile();
+      buffer=await file.arrayBuffer();
+      wb=XLSX.read(buffer,{type:'array',cellStyles:true,cellNF:true,cellHTML:true});
+    }catch(readErr){
+      console.warn('Could not read selected Excel file:',readErr);
+      if(allowRepick && 'showOpenFilePicker' in window){
+        setMonthlyExcelStatus('Excel changed outside the app. Please select the SAME existing Excel file again.');
+        const fresh=await pickExistingMonthlyExcel();
+        if(fresh){
+          return await writePersistentMonthlyExcel(month,false);
+        }
+      }
+      return false;
+    }
+
+    // Update values in the existing worksheet only. Existing cell styles are never
+    // replaced. New rows inherit formatting from the row immediately above.
+    wb=mergeMonthlyWorkbookPreservingEdits(wb,month);
+
+    // xlsx-js-style is loaded at the top of this page. It preserves cell.s styles
+    // when writing the workbook back to .xlsx.
+    const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true,cellNF:true,bookSST:false});
+
+    try{
+      const writable=await handle.createWritable();
+      await writable.write(out);
+      await writable.close();
+    }catch(writeErr){
+      console.warn('Could not write selected Excel file:',writeErr);
+      if(allowRepick && 'showOpenFilePicker' in window){
+        setMonthlyExcelStatus('Excel file was changed by another app. Select the SAME existing Excel file again.');
+        const fresh=await pickExistingMonthlyExcel();
+        if(fresh){
+          return await writePersistentMonthlyExcel(month,false);
+        }
+      }
+      setMonthlyExcelStatus('Could not update the selected Excel file. Close the Excel/Sheets app if it is open, then tap Connect / Open Monthly Excel and select the SAME file again.');
+      return false;
+    }
+
+    monthlyFileHandle=handle;
+    await saveMonthlyFileHandle(handle,month);
+    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Same Excel file updated. Your existing colors and formatting are preserved.`,true);
+    return true;
+  }catch(e){
+    console.warn('Monthly Excel update failed:',e);
+    setMonthlyExcelStatus('Could not update the selected Excel file. Close Excel/Sheets and reconnect the SAME file.');
+    return false;
   }
 }
 
 async function connectOrOpenMonthlyExcel(){
   const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
-  if(!('showOpenFilePicker' in window) && !('showSaveFilePicker' in window)){
-    alert('Your browser does not support direct Excel file connection. Please use Chrome on Android.');
+  if(!('showOpenFilePicker' in window)){
+    alert('Chrome on Android is required to connect an existing Excel file.');
     return;
   }
   try{
-    // 1) Try the currently connected handle.
-    if(monthlyFileHandle){
-      const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
-      if(ok){
-        const wrote=await writePersistentMonthlyExcel(month);
-        if(wrote){showToast('✓ Same monthly Excel file updated');return;}
-      }
-    }
-
-    // 2) Try the persisted handle again. This fixes stale in-memory handles.
-    const saved=await refreshMonthlyFileHandleFromDB();
-    if(saved){
-      const ok=await verifyMonthlyFilePermission(saved,true);
-      if(ok){
-        const wrote=await writePersistentMonthlyExcel(month);
-        if(wrote){showToast('✓ Existing monthly Excel file reconnected and updated');return;}
-      }
-    }
-
-    // 3) IMPORTANT: select the EXISTING Excel file instead of automatically creating
-    // a new download/file. The selected file becomes the permanent update target.
-    if('showOpenFilePicker' in window){
-      const handle=await pickExistingMonthlyExcel();
-      if(handle){
-        const ok=await verifyMonthlyFilePermission(handle,true);
-        if(!ok)throw new Error('Write permission was not granted for the selected Excel file.');
-        const wrote=await writePersistentMonthlyExcel(month);
-        if(!wrote)throw new Error('Could not update the selected Excel file.');
-        setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — This same file will update after every Sent Order.`,true);
-        showToast('✓ Existing Excel connected. No new Excel download needed.');
-        return;
-      }
-    }
-
-    // 4) Only if there is no existing file to select, create a new workbook.
-    if(!('showSaveFilePicker' in window))throw new Error('No Excel file selected.');
-    monthlyFileHandle=await window.showSaveFilePicker({suggestedName:monthlyExcelFilename(month),types:[{description:'Excel Workbook',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]});
-    const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
-    if(!ok)throw new Error('Write permission was not granted.');
-    await saveMonthlyFileHandle(monthlyFileHandle,month);
-    const created=createFreshMonthlyWorkbook(month).wb;
-    const out=XLSX.write(created,{bookType:'xlsx',type:'array',cellStyles:true});
-    const writable=await monthlyFileHandle.createWritable();
-    await writable.write(out);await writable.close();
-    saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month))});
-    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — This same file will update after every Sent Order.`,true);
-    showToast('✓ New monthly Excel created and connected.');
+    // Always prefer selecting the user's existing workbook. This avoids stale
+    // Android/Chrome handles and never creates a replacement workbook by mistake.
+    const handle=await pickExistingMonthlyExcel();
+    if(!handle)return;
+    const ok=await verifyMonthlyFilePermission(handle,true);
+    if(!ok)throw new Error('Write permission was not granted for the selected Excel file.');
+    const wrote=await writePersistentMonthlyExcel(month,false);
+    if(!wrote)throw new Error('Could not update the selected Excel file. Close Excel/Sheets if it is open and try again.');
+    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — This same file will update after every Sent Order. Existing formatting is preserved.`,true);
+    showToast('✓ Same existing Excel connected');
   }catch(e){
     if(e.name!=='AbortError')alert('Excel connection failed: '+e.message);
   }
@@ -1087,26 +1046,23 @@ async function connectOrOpenMonthlyExcel(){
 
 async function requestMonthlyExcelPermission(){
   try{
-    if(!monthlyFileHandle)await refreshMonthlyFileHandleFromDB();
     if(monthlyFileHandle){
       const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
       if(ok){
-        const wrote=await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey());
-        if(wrote){showToast('✓ Write permission restored and Excel updated');return;}
+        const wrote=await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey(),true);
+        if(wrote){showToast('✓ Excel write permission restored');return;}
       }
     }
-
-    // If the cached handle is stale, let the user select the SAME existing file.
     if('showOpenFilePicker' in window){
       const handle=await pickExistingMonthlyExcel();
       if(handle){
         const ok=await verifyMonthlyFilePermission(handle,true);
         if(!ok)throw new Error('Write permission was not granted.');
-        const wrote=await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey());
-        if(wrote){showToast('✓ Existing Excel reconnected and write permission restored');return;}
+        const wrote=await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey(),false);
+        if(wrote){showToast('✓ Same Excel reconnected and updated');return;}
       }
     }
-    alert('Please select your existing Excel file. A new Excel file is not required.');
+    alert('Select your SAME existing Excel file. Do not create a new Excel file.');
   }catch(e){if(e.name!=='AbortError')alert('Excel permission failed: '+e.message)}
 }
 

@@ -199,14 +199,14 @@ textarea{min-height:75px;resize:vertical}
       <div class="field"><label>Sent Order count</label><input id="excelMonthOrderCount" readonly></div>
     </div>
     <div id="excelMonthSummary" class="total" style="margin-top:12px">Monthly Product Sales: ৳0.00 · 0 Product</div>
-    <div id="monthlyExcelStatus" class="notice" style="margin-top:10px">📗 Google Sheet is connected. After every Sent Order, Product-wise Quantity and Sales are sent to the Google Sheet. Your Sheet design/formatting is not changed by the app.</div>
+    <div id="monthlyExcelStatus" class="notice" style="margin-top:10px">📊 ONE Master Excel file থাকবে। প্রথমবার যে .xlsx ফাইলটি Save/Connect করবেন, পরের সব Export সেই একই ফাইলেই নতুন/আপডেট ডাটা যোগ করবে। আপনার Excel-এর Design, Color, Font, Border ও Layout পরিবর্তন করা হবে না।</div>
     <div id="monthlySalesSheet" class="order-table-wrap" style="margin-top:12px"></div>
     <div class="actions">
       <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sales</button>
       <button class="btn btn-primary" onclick="openConnectedMonthlyExcel()">📊 Open / Connect Master Excel</button>
       <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export / Update Same Excel</button>
       <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
-      <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Same Master File</button>
+      <button class="btn btn-primary" onclick="openSameMasterFile()">📗 Open Same Master File</button>
       <button class="btn btn-light" onclick="closeModal('monthlyExcelModal')">Close</button>
     </div>
   </div>
@@ -849,34 +849,45 @@ async function syncGoogleSheetQueue(){
 
 // ONE MASTER FILE: do not open a separate/new Google Sheet.
 // This button opens the SAME connected Master Excel file.
-async function openGoogleSheet(){
+async function openSameMasterFile(){
   try{
+    // Always restore the exact FileSystemFileHandle saved for the Master Excel.
+    // This opens the SAME physical .xlsx file; it does not create a new workbook.
     if(!monthlyFileHandle){
       const saved=await loadMonthlyFileHandle();
       if(saved?.handle) monthlyFileHandle=saved.handle;
     }
     if(!monthlyFileHandle){
-      alert("আগে আপনার SAME Master Excel ফাইলটি Open / Connect Master Excel দিয়ে একবার নির্বাচন করুন।\n\nএরপর এই Open Google Sheet বাটন চাপলে আর নতুন/খালি Sheet খোলা হবে না।");
+      alert("আগে 📊 Open / Connect Master Excel চাপুন এবং আপনার একটি SAME .xlsx ফাইল নির্বাচন করুন।\n\nতারপর 📗 Open Same Master File চাপলে সেই একই Master Excel ফাইলটি খোলা হবে।");
       return;
     }
-    const ok=await verifyMonthlyFilePermission(monthlyFileHandle,false);
-    if(!ok){
-      alert("Master Excel-এর Write Permission নেই। আগে Open / Connect Master Excel বা Restore Write Permission চাপুন।");
+
+    const readable=await verifyMonthlyFilePermission(monthlyFileHandle,false);
+    if(!readable){
+      alert("Master Excel ফাইলের permission পাওয়া যাচ্ছে না। 📊 Open / Connect Master Excel চাপুন এবং একই .xlsx ফাইলটি আবার নির্বাচন করুন।");
       return;
     }
+
     const file=await monthlyFileHandle.getFile();
     const url=URL.createObjectURL(file);
-    const win=window.open(url,"_blank");
+    const win=window.open(url,"_blank","noopener");
     if(!win){
       const a=document.createElement("a");
-      a.href=url;a.target="_blank";a.rel="noopener";a.click();
+      a.href=url;
+      a.target="_blank";
+      a.rel="noopener";
+      a.click();
     }
-    setTimeout(()=>URL.revokeObjectURL(url),60000);
-    setMonthlyExcelStatus(`Opened SAME Master Excel: ${file.name}. No separate Google Sheet is used.`,true);
+    setTimeout(()=>URL.revokeObjectURL(url),120000);
+    setMonthlyExcelStatus(`📊 SAME Master Excel opened: ${file.name} — পরের Export এই একই ফাইলেই Update হবে।`,true);
   }catch(e){
     if(e.name!=="AbortError") alert("Master Excel open failed: "+(e.message||e));
   }
 }
+
+// Backward-compatible alias for older cached UI code.
+async function openGoogleSheet(){return openSameMasterFile()}
+
 
 const MONTHLY_SNAPSHOT_KEY="kohinoor_monthly_excel_snapshot_v3";
 function monthlySnapshotKey(month){return `${MONTHLY_SNAPSHOT_KEY}_${month}`;}

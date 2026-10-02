@@ -899,8 +899,69 @@ function mergeMonthlyWorkbookPreservingEdits(wb,month){
     ...outputRows,
     ["","TOTAL","",totalQty,totalValue]
   ];
+  // Rebuild the values without rebuilding the worksheet styles.  Recreating a
+  // worksheet with aoa_to_sheet() throws away styles that the user changed in
+  // Excel (cell fills, fonts, borders, alignment, etc.).  Keep the existing
+  // worksheet as the source of truth for every existing cell's formatting.
+  const oldWs=ws;
   const newWs=XLSX.utils.aoa_to_sheet(aoa);
-  styleMonthlyWorksheet(newWs,aoa.length-1);
+
+  // Copy user formatting from the old sheet to the same existing coordinates.
+  // Existing rows are deliberately kept in the same order, so a user's manual
+  // colour/font/border edits stay attached to the same row and cell.
+  const oldRef=oldWs['!ref'] ? XLSX.utils.decode_range(oldWs['!ref']) : null;
+  if(oldRef){
+    for(let rr=0; rr<=oldRef.e.r; rr++){
+      for(let cc=0; cc<=oldRef.e.c; cc++){
+        const addr=XLSX.utils.encode_cell({r:rr,c:cc});
+        const oldCell=oldWs[addr];
+        const newCell=newWs[addr];
+        if(oldCell && newCell && oldCell.s){
+          newCell.s=JSON.parse(JSON.stringify(oldCell.s));
+        }
+      }
+    }
+  }
+
+  // Preserve sheet-level layout/formatting settings too.
+  if(oldWs['!cols']) newWs['!cols']=JSON.parse(JSON.stringify(oldWs['!cols']));
+  if(oldWs['!rows']) newWs['!rows']=JSON.parse(JSON.stringify(oldWs['!rows']));
+  if(oldWs['!merges']) newWs['!merges']=JSON.parse(JSON.stringify(oldWs['!merges']));
+  if(oldWs['!freeze']) newWs['!freeze']=JSON.parse(JSON.stringify(oldWs['!freeze']));
+  if(oldWs['!autofilter']) newWs['!autofilter']=JSON.parse(JSON.stringify(oldWs['!autofilter']));
+
+  // Keep the user's existing header/company/month styles. Only the newly added
+  // rows/cells need the app's default style.
+  const oldLastRow=oldRef ? oldRef.e.r : 0;
+  const newLastRow=aoa.length-1;
+  if(newLastRow>oldLastRow){
+    for(let rr=oldLastRow+1; rr<newLastRow; rr++){
+      for(let cc=0; cc<5; cc++){
+        const cell=newWs[excelAddr(rr,cc)];
+        if(cell) cell.s={font:{color:"000000"},alignment:{vertical:"center",horizontal:[0,2,3,4].includes(cc)?"center":"left"}};
+        if(cell && rr%2===0) cell.s={...(cell.s||{}),fill:{fgColor:{rgb:"F1FAF6"}}};
+      }
+    }
+  }
+  // Put the existing total-row style onto the new total row, if one existed.
+  const oldTotalRow=existing.findIndex((row,idx)=>idx>=dataStart && (String(row?.[0]??'').trim()==='TOTAL' || String(row?.[1]??'').trim()==='TOTAL'));
+  if(oldTotalRow>=0){
+    for(let cc=0; cc<5; cc++){
+      const oldCell=oldWs[excelAddr(oldTotalRow,cc)];
+      const newCell=newWs[excelAddr(newLastRow,cc)];
+      if(oldCell?.s && newCell) newCell.s=JSON.parse(JSON.stringify(oldCell.s));
+    }
+  }else{
+    for(let cc=0; cc<5; cc++){
+      const cell=newWs[excelAddr(newLastRow,cc)];
+      if(cell) cell.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:cc===1?"right":"center"}};
+    }
+  }
+
+  // Update only the dynamic layout settings; do not reset user cell styles.
+  newWs['!merges']=[{s:{r:0,c:0},e:{r:0,c:4}},{s:{r:1,c:0},e:{r:1,c:4}}];
+  newWs['!freeze']={xSplit:0,ySplit:4};
+  newWs['!autofilter']={ref:`A4:E${Math.max(4,newLastRow)}`};
   wb.Sheets["Product-wise Sales"]=newWs;
 
   if(wb.SheetNames.includes("Summary")){

@@ -702,149 +702,147 @@ function excelAddr(r,c){return XLSX.utils.encode_cell({r,c})}
 function normalizeExcelValue(v){return v===null||v===undefined?"":String(v)}
 
 function styleMonthlyWorksheet(ws, lastRow){
-  ws['!cols']=[{wch:6},{wch:17},{wch:34},{wch:13},{wch:15},{wch:16},{wch:14},{wch:20}];
-  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:7}},{s:{r:1,c:0},e:{r:1,c:7}},{s:{r:2,c:0},e:{r:2,c:7}}];
-  ws['!freeze']={xSplit:0,ySplit:5};
-  for(let c=0;c<8;c++){
-    const cell=ws[excelAddr(0,c)]; if(cell) cell.s={font:{bold:true,color:"FFFFFF",sz:18},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:"center",vertical:"center"}};
-    const cell2=ws[excelAddr(1,c)]; if(cell2) cell2.s={font:{bold:true,color:"FFFFFF",sz:13},fill:{fgColor:{rgb:"18A66A"}},alignment:{horizontal:"center",vertical:"center"}};
-    const cell3=ws[excelAddr(2,c)]; if(cell3) cell3.s={font:{bold:true,color:"FFFFFF",sz:11},fill:{fgColor:{rgb:"35B779"}},alignment:{horizontal:"center",vertical:"center"}};
-    const head=ws[excelAddr(4,c)]; if(head) head.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"2878D7"}},alignment:{horizontal:"center",vertical:"center",wrapText:true},border:{top:{style:"thin",color:{rgb:"FFFFFF"}},bottom:{style:"thin",color:{rgb:"FFFFFF"}}}};
+  ws['!cols']=[{wch:7},{wch:38},{wch:14},{wch:18},{wch:22}];
+  ws['!merges']=[
+    {s:{r:0,c:0},e:{r:0,c:4}},
+    {s:{r:1,c:0},e:{r:1,c:4}}
+  ];
+  ws['!freeze']={xSplit:0,ySplit:4};
+  ws['!autofilter']={ref:`A4:E${Math.max(4,lastRow)}`};
+  for(let c=0;c<5;c++){
+    const company=ws[excelAddr(0,c)];
+    if(company) company.s={font:{bold:true,color:"FFFFFF",sz:18},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:"center",vertical:"center"}};
+    const month=ws[excelAddr(1,c)];
+    if(month) month.s={font:{bold:true,color:"FFFFFF",sz:13},fill:{fgColor:{rgb:"18A66A"}},alignment:{horizontal:"center",vertical:"center"}};
+    const head=ws[excelAddr(3,c)];
+    if(head) head.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"2878D7"}},alignment:{horizontal:"center",vertical:"center",wrapText:true},border:{top:{style:"thin",color:{rgb:"FFFFFF"}},bottom:{style:"thin",color:{rgb:"FFFFFF"}}}};
   }
-  ws['!rows']=[{hpt:30},{hpt:23},{hpt:21},{hpt:8},{hpt:28}];
-  const totalRow=lastRow;
-  for(let c=0;c<8;c++){
-    const cell=ws[excelAddr(totalRow,c)]; if(cell) cell.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:c===4?"right":"center"}};
-  }
-  for(let r=5;r<totalRow;r++){
-    for(let c=0;c<8;c++){
+  ws['!rows']=[{hpt:30},{hpt:23},{hpt:8},{hpt:28}];
+  for(let r=4;r<lastRow;r++){
+    for(let c=0;c<5;c++){
       const cell=ws[excelAddr(r,c)];
-      if(cell) cell.s={...(cell.s||{}),alignment:{vertical:"center",horizontal:[0,4,5,6].includes(c)?"center":"left"}};
+      if(cell) cell.s={...(cell.s||{}),alignment:{vertical:"center",horizontal:[0,2,3,4].includes(c)?"center":"left"}};
+      if(cell && r%2===0) cell.s={...(cell.s||{}),fill:{fgColor:{rgb:"F1FAF6"}}};
     }
   }
-  for(let r=5;r<totalRow;r+=2){
-    for(let c=0;c<8;c++){
-      const cell=ws[excelAddr(r,c)];
-      if(cell && (!cell.s || !cell.s.fill)) cell.s={...(cell.s||{}),fill:{fgColor:{rgb:"F1FAF6"}}};
-    }
+  for(let c=0;c<5;c++){
+    const cell=ws[excelAddr(lastRow,c)];
+    if(cell) cell.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:c===1?"right":"center"}};
+  }
+  for(let r=4;r<lastRow;r++){
+    const qty=ws[excelAddr(r,3)], val=ws[excelAddr(r,4)];
+    if(qty) qty.z='0.00';
+    if(val) val.z='#,##0.00';
   }
 }
 
 function createFreshMonthlyWorkbook(month){
   const rows=buildMonthlyProductSales(month);
   const totalQty=rows.reduce((s,r)=>s+Number(r["Total Quantity"]||0),0);
-  const totalBonus=rows.reduce((s,r)=>s+Number(r["Total Bonus"]||0),0);
   const totalValue=rows.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
   const aoa=[
     ["Kohinoor Chemical PLC"],
-    [`Monthly Product Sales — ${excelMonthTitle(month)}`],
-    [`Sent Orders: ${getOrdersForMonth(month).length}   |   Products: ${rows.length}`],
+    [excelMonthTitle(month)],
     [],
-    ["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"],
-    ...rows.map(r=>[r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]]),
-    ["","","","","TOTAL",totalQty,totalBonus,totalValue]
+    ["Sl","Product Name","Pack","Total Quantity","Total Sales Value"],
+    ...rows.map(r=>[r["Sl"],r["Product Name"],r["Pack"],r["Total Quantity"],r["Total Sales Value"]]),
+    ["","TOTAL","",totalQty,totalValue]
   ];
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet(aoa);
   styleMonthlyWorksheet(ws,aoa.length-1);
   XLSX.utils.book_append_sheet(wb,ws,"Product-wise Sales");
-
-  const summary=[
-    ["Kohinoor Chemical PLC"],[`Monthly Sales Summary — ${excelMonthTitle(month)}`],[],
-    ["Month",excelMonthTitle(month)],
-    ["Sent Orders",getOrdersForMonth(month).length],
-    ["Products",rows.length],
-    ["Total Quantity",totalQty],
-    ["Total Bonus",totalBonus],
-    ["Total Sales Value",totalValue]
-  ];
-  const ws2=XLSX.utils.aoa_to_sheet(summary);
-  ws2['!cols']=[{wch:25},{wch:28}];
-  ws2['A1'].s={font:{bold:true,color:"FFFFFF",sz:18},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:"center"}};
-  ws2['A2'].s={font:{bold:true,color:"FFFFFF",sz:13},fill:{fgColor:{rgb:"2878D7"}},alignment:{horizontal:"center"}};
-  XLSX.utils.book_append_sheet(wb,ws2,"Summary");
   return {wb,rows};
 }
 
-function monthlyRowsForSnapshot(rows){return rows.map(r=>[r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]])}
+function monthlyRowsForSnapshot(rows){
+  return rows.map(r=>[r["Sl"],r["Product Name"],r["Pack"],r["Total Quantity"],r["Total Sales Value"]]);
+}
+
+function monthlyRowFromExisting(row){
+  if(!Array.isArray(row)) return ["","","","",""];
+  // New layout: Sl, Product Name, Pack, Total Quantity, Total Sales Value
+  if(row.length<=5) return [row[0]??"",row[1]??"",row[2]??"",row[3]??"",row[4]??""];
+  // Previous layout: Sl, Product Code, Product Name, Pack, Order Count, Total Quantity, Total Bonus, Total Sales Value
+  return [row[0]??"",row[2]??"",row[3]??"",row[5]??"",row[7]??""];
+}
 
 function mergeMonthlyWorkbookPreservingEdits(wb,month){
   const fresh=buildMonthlyProductSales(month);
   let ws=wb.Sheets["Product-wise Sales"];
   if(!ws){
-    const made=createFreshMonthlyWorkbook(month); saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(fresh),title:excelMonthTitle(month)}); return made.wb;
+    const made=createFreshMonthlyWorkbook(month);
+    saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(fresh)});
+    return made.wb;
   }
 
   const existing=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:true});
   const snapshot=loadMonthlySnapshot(month);
   const snapMap=new Map();
-  (snapshot?.rows||[]).forEach(row=>{const key=String(row[1]||row[2]||"").trim();if(key)snapMap.set(key,row)});
+  (snapshot?.rows||[]).forEach(row=>{
+    const mapped=monthlyRowFromExisting(row);
+    const key=String(mapped[1]||"").trim();
+    if(key) snapMap.set(key,mapped);
+  });
+
+  // Locate the data rows in either the old 8-column format or the new 5-column format.
+  let headerIndex=existing.findIndex(row=>Array.isArray(row) && String(row[0]||"").trim()==="Sl" && String(row).includes("Product Name"));
+  if(headerIndex<0) headerIndex=4;
   const existingMap=new Map();
-  for(let r=5;r<existing.length;r++){
-    const row=existing[r]||[];
-    const key=String(row[1]||row[2]||"").trim();
-    if(key && key!=="TOTAL") existingMap.set(key,{rowIndex:r,row});
+  for(let r=headerIndex+1;r<existing.length;r++){
+    const raw=existing[r]||[];
+    const mapped=monthlyRowFromExisting(raw);
+    const key=String(mapped[1]||"").trim();
+    if(key && key!=="TOTAL") existingMap.set(key,{rowIndex:r,row:mapped});
   }
 
-  // Preserve the workbook and the user's own edits. App-owned cells are updated only
-  // when they still equal the last value written by the app. If the user changed a cell,
-  // that cell is left untouched.
   const outputRows=[];
   fresh.forEach((r,i)=>{
-    const key=String(r["Product Code"]||r["Product Name"]||"").trim();
-    const generated=[i+1,r["Product Code"],r["Product Name"],r["Pack"],r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]];
+    const key=String(r["Product Name"]||"").trim();
+    const generated=[i+1,r["Product Name"],r["Pack"],r["Total Quantity"],r["Total Sales Value"]];
     const old=existingMap.get(key);
     const prev=snapMap.get(key);
     const merged=generated.slice();
-    if(old){
-      for(let c=0;c<8;c++){
+    if(old && prev){
+      for(let c=0;c<5;c++){
         const oldVal=normalizeExcelValue(old.row[c]);
-        const prevVal=normalizeExcelValue(prev?.[c]);
-        if(prev && oldVal!==prevVal) merged[c]=old.row[c];
+        const prevVal=normalizeExcelValue(prev[c]);
+        if(oldVal!==prevVal) merged[c]=old.row[c];
       }
     }
     outputRows.push(merged);
   });
 
-  // Keep manually added rows that are not generated by the app.
+  // Preserve manually added product rows, but convert them to the new compact layout.
   existing.forEach((row,r)=>{
-    if(r<5 || !row)return;
-    const key=String(row[1]||row[2]||"").trim();
+    if(r<=headerIndex || !row)return;
+    const mapped=monthlyRowFromExisting(row);
+    const key=String(mapped[1]||"").trim();
     if(!key || key==="TOTAL")return;
-    if(!fresh.some(x=>String(x["Product Code"]||x["Product Name"]||"").trim()===key)) outputRows.push(row.slice(0,8));
+    if(!fresh.some(x=>String(x["Product Name"]||"").trim()===key)) outputRows.push(mapped);
   });
 
   const totalQty=fresh.reduce((s,r)=>s+Number(r["Total Quantity"]||0),0);
-  const totalBonus=fresh.reduce((s,r)=>s+Number(r["Total Bonus"]||0),0);
   const totalValue=fresh.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
-  const headerRows=[
+  const aoa=[
     ["Kohinoor Chemical PLC"],
-    [`Monthly Product Sales — ${excelMonthTitle(month)}`],
-    [`Sent Orders: ${getOrdersForMonth(month).length}   |   Products: ${fresh.length}`],
+    [excelMonthTitle(month)],
     [],
-    ["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"]
+    ["Sl","Product Name","Pack","Total Quantity","Total Sales Value"],
+    ...outputRows,
+    ["","TOTAL","",totalQty,totalValue]
   ];
-  const aoa=[...headerRows,...outputRows,["","","","","TOTAL",totalQty,totalBonus,totalValue]];
   const newWs=XLSX.utils.aoa_to_sheet(aoa);
   styleMonthlyWorksheet(newWs,aoa.length-1);
   wb.Sheets["Product-wise Sales"]=newWs;
-  if(!wb.SheetNames.includes("Summary")){
-    const made=createFreshMonthlyWorkbook(month); wb.Sheets["Summary"]=made.wb.Sheets["Summary"]; wb.SheetNames.push("Summary");
-  }else{
-    const sum=wb.Sheets["Summary"];
-    const vals=[["Kohinoor Chemical PLC"],[`Monthly Sales Summary — ${excelMonthTitle(month)}`],[],["Month",excelMonthTitle(month)],["Sent Orders",getOrdersForMonth(month).length],["Products",fresh.length],["Total Quantity",totalQty],["Total Bonus",totalBonus],["Total Sales Value",totalValue]];
-    // Summary is app-managed. Do not replace cells the user has edited compared with snapshot.
-    const oldSummary=XLSX.utils.sheet_to_json(sum,{header:1,defval:"",raw:true});
-    const oldSnap=loadMonthlySnapshot(month)?.summary||[];
-    for(let r=0;r<vals.length;r++)for(let c=0;c<2;c++){
-      const addr=excelAddr(r,c); const old=oldSummary[r]?.[c]??""; const prev=oldSnap[r]?.[c]??"";
-      if(normalizeExcelValue(old)===normalizeExcelValue(prev)||!oldSnap.length) sum[addr]={v:vals[r][c],t:typeof vals[r][c]==="number"?"n":"s"};
-    }
-    sum['!cols']=[{wch:25},{wch:28}];
+
+  // The requested workbook has no Summary sheet.
+  if(wb.SheetNames.includes("Summary")){
+    wb.SheetNames=wb.SheetNames.filter(n=>n!=="Summary");
+    delete wb.Sheets["Summary"];
   }
-  saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(fresh),summary:[
-    ["Kohinoor Chemical PLC"],[`Monthly Sales Summary — ${excelMonthTitle(month)}`],[],["Month",excelMonthTitle(month)],["Sent Orders",getOrdersForMonth(month).length],["Products",fresh.length],["Total Quantity",totalQty],["Total Bonus",totalBonus],["Total Sales Value",totalValue]
-  ]});
+
+  saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(fresh)});
   return wb;
 }
 

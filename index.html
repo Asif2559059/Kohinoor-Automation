@@ -204,6 +204,8 @@ textarea{min-height:75px;resize:vertical}
     <div class="actions">
       <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
       <button class="btn btn-info" onclick="connectOrOpenMonthlyExcel()">📂 Connect / Open Monthly Excel</button>
+      <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Google Sheet</button>
+      <button class="btn btn-light" onclick="setGoogleSheetUrl()">⚙️ Set Google Sheet</button>
       <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
       <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export New Excel</button>
       <button class="btn btn-light" onclick="closeModal('monthlyExcelModal')">Close</button>
@@ -725,6 +727,37 @@ function openMonthlyExcel(){
 }
 
 function monthlyExcelFilename(month){return `Kohinoor_Product_Wise_Sales_${month}.xlsx`;}
+
+// Google Sheet shortcut: stores the user's own Sheet URL locally and opens it directly.
+const GOOGLE_SHEET_URL_KEY="kohinoor_google_sheet_url_v1";
+function getGoogleSheetUrl(){return String(localStorage.getItem(GOOGLE_SHEET_URL_KEY)||"").trim();}
+function setGoogleSheetUrl(){
+  const current=getGoogleSheetUrl();
+  const url=prompt("Paste your Google Sheet link here:",current);
+  if(url===null)return;
+  const value=String(url).trim();
+  if(!value){localStorage.removeItem(GOOGLE_SHEET_URL_KEY);showToast("Google Sheet link cleared");return;}
+  if(!/^https:\/\/(docs\.google\.com\/spreadsheets\/|drive\.google\.com\/)/i.test(value)){
+    alert("Please enter a valid Google Sheets link.");
+    return;
+  }
+  localStorage.setItem(GOOGLE_SHEET_URL_KEY,value);
+  showToast("✓ Google Sheet link saved");
+}
+function openGoogleSheet(){
+  let url=getGoogleSheetUrl();
+  if(!url){
+    const entered=prompt("First, paste your Google Sheet link:");
+    if(entered===null)return;
+    url=String(entered).trim();
+    if(!/^https:\/\/(docs\.google\.com\/spreadsheets\/|drive\.google\.com\/)/i.test(url)){
+      alert("Please enter a valid Google Sheets link.");
+      return;
+    }
+    localStorage.setItem(GOOGLE_SHEET_URL_KEY,url);
+  }
+  window.open(url,"_blank","noopener,noreferrer");
+}
 
 const MONTHLY_SNAPSHOT_KEY="kohinoor_monthly_excel_snapshot_v3";
 function monthlySnapshotKey(month){return `${MONTHLY_SNAPSHOT_KEY}_${month}`;}

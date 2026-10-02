@@ -203,7 +203,7 @@ textarea{min-height:75px;resize:vertical}
     <div id="monthlySalesSheet" class="order-table-wrap" style="margin-top:12px"></div>
     <div class="actions">
       <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sales</button>
-      <button class="btn btn-primary" onclick="openConnectedMonthlyExcel()">📊 Open / Connect Excel</button>
+      <button class="btn btn-primary" onclick="openConnectedMonthlyExcel()">📊 Open / Connect Master Excel</button>
       <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export / Update Same Excel</button>
       <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
       <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Google Sheet</button>
@@ -229,6 +229,9 @@ let currentUser=null,products=[],orders=[],draftOrders=[],notifications=[],curre
 // Persistent monthly Excel file connection (Android/Chrome File System Access API)
 let monthlyFileHandle=null;
 const MONTHLY_FILE_DB='kohinoor_monthly_excel_db_v2', MONTHLY_FILE_STORE='handles';
+const MONTHLY_MASTER_CREATED_KEY='kohinoor_monthly_master_excel_created_v1';
+function monthlyMasterCreated(){try{return localStorage.getItem(MONTHLY_MASTER_CREATED_KEY)==='1'}catch(e){return false}}
+function markMonthlyMasterCreated(){try{localStorage.setItem(MONTHLY_MASTER_CREATED_KEY,'1')}catch(e){}}
 function openMonthlyFileDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open(MONTHLY_FILE_DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(MONTHLY_FILE_STORE))r.result.createObjectStore(MONTHLY_FILE_STORE)};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
 async function saveMonthlyFileHandle(handle,month){try{const db=await openMonthlyFileDB();const tx=db.transaction(MONTHLY_FILE_STORE,'readwrite');tx.objectStore(MONTHLY_FILE_STORE).put({handle,month},'current');return new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}catch(e){console.warn('Could not persist Excel handle',e)}}
 async function loadMonthlyFileHandle(){try{const db=await openMonthlyFileDB();return await new Promise((res,rej)=>{const tx=db.transaction(MONTHLY_FILE_STORE,'readonly'),r=tx.objectStore(MONTHLY_FILE_STORE).get('current');r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error)})}catch(e){return null}}
@@ -1089,7 +1092,7 @@ async function writePersistentMonthlyExcel(month, allowRepick=true){
 
   try{
     if(!(await verifyMonthlyFilePermission(handle,true))){
-      setMonthlyExcelStatus('Write permission is required. Tap “Connect / Open Monthly Excel” and select the same existing Excel file.');
+      setMonthlyExcelStatus('Write permission is required. Tap “Open / Connect Master Excel” and select the same existing Excel file.');
       return false;
     }
 
@@ -1131,7 +1134,7 @@ async function writePersistentMonthlyExcel(month, allowRepick=true){
           return await writePersistentMonthlyExcel(month,false);
         }
       }
-      setMonthlyExcelStatus('Could not update the selected Excel file. Close the Excel/Sheets app if it is open, then tap Connect / Open Monthly Excel and select the SAME file again.');
+      setMonthlyExcelStatus('Could not update the selected Excel file. Close the Excel/Sheets app if it is open, then tap Open / Connect Master Excel and select the SAME file again.');
       return false;
     }
 
@@ -1149,22 +1152,33 @@ async function writePersistentMonthlyExcel(month, allowRepick=true){
 async function connectOrOpenMonthlyExcel(){
   const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
   if(!('showOpenFilePicker' in window)){
-    alert('Chrome on Android is required to connect an existing Excel file.');
+    alert('এই ফোন/ব্রাউজারে Excel file connect করার সুবিধা নেই। Chrome ব্যবহার করুন।');
     return;
   }
   try{
-    // Always prefer selecting the user's existing workbook. This avoids stale
-    // Android/Chrome handles and never creates a replacement workbook by mistake.
+    const saved=await loadMonthlyFileHandle();
+    if(saved?.handle){
+      monthlyFileHandle=saved.handle;
+      const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
+      if(ok){
+        const file=await monthlyFileHandle.getFile();
+        setMonthlyExcelStatus(`Connected: ${file.name} — এই একই Master Excel-এ Update হবে।`,true);
+        showToast('✓ Master Excel connected');
+        return;
+      }
+    }
     const handle=await pickExistingMonthlyExcel();
     if(!handle)return;
     const ok=await verifyMonthlyFilePermission(handle,true);
-    if(!ok)throw new Error('Write permission was not granted for the selected Excel file.');
-    const wrote=await writePersistentMonthlyExcel(month,false);
-    if(!wrote)throw new Error('Could not update the selected Excel file. Close Excel/Sheets if it is open and try again.');
-    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — This same file will update after every Sent Order. Existing formatting is preserved.`,true);
-    showToast('✓ Same existing Excel connected');
+    if(!ok)throw new Error('Write permission was not granted.');
+    monthlyFileHandle=handle;
+    await saveMonthlyFileHandle(handle,month);
+    markMonthlyMasterCreated();
+    const file=await handle.getFile();
+    setMonthlyExcelStatus(`Connected: ${file.name} — আপনার Design রেখে এই একই ফাইলেই Update হবে।`,true);
+    showToast('✓ Same Master Excel connected');
   }catch(e){
-    if(e.name!=='AbortError')alert('Excel connection failed: '+e.message);
+    if(e.name!=='AbortError') alert('Excel connection failed: '+e.message);
   }
 }
 
@@ -1194,20 +1208,28 @@ async function updateMonthlyExcelAfterOrder(){
   const month=getCurrentMonthKey();
   if(!monthlyFileHandle){const saved=await loadMonthlyFileHandle();if(saved?.handle){monthlyFileHandle=saved.handle}}
   if(!monthlyFileHandle)return false;
-  try{return await writePersistentMonthlyExcel(month)}catch(e){setMonthlyExcelStatus('Excel is connected but needs write permission. Open Monthly Product Excel and tap Restore Write Permission.');console.warn(e);return false}
+  try{return await writePersistentMonthlyExcel(month)}catch(e){setMonthlyExcelStatus('Excel is connected but needs write permission. Open / Connect Master Excel and tap Restore Write Permission.');console.warn(e);return false}
 }
 
 async function openConnectedMonthlyExcel(){
   const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
   try{
-    if(monthlyFileHandle){
+    // First try the exact Master Excel handle saved by the app. This is critical
+    // after the app/page is reopened: otherwise Export would create a fresh workbook.
+    const saved=await loadMonthlyFileHandle();
+    if(saved?.handle){
+      monthlyFileHandle=saved.handle;
       const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
       if(ok){
         const file=await monthlyFileHandle.getFile();
-        setMonthlyExcelStatus(`Connected: ${file.name} — এই একই Excel ফাইলেই পরের Export/Update হবে।`,true);
-        showToast('✓ Same Excel file connected');
+        setMonthlyExcelStatus(`Connected: ${file.name} — এই একই Master Excel-এ পরের Update হবে।`,true);
+        showToast('✓ Same Master Excel connected');
         return;
       }
+    }
+    if(!('showOpenFilePicker' in window)){
+      alert('Chrome ব্যবহার করে আবার চেষ্টা করুন।');
+      return;
     }
     const handle=await pickExistingMonthlyExcel();
     if(!handle)return;
@@ -1215,11 +1237,12 @@ async function openConnectedMonthlyExcel(){
     if(!ok)throw new Error('Write permission was not granted.');
     monthlyFileHandle=handle;
     await saveMonthlyFileHandle(handle,month);
+    markMonthlyMasterCreated();
     const file=await handle.getFile();
-    setMonthlyExcelStatus(`Connected: ${file.name} — এই একই ফাইলের ডিজাইন রেখে ডাটা Update হবে।`,true);
-    showToast('✓ Same Excel file connected');
+    setMonthlyExcelStatus(`Connected: ${file.name} — আপনার Design রেখে এই একই ফাইলেই Update হবে।`,true);
+    showToast('✓ Same Master Excel connected');
   }catch(e){
-    if(e.name!=='AbortError') alert('Excel connect failed: '+e.message);
+    if(e.name!=='AbortError') alert('Excel connection failed: '+e.message);
   }
 }
 
@@ -1245,11 +1268,11 @@ async function exportMonthlyProductExcel(){
 
   if(currentUser&&navigator.onLine){
     try{
-      const start=`${month}-01`;
+      const startDate=`${month}-01`;
       const d=new Date(`${month}-01T00:00:00`);
       d.setMonth(d.getMonth()+1);
-      const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
-      const {data,error}=await supabaseClient.from('orders').select('*').gte('order_date',start).lt('order_date',end).order('order_date',{ascending:true});
+      const endDate=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
+      const {data,error}=await supabaseClient.from('orders').select('*').gte('order_date',startDate).lt('order_date',endDate).order('order_date',{ascending:true});
       if(!error&&Array.isArray(data)){
         orders=orders.filter(o=>String(o.order_date||o.created_at||'').slice(0,7)!==month).concat(data);
       }
@@ -1258,20 +1281,35 @@ async function exportMonthlyProductExcel(){
 
   const filename=monthlyExcelFilename(month);
 
-  // Once a master Excel file is connected, NEVER create a new workbook/sheet.
-  // Update that exact workbook so the user's own colours, fonts, borders,
-  // widths and layout remain intact.
-  if(monthlyFileHandle){
-    const ok=await writePersistentMonthlyExcel(month,true);
-    if(ok){showToast('✓ একই Excel ফাইল Update হয়েছে — Design অক্ষত আছে');return;}
+  // IMPORTANT: restore the saved Master Excel handle after page/app reload.
+  // Without this step Android/Chrome would think there is no connected file and
+  // create a brand-new default workbook, which destroys the user's design.
+  if(!monthlyFileHandle){
+    try{
+      const saved=await loadMonthlyFileHandle();
+      if(saved?.handle) monthlyFileHandle=saved.handle;
+    }catch(e){console.warn('Could not restore Master Excel handle:',e)}
   }
 
-  // First export: create exactly ONE worksheet and let the user choose where
-  // to save it. The resulting file becomes the app's Master Excel file.
+  if(monthlyFileHandle){
+    const ok=await writePersistentMonthlyExcel(month,true);
+    if(ok){showToast('✓ একই Master Excel Update হয়েছে — আপনার Design অক্ষত আছে');return;}
+  }
+
+  // If a Master Excel was already created before, NEVER silently create another
+  // workbook. Ask the user to connect the SAME file instead.
+  if(monthlyMasterCreated()){
+    alert('আপনার Master Excel ফাইলটি আগে থেকেই আছে। নতুন Excel তৈরি করা হবে না।\n\n📊 Open / Connect Master Excel চাপুন এবং আপনার আগের সেই একই .xlsx ফাইলটি নির্বাচন করুন। তারপর Export / Update Same Excel চাপুন।');
+    return;
+  }
+
+  // First-ever export only: create ONE workbook with ONE worksheet. This file then
+  // becomes the Master Excel file. The user may freely design it afterwards.
   const made=createFreshMonthlyWorkbook(month);
   try{
     const saved=await saveNewMonthlyExcelWithPicker(made.wb,filename,month);
     if(saved){
+      markMonthlyMasterCreated();
       saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[]});
       showToast('✓ Master Excel তৈরি হয়েছে — এখন এই একই ফাইলেই Update হবে');
       return;
@@ -1283,12 +1321,12 @@ async function exportMonthlyProductExcel(){
     }else return;
   }
 
-  // Browser fallback: ordinary download. On browsers without File System
-  // Access API, the user must connect the downloaded file once using
-  // Open / Connect Excel before future updates can preserve its design.
+  // Browser fallback. It is still a first-time export only. The user must connect
+  // this exact downloaded file once; later exports will never create a new workbook.
   XLSX.writeFile(made.wb,filename);
+  markMonthlyMasterCreated();
   saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[]});
-  showToast(`✓ ${filename} downloaded. তারপর Open / Connect Excel দিয়ে এই একই ফাইল নির্বাচন করুন।`);
+  showToast(`✓ ${filename} downloaded. এখন Open / Connect Master Excel দিয়ে এই একই ফাইলটি একবার নির্বাচন করুন।`);
 }
 
 function addNotification(title,text){notifications.unshift({id:Date.now(),title,text,created_at:new Date().toISOString()});notifications=notifications.slice(0,50);localStorage.setItem(LOCAL_NOTICES_KEY,JSON.stringify(notifications));renderNotifications()}

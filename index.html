@@ -206,7 +206,7 @@ textarea{min-height:75px;resize:vertical}
       <button class="btn btn-primary" onclick="openConnectedMonthlyExcel()">📊 Open / Connect Master Excel</button>
       <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export / Update Same Excel</button>
       <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
-      <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Google Sheet</button>
+      <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Same Master File</button>
       <button class="btn btn-light" onclick="closeModal('monthlyExcelModal')">Close</button>
     </div>
   </div>
@@ -847,10 +847,35 @@ async function syncGoogleSheetQueue(){
   if(q.length && !remaining.length) showToast("✅ Pending Google Sheet updates completed");
 }
 
-const GOOGLE_SHEET_URL="https://docs.google.com/spreadsheets/d/1yQyfl5GRxPyhQVmmKUEFJ3K8wZlQ5rDXlrq5A23JdKs/edit";
-
-function openGoogleSheet(){
-  window.open(GOOGLE_SHEET_URL,"_blank","noopener,noreferrer");
+// ONE MASTER FILE: do not open a separate/new Google Sheet.
+// This button opens the SAME connected Master Excel file.
+async function openGoogleSheet(){
+  try{
+    if(!monthlyFileHandle){
+      const saved=await loadMonthlyFileHandle();
+      if(saved?.handle) monthlyFileHandle=saved.handle;
+    }
+    if(!monthlyFileHandle){
+      alert("আগে আপনার SAME Master Excel ফাইলটি Open / Connect Master Excel দিয়ে একবার নির্বাচন করুন।\n\nএরপর এই Open Google Sheet বাটন চাপলে আর নতুন/খালি Sheet খোলা হবে না।");
+      return;
+    }
+    const ok=await verifyMonthlyFilePermission(monthlyFileHandle,false);
+    if(!ok){
+      alert("Master Excel-এর Write Permission নেই। আগে Open / Connect Master Excel বা Restore Write Permission চাপুন।");
+      return;
+    }
+    const file=await monthlyFileHandle.getFile();
+    const url=URL.createObjectURL(file);
+    const win=window.open(url,"_blank");
+    if(!win){
+      const a=document.createElement("a");
+      a.href=url;a.target="_blank";a.rel="noopener";a.click();
+    }
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+    setMonthlyExcelStatus(`Opened SAME Master Excel: ${file.name}. No separate Google Sheet is used.`,true);
+  }catch(e){
+    if(e.name!=="AbortError") alert("Master Excel open failed: "+(e.message||e));
+  }
 }
 
 const MONTHLY_SNAPSHOT_KEY="kohinoor_monthly_excel_snapshot_v3";
@@ -1321,8 +1346,8 @@ async function exportMonthlyProductExcel(){
     }else return;
   }
 
-  // Browser fallback. It is still a first-time export only. The user must connect
-  // this exact downloaded file once; later exports will never create a new workbook.
+  // Browser fallback. This is only for the first-ever Master file.
+  // After this file is connected, later exports never create a new workbook.
   XLSX.writeFile(made.wb,filename);
   markMonthlyMasterCreated();
   saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[]});

@@ -13,8 +13,7 @@
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <title>Kohinoor Chemical PLC — Order Automation</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,"Arial",sans-serif;background:#f4f7f6;color:#18352a}
@@ -194,13 +193,13 @@ textarea{min-height:75px;resize:vertical}
 <div class="modal" id="monthlyExcelModal">
   <div class="modal-box">
     <div class="modal-head"><h3>📊 Monthly Product Excel</h3><button class="close" onclick="closeModal('monthlyExcelModal')">✕</button></div>
-    <div class="small" style="margin-bottom:12px">For the selected month, all <b>Sent Order</b> Product-wise together Excel will be. Market/Shop will not be separated or shown।</div>
+    <div class="small" style="margin-bottom:12px">For the selected month, all <b>Sent Orders</b> are combined Product-wise. Market/Shop is not separated. The connected Excel file is updated automatically.</div>
     <div class="form-grid">
       <div class="field"><label>Select Month</label><input id="excelMonth" type="month"></div>
       <div class="field"><label>Sent Order count</label><input id="excelMonthOrderCount" readonly></div>
     </div>
     <div id="excelMonthSummary" class="total" style="margin-top:12px">Monthly Product Sales: ৳0.00 · 0 Product</div>
-    <div id="monthlyExcelStatus" class="notice" style="margin-top:10px">No monthly Excel file connected. Connect once and this same file will be updated after every sent order.</div>
+    <div id="monthlyExcelStatus" class="notice" style="margin-top:10px">No monthly Excel file connected. Connect your Excel file once. The same file will update after every Sent Order, while your manual Excel edits are preserved.</div>
     <div id="monthlySalesSheet" class="order-table-wrap" style="margin-top:12px"></div>
     <div class="actions">
       <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
@@ -689,58 +688,233 @@ function openMonthlyExcel(){
 }
 
 function monthlyExcelFilename(month){return `Kohinoor_Product_Wise_Sales_${month}.xlsx`;}
-function buildMonthlyWorkbook(month){
+
+const MONTHLY_SNAPSHOT_KEY="kohinoor_monthly_excel_snapshot_v3";
+function monthlySnapshotKey(month){return `${MONTHLY_SNAPSHOT_KEY}_${month}`;}
+function loadMonthlySnapshot(month){try{return JSON.parse(localStorage.getItem(monthlySnapshotKey(month))||"null")}catch(e){return null}}
+function saveMonthlySnapshot(month,data){try{localStorage.setItem(monthlySnapshotKey(month),JSON.stringify(data))}catch(e){console.warn("Could not save Excel snapshot",e)}}
+function excelMonthTitle(month){
+  const d=new Date(`${month}-01T00:00:00`);
+  return d.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+}
+function excelCellValue(ws,addr){return ws&&ws[addr]&&ws[addr].v!==undefined?ws[addr].v:""}
+function excelAddr(r,c){return XLSX.utils.encode_cell({r,c})}
+function normalizeExcelValue(v){return v===null||v===undefined?"":String(v)}
+
+function styleMonthlyWorksheet(ws, lastRow){
+  ws['!cols']=[{wch:6},{wch:17},{wch:34},{wch:13},{wch:15},{wch:16},{wch:14},{wch:20}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:7}},{s:{r:1,c:0},e:{r:1,c:7}},{s:{r:2,c:0},e:{r:2,c:7}}];
+  ws['!freeze']={xSplit:0,ySplit:5};
+  for(let c=0;c<8;c++){
+    const cell=ws[excelAddr(0,c)]; if(cell) cell.s={font:{bold:true,color:"FFFFFF",sz:18},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:"center",vertical:"center"}};
+    const cell2=ws[excelAddr(1,c)]; if(cell2) cell2.s={font:{bold:true,color:"FFFFFF",sz:13},fill:{fgColor:{rgb:"18A66A"}},alignment:{horizontal:"center",vertical:"center"}};
+    const cell3=ws[excelAddr(2,c)]; if(cell3) cell3.s={font:{bold:true,color:"FFFFFF",sz:11},fill:{fgColor:{rgb:"35B779"}},alignment:{horizontal:"center",vertical:"center"}};
+    const head=ws[excelAddr(4,c)]; if(head) head.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"2878D7"}},alignment:{horizontal:"center",vertical:"center",wrapText:true},border:{top:{style:"thin",color:{rgb:"FFFFFF"}},bottom:{style:"thin",color:{rgb:"FFFFFF"}}}};
+  }
+  ws['!rows']=[{hpt:30},{hpt:23},{hpt:21},{hpt:8},{hpt:28}];
+  const totalRow=lastRow;
+  for(let c=0;c<8;c++){
+    const cell=ws[excelAddr(totalRow,c)]; if(cell) cell.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:c===4?"right":"center"}};
+  }
+  for(let r=5;r<totalRow;r++){
+    for(let c=0;c<8;c++){
+      const cell=ws[excelAddr(r,c)];
+      if(cell) cell.s={...(cell.s||{}),alignment:{vertical:"center",horizontal:[0,4,5,6].includes(c)?"center":"left"}};
+    }
+  }
+  for(let r=5;r<totalRow;r+=2){
+    for(let c=0;c<8;c++){
+      const cell=ws[excelAddr(r,c)];
+      if(cell && (!cell.s || !cell.s.fill)) cell.s={...(cell.s||{}),fill:{fgColor:{rgb:"F1FAF6"}}};
+    }
+  }
+}
+
+function createFreshMonthlyWorkbook(month){
   const rows=buildMonthlyProductSales(month);
   const totalQty=rows.reduce((s,r)=>s+Number(r["Total Quantity"]||0),0);
   const totalBonus=rows.reduce((s,r)=>s+Number(r["Total Bonus"]||0),0);
   const totalValue=rows.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
-  const sheetRows=[["Kohinoor Chemical PLC — Product-wise Monthly Sales"],[`Month: ${month}`],[`Sent Orders: ${getOrdersForMonth(month).length}`],[],["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"],...rows.map(r=>[r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]]),[],["","","","","TOTAL",totalQty,totalBonus,totalValue]];
-  const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(sheetRows);ws['!cols']=[{wch:6},{wch:16},{wch:32},{wch:12},{wch:14},{wch:16},{wch:14},{wch:20}];XLSX.utils.book_append_sheet(wb,ws,'Product-wise Sales');
-  const summaryRows=[["Kohinoor Chemical PLC"],["Monthly Product-wise Sales Summary"],["Month",month],["Sent Orders",getOrdersForMonth(month).length],["Products",rows.length],["Total Quantity",totalQty],["Total Bonus",totalBonus],["Total Sales Value",totalValue]];const ws2=XLSX.utils.aoa_to_sheet(summaryRows);ws2['!cols']=[{wch:24},{wch:25}];XLSX.utils.book_append_sheet(wb,ws2,'Summary');
+  const aoa=[
+    ["Kohinoor Chemical PLC"],
+    [`Monthly Product Sales — ${excelMonthTitle(month)}`],
+    [`Sent Orders: ${getOrdersForMonth(month).length}   |   Products: ${rows.length}`],
+    [],
+    ["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"],
+    ...rows.map(r=>[r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]]),
+    ["","","","","TOTAL",totalQty,totalBonus,totalValue]
+  ];
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(aoa);
+  styleMonthlyWorksheet(ws,aoa.length-1);
+  XLSX.utils.book_append_sheet(wb,ws,"Product-wise Sales");
+
+  const summary=[
+    ["Kohinoor Chemical PLC"],[`Monthly Sales Summary — ${excelMonthTitle(month)}`],[],
+    ["Month",excelMonthTitle(month)],
+    ["Sent Orders",getOrdersForMonth(month).length],
+    ["Products",rows.length],
+    ["Total Quantity",totalQty],
+    ["Total Bonus",totalBonus],
+    ["Total Sales Value",totalValue]
+  ];
+  const ws2=XLSX.utils.aoa_to_sheet(summary);
+  ws2['!cols']=[{wch:25},{wch:28}];
+  ws2['A1'].s={font:{bold:true,color:"FFFFFF",sz:18},fill:{fgColor:{rgb:"087F50"}},alignment:{horizontal:"center"}};
+  ws2['A2'].s={font:{bold:true,color:"FFFFFF",sz:13},fill:{fgColor:{rgb:"2878D7"}},alignment:{horizontal:"center"}};
+  XLSX.utils.book_append_sheet(wb,ws2,"Summary");
+  return {wb,rows};
+}
+
+function monthlyRowsForSnapshot(rows){return rows.map(r=>[r["Sl"],r["Product Code"],r["Product Name"],r["Pack"],r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]])}
+
+function mergeMonthlyWorkbookPreservingEdits(wb,month){
+  const fresh=buildMonthlyProductSales(month);
+  let ws=wb.Sheets["Product-wise Sales"];
+  if(!ws){
+    const made=createFreshMonthlyWorkbook(month); saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(fresh),title:excelMonthTitle(month)}); return made.wb;
+  }
+
+  const existing=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:true});
+  const snapshot=loadMonthlySnapshot(month);
+  const snapMap=new Map();
+  (snapshot?.rows||[]).forEach(row=>{const key=String(row[1]||row[2]||"").trim();if(key)snapMap.set(key,row)});
+  const existingMap=new Map();
+  for(let r=5;r<existing.length;r++){
+    const row=existing[r]||[];
+    const key=String(row[1]||row[2]||"").trim();
+    if(key && key!=="TOTAL") existingMap.set(key,{rowIndex:r,row});
+  }
+
+  // Preserve the workbook and the user's own edits. App-owned cells are updated only
+  // when they still equal the last value written by the app. If the user changed a cell,
+  // that cell is left untouched.
+  const outputRows=[];
+  fresh.forEach((r,i)=>{
+    const key=String(r["Product Code"]||r["Product Name"]||"").trim();
+    const generated=[i+1,r["Product Code"],r["Product Name"],r["Pack"],r["Order Count"],r["Total Quantity"],r["Total Bonus"],r["Total Sales Value"]];
+    const old=existingMap.get(key);
+    const prev=snapMap.get(key);
+    const merged=generated.slice();
+    if(old){
+      for(let c=0;c<8;c++){
+        const oldVal=normalizeExcelValue(old.row[c]);
+        const prevVal=normalizeExcelValue(prev?.[c]);
+        if(prev && oldVal!==prevVal) merged[c]=old.row[c];
+      }
+    }
+    outputRows.push(merged);
+  });
+
+  // Keep manually added rows that are not generated by the app.
+  existing.forEach((row,r)=>{
+    if(r<5 || !row)return;
+    const key=String(row[1]||row[2]||"").trim();
+    if(!key || key==="TOTAL")return;
+    if(!fresh.some(x=>String(x["Product Code"]||x["Product Name"]||"").trim()===key)) outputRows.push(row.slice(0,8));
+  });
+
+  const totalQty=fresh.reduce((s,r)=>s+Number(r["Total Quantity"]||0),0);
+  const totalBonus=fresh.reduce((s,r)=>s+Number(r["Total Bonus"]||0),0);
+  const totalValue=fresh.reduce((s,r)=>s+Number(r["Total Sales Value"]||0),0);
+  const headerRows=[
+    ["Kohinoor Chemical PLC"],
+    [`Monthly Product Sales — ${excelMonthTitle(month)}`],
+    [`Sent Orders: ${getOrdersForMonth(month).length}   |   Products: ${fresh.length}`],
+    [],
+    ["Sl","Product Code","Product Name","Pack","Order Count","Total Quantity","Total Bonus","Total Sales Value"]
+  ];
+  const aoa=[...headerRows,...outputRows,["","","","","TOTAL",totalQty,totalBonus,totalValue]];
+  const newWs=XLSX.utils.aoa_to_sheet(aoa);
+  styleMonthlyWorksheet(newWs,aoa.length-1);
+  wb.Sheets["Product-wise Sales"]=newWs;
+  if(!wb.SheetNames.includes("Summary")){
+    const made=createFreshMonthlyWorkbook(month); wb.Sheets["Summary"]=made.wb.Sheets["Summary"]; wb.SheetNames.push("Summary");
+  }else{
+    const sum=wb.Sheets["Summary"];
+    const vals=[["Kohinoor Chemical PLC"],[`Monthly Sales Summary — ${excelMonthTitle(month)}`],[],["Month",excelMonthTitle(month)],["Sent Orders",getOrdersForMonth(month).length],["Products",fresh.length],["Total Quantity",totalQty],["Total Bonus",totalBonus],["Total Sales Value",totalValue]];
+    // Summary is app-managed. Do not replace cells the user has edited compared with snapshot.
+    const oldSummary=XLSX.utils.sheet_to_json(sum,{header:1,defval:"",raw:true});
+    const oldSnap=loadMonthlySnapshot(month)?.summary||[];
+    for(let r=0;r<vals.length;r++)for(let c=0;c<2;c++){
+      const addr=excelAddr(r,c); const old=oldSummary[r]?.[c]??""; const prev=oldSnap[r]?.[c]??"";
+      if(normalizeExcelValue(old)===normalizeExcelValue(prev)||!oldSnap.length) sum[addr]={v:vals[r][c],t:typeof vals[r][c]==="number"?"n":"s"};
+    }
+    sum['!cols']=[{wch:25},{wch:28}];
+  }
+  saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(fresh),summary:[
+    ["Kohinoor Chemical PLC"],[`Monthly Sales Summary — ${excelMonthTitle(month)}`],[],["Month",excelMonthTitle(month)],["Sent Orders",getOrdersForMonth(month).length],["Products",fresh.length],["Total Quantity",totalQty],["Total Bonus",totalBonus],["Total Sales Value",totalValue]
+  ]});
   return wb;
 }
+
 function setMonthlyExcelStatus(text,ok=false){const el=document.getElementById('monthlyExcelStatus');if(el){el.textContent=text;el.className='notice'+(ok?' ok':'')}}
+
 async function writePersistentMonthlyExcel(month){
   if(!monthlyFileHandle)return false;
   const permitted=await verifyMonthlyFilePermission(monthlyFileHandle,true);
   if(!permitted){setMonthlyExcelStatus('Write permission is required. Tap “Restore Write Permission”.');return false}
-  const wb=buildMonthlyWorkbook(month);
-  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-  const writable=await monthlyFileHandle.createWritable();await writable.write(out);await writable.close();
+  let wb;
+  try{
+    const file=await monthlyFileHandle.getFile();
+    const buffer=await file.arrayBuffer();
+    wb=XLSX.read(buffer,{type:'array',cellStyles:true,cellNF:true});
+    wb=mergeMonthlyWorkbookPreservingEdits(wb,month);
+  }catch(e){
+    console.warn('Existing Excel could not be read; creating a fresh workbook.',e);
+    wb=createFreshMonthlyWorkbook(month).wb;
+    saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[]});
+  }
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true});
+  const writable=await monthlyFileHandle.createWritable();
+  await writable.write(out); await writable.close();
   await saveMonthlyFileHandle(monthlyFileHandle,month);
-  setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — automatically updated`,true);
+  setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Dynamic & auto-updating. Your manual Excel edits are preserved.`,true);
   return true;
 }
+
 async function connectOrOpenMonthlyExcel(){
   const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
   if(!('showSaveFilePicker' in window)){alert('Your browser does not support direct Excel file connection. Please use Chrome on Android.');return}
   try{
     if(monthlyFileHandle){
       const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
-      if(ok){await writePersistentMonthlyExcel(month);showToast('✓ Same monthly Excel file updated');return}
+      if(ok){await writePersistentMonthlyExcel(month);showToast('✓ Same monthly Excel file connected and updated');return}
     }
     const saved=await loadMonthlyFileHandle();
     if(saved?.handle){monthlyFileHandle=saved.handle;const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);if(ok){await writePersistentMonthlyExcel(month);showToast('✓ Existing monthly Excel file reconnected');return}}
     monthlyFileHandle=await window.showSaveFilePicker({suggestedName:monthlyExcelFilename(month),types:[{description:'Excel Workbook',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]});
     const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);if(!ok)throw new Error('Write permission was not granted.');
-    await saveMonthlyFileHandle(monthlyFileHandle,month);await writePersistentMonthlyExcel(month);showToast('✓ Monthly Excel connected. It will update after every Order Send.');
+    await saveMonthlyFileHandle(monthlyFileHandle,month);
+    const created=createFreshMonthlyWorkbook(month).wb;
+    const out=XLSX.write(created,{bookType:'xlsx',type:'array',cellStyles:true});
+    const writable=await monthlyFileHandle.createWritable();await writable.write(out);await writable.close();
+    saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[
+      ["Kohinoor Chemical PLC"],[`Monthly Sales Summary — ${excelMonthTitle(month)}`],[],["Month",excelMonthTitle(month)],["Sent Orders",getOrdersForMonth(month).length],["Products",buildMonthlyProductSales(month).length]
+    ]});
+    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Dynamic & auto-updating. Your manual Excel edits are preserved.`,true);
+    showToast('✓ Monthly Excel connected. It will update after every Order Send.');
   }catch(e){if(e.name!=='AbortError')alert('Excel connection failed: '+e.message)}
 }
+
 async function requestMonthlyExcelPermission(){
   if(!monthlyFileHandle){const restored=await restoreMonthlyFileHandle();if(!restored){alert('No saved monthly Excel file was found. Tap “Connect / Open Monthly Excel” first.');return}}
-  const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);if(ok){setMonthlyExcelStatus('Write permission restored. The same Excel file will update after Order Send.',true);await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey());showToast('✓ Write permission restored')}else alert('Write permission was not granted. Please select the Excel file again.');
+  const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
+  if(ok){setMonthlyExcelStatus('Write permission restored. The same Excel file will update after Order Send.',true);await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey());showToast('✓ Write permission restored')}else alert('Write permission was not granted. Please select the Excel file again.');
 }
+
 async function updateMonthlyExcelAfterOrder(){
   const month=getCurrentMonthKey();
   if(!monthlyFileHandle){const saved=await loadMonthlyFileHandle();if(saved?.handle){monthlyFileHandle=saved.handle}}
   if(!monthlyFileHandle)return false;
   try{return await writePersistentMonthlyExcel(month)}catch(e){setMonthlyExcelStatus('Excel is connected but needs write permission. Open Monthly Product Excel and tap Restore Write Permission.');console.warn(e);return false}
 }
+
 async function exportMonthlyProductExcel(){
   const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
   if(!month){alert('Select Month');return}
-  if(currentUser&&navigator.onLine){try{const start=`${month}-01`;const d=new Date(`${month}-01T00:00:00`);d.setMonth(d.getMonth()+1);const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;const {data,error}=await supabaseClient.from('orders').select('*').gte('order_date',start).lt('order_date',end).order('order_date',{ascending:true});if(!error&&Array.isArray(data)){const ids=new Set(orders.map(o=>String(o.id)));data.forEach(o=>{if(ids.has(String(o.id))){const i=orders.findIndex(x=>String(x.id)===String(o.id));if(i>=0)orders[i]=o}else orders.push(o)})}}catch(e){console.warn(e)}}
-  const rows=buildMonthlyProductSales(month);if(!rows.length){alert(`${month} No Sent Orders found for this month.`);return}const wb=buildMonthlyWorkbook(month);XLSX.writeFile(wb,monthlyExcelFilename(month));showToast(`✓ ${month} Product-wise Excel exported`);
+  if(currentUser&&navigator.onLine){try{const start=`${month}-01`;const d=new Date(`${month}-01T00:00:00`);d.setMonth(d.getMonth()+1);const end=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;const {data,error}=await supabaseClient.from('orders').select('*').gte('order_date',start).lt('order_date',end).order('order_date',{ascending:true});if(!error&&Array.isArray(data)){orders=orders.filter(o=>String(o.order_date||o.created_at||"").slice(0,7)!==month).concat(data)}}catch(e){console.warn(e)}}
+  const made=createFreshMonthlyWorkbook(month);XLSX.writeFile(made.wb,monthlyExcelFilename(month));saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[]});showToast(`✓ ${month} Product-wise Excel exported`);
 }
 
 function addNotification(title,text){notifications.unshift({id:Date.now(),title,text,created_at:new Date().toISOString()});notifications=notifications.slice(0,50);localStorage.setItem(LOCAL_NOTICES_KEY,JSON.stringify(notifications));renderNotifications()}

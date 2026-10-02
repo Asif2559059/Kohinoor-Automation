@@ -231,8 +231,45 @@ const MONTHLY_FILE_DB='kohinoor_monthly_excel_db_v2', MONTHLY_FILE_STORE='handle
 function openMonthlyFileDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open(MONTHLY_FILE_DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(MONTHLY_FILE_STORE))r.result.createObjectStore(MONTHLY_FILE_STORE)};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
 async function saveMonthlyFileHandle(handle,month){try{const db=await openMonthlyFileDB();const tx=db.transaction(MONTHLY_FILE_STORE,'readwrite');tx.objectStore(MONTHLY_FILE_STORE).put({handle,month},'current');return new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}catch(e){console.warn('Could not persist Excel handle',e)}}
 async function loadMonthlyFileHandle(){try{const db=await openMonthlyFileDB();return await new Promise((res,rej)=>{const tx=db.transaction(MONTHLY_FILE_STORE,'readonly'),r=tx.objectStore(MONTHLY_FILE_STORE).get('current');r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error)})}catch(e){return null}}
-async function verifyMonthlyFilePermission(handle,request=false){if(!handle)return false;try{let p=await handle.queryPermission({mode:'readwrite'});if(p==='granted')return true;if(request){p=await handle.requestPermission({mode:'readwrite'});return p==='granted'}}catch(e){}return false}
-async function restoreMonthlyFileHandle(){const saved=await loadMonthlyFileHandle();if(!saved?.handle)return false;monthlyFileHandle=saved.handle;const ok=await verifyMonthlyFilePermission(monthlyFileHandle,false);if(ok){showToast('✓ Monthly Excel file connected');return true}return false}
+async function verifyMonthlyFilePermission(handle,request=false){
+  if(!handle)return false;
+  try{
+    let p=await handle.queryPermission({mode:'readwrite'});
+    if(p==='granted')return true;
+    if(request){p=await handle.requestPermission({mode:'readwrite'});return p==='granted'}
+  }catch(e){console.warn('Excel permission check failed:',e)}
+  return false;
+}
+
+// Re-read the persisted FileSystemFileHandle before writing. Android/Chrome can keep an
+// older handle object in memory after Excel/Files modifies the file on disk.
+async function refreshMonthlyFileHandleFromDB(){
+  try{
+    const saved=await loadMonthlyFileHandle();
+    if(saved?.handle){monthlyFileHandle=saved.handle;return monthlyFileHandle}
+  }catch(e){console.warn('Could not refresh Excel handle:',e)}
+  return null;
+}
+
+async function pickExistingMonthlyExcel(){
+  if(!('showOpenFilePicker' in window))return null;
+  const picked=await window.showOpenFilePicker({
+    multiple:false,
+    types:[{description:'Excel Workbook',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]
+  });
+  const handle=picked?.[0]||null;
+  if(handle){monthlyFileHandle=handle;await saveMonthlyFileHandle(handle,document.getElementById('excelMonth')?.value||getCurrentMonthKey());}
+  return handle;
+}
+
+async function restoreMonthlyFileHandle(){
+  const saved=await loadMonthlyFileHandle();
+  if(!saved?.handle)return false;
+  monthlyFileHandle=saved.handle;
+  const ok=await verifyMonthlyFilePermission(monthlyFileHandle,false);
+  if(ok){showToast('✓ Monthly Excel file connected');return true}
+  return false;
+}
 
 const MARKET_SHOPS_KEY="kohinoor_market_shop_list_v2_user_";let marketShops=[],editingMarketShopId=null;
 
@@ -850,55 +887,155 @@ function setMonthlyExcelStatus(text,ok=false){const el=document.getElementById('
 
 async function writePersistentMonthlyExcel(month){
   if(!monthlyFileHandle)return false;
-  const permitted=await verifyMonthlyFilePermission(monthlyFileHandle,true);
-  if(!permitted){setMonthlyExcelStatus('Write permission is required. Tap “Restore Write Permission”.');return false}
-  let wb;
-  try{
-    const file=await monthlyFileHandle.getFile();
-    const buffer=await file.arrayBuffer();
-    wb=XLSX.read(buffer,{type:'array',cellStyles:true,cellNF:true});
-    wb=mergeMonthlyWorkbookPreservingEdits(wb,month);
-  }catch(e){
-    console.warn('Existing Excel could not be read; creating a fresh workbook.',e);
-    wb=createFreshMonthlyWorkbook(month).wb;
-    saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[]});
+
+  // First try the current handle. If Android/Chrome reports that its cached state
+  // changed on disk, reload the handle from IndexedDB and retry before asking the
+  // user to select anything. This prevents unnecessary new Excel downloads/files.
+  let handle=monthlyFileHandle;
+  let retriedWithFreshHandle=false;
+
+  while(true){
+    try{
+      const permitted=await verifyMonthlyFilePermission(handle,true);
+      if(!permitted){
+        if(!retriedWithFreshHandle){
+          const fresh=await refreshMonthlyFileHandleFromDB();
+          if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
+        }
+        setMonthlyExcelStatus('Write permission is required. Tap “Connect / Open Monthly Excel” and select your existing Excel file.');
+        return false;
+      }
+
+      let wb;
+      try{
+        const file=await handle.getFile();
+        const buffer=await file.arrayBuffer();
+        wb=XLSX.read(buffer,{type:'array',cellStyles:true,cellNF:true});
+        wb=mergeMonthlyWorkbookPreservingEdits(wb,month);
+      }catch(e){
+        // A stale FileSystemFileHandle can throw exactly the error shown on Android.
+        // Re-load the persisted handle once before falling back to a fresh workbook.
+        if(!retriedWithFreshHandle){
+          const fresh=await refreshMonthlyFileHandleFromDB();
+          if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
+        }
+        console.warn('Existing Excel could not be read; creating a fresh workbook.',e);
+        wb=createFreshMonthlyWorkbook(month).wb;
+        saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month))});
+      }
+
+      const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true});
+      try{
+        const writable=await handle.createWritable();
+        await writable.write(out);
+        await writable.close();
+      }catch(e){
+        // Retry once using a freshly restored persisted handle.
+        if(!retriedWithFreshHandle){
+          const fresh=await refreshMonthlyFileHandleFromDB();
+          if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
+        }
+        throw e;
+      }
+
+      monthlyFileHandle=handle;
+      await saveMonthlyFileHandle(handle,month);
+      setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Dynamic & auto-updating. Your manual Excel edits are preserved.`,true);
+      return true;
+    }catch(e){
+      console.warn('Monthly Excel write failed:',e);
+      if(!retriedWithFreshHandle){
+        const fresh=await refreshMonthlyFileHandleFromDB();
+        if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
+      }
+      setMonthlyExcelStatus('Excel file changed on disk. Tap “Connect / Open Monthly Excel” and select the same existing Excel file.');
+      return false;
+    }
   }
-  const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true});
-  const writable=await monthlyFileHandle.createWritable();
-  await writable.write(out); await writable.close();
-  await saveMonthlyFileHandle(monthlyFileHandle,month);
-  setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Dynamic & auto-updating. Your manual Excel edits are preserved.`,true);
-  return true;
 }
 
 async function connectOrOpenMonthlyExcel(){
   const month=document.getElementById('excelMonth')?.value||getCurrentMonthKey();
-  if(!('showSaveFilePicker' in window)){alert('Your browser does not support direct Excel file connection. Please use Chrome on Android.');return}
+  if(!('showOpenFilePicker' in window) && !('showSaveFilePicker' in window)){
+    alert('Your browser does not support direct Excel file connection. Please use Chrome on Android.');
+    return;
+  }
   try{
+    // 1) Try the currently connected handle.
     if(monthlyFileHandle){
       const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
-      if(ok){await writePersistentMonthlyExcel(month);showToast('✓ Same monthly Excel file connected and updated');return}
+      if(ok){
+        const wrote=await writePersistentMonthlyExcel(month);
+        if(wrote){showToast('✓ Same monthly Excel file updated');return;}
+      }
     }
-    const saved=await loadMonthlyFileHandle();
-    if(saved?.handle){monthlyFileHandle=saved.handle;const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);if(ok){await writePersistentMonthlyExcel(month);showToast('✓ Existing monthly Excel file reconnected');return}}
+
+    // 2) Try the persisted handle again. This fixes stale in-memory handles.
+    const saved=await refreshMonthlyFileHandleFromDB();
+    if(saved){
+      const ok=await verifyMonthlyFilePermission(saved,true);
+      if(ok){
+        const wrote=await writePersistentMonthlyExcel(month);
+        if(wrote){showToast('✓ Existing monthly Excel file reconnected and updated');return;}
+      }
+    }
+
+    // 3) IMPORTANT: select the EXISTING Excel file instead of automatically creating
+    // a new download/file. The selected file becomes the permanent update target.
+    if('showOpenFilePicker' in window){
+      const handle=await pickExistingMonthlyExcel();
+      if(handle){
+        const ok=await verifyMonthlyFilePermission(handle,true);
+        if(!ok)throw new Error('Write permission was not granted for the selected Excel file.');
+        const wrote=await writePersistentMonthlyExcel(month);
+        if(!wrote)throw new Error('Could not update the selected Excel file.');
+        setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — This same file will update after every Sent Order.`,true);
+        showToast('✓ Existing Excel connected. No new Excel download needed.');
+        return;
+      }
+    }
+
+    // 4) Only if there is no existing file to select, create a new workbook.
+    if(!('showSaveFilePicker' in window))throw new Error('No Excel file selected.');
     monthlyFileHandle=await window.showSaveFilePicker({suggestedName:monthlyExcelFilename(month),types:[{description:'Excel Workbook',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]});
-    const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);if(!ok)throw new Error('Write permission was not granted.');
+    const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
+    if(!ok)throw new Error('Write permission was not granted.');
     await saveMonthlyFileHandle(monthlyFileHandle,month);
     const created=createFreshMonthlyWorkbook(month).wb;
     const out=XLSX.write(created,{bookType:'xlsx',type:'array',cellStyles:true});
-    const writable=await monthlyFileHandle.createWritable();await writable.write(out);await writable.close();
-    saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month)),summary:[
-      ["Kohinoor Chemical PLC"],[`Monthly Sales Summary — ${excelMonthTitle(month)}`],[],["Month",excelMonthTitle(month)],["Sent Orders",getOrdersForMonth(month).length],["Products",buildMonthlyProductSales(month).length]
-    ]});
-    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — Dynamic & auto-updating. Your manual Excel edits are preserved.`,true);
-    showToast('✓ Monthly Excel connected. It will update after every Order Send.');
-  }catch(e){if(e.name!=='AbortError')alert('Excel connection failed: '+e.message)}
+    const writable=await monthlyFileHandle.createWritable();
+    await writable.write(out);await writable.close();
+    saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month))});
+    setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — This same file will update after every Sent Order.`,true);
+    showToast('✓ New monthly Excel created and connected.');
+  }catch(e){
+    if(e.name!=='AbortError')alert('Excel connection failed: '+e.message);
+  }
 }
 
 async function requestMonthlyExcelPermission(){
-  if(!monthlyFileHandle){const restored=await restoreMonthlyFileHandle();if(!restored){alert('No saved monthly Excel file was found. Tap “Connect / Open Monthly Excel” first.');return}}
-  const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
-  if(ok){setMonthlyExcelStatus('Write permission restored. The same Excel file will update after Order Send.',true);await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey());showToast('✓ Write permission restored')}else alert('Write permission was not granted. Please select the Excel file again.');
+  try{
+    if(!monthlyFileHandle)await refreshMonthlyFileHandleFromDB();
+    if(monthlyFileHandle){
+      const ok=await verifyMonthlyFilePermission(monthlyFileHandle,true);
+      if(ok){
+        const wrote=await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey());
+        if(wrote){showToast('✓ Write permission restored and Excel updated');return;}
+      }
+    }
+
+    // If the cached handle is stale, let the user select the SAME existing file.
+    if('showOpenFilePicker' in window){
+      const handle=await pickExistingMonthlyExcel();
+      if(handle){
+        const ok=await verifyMonthlyFilePermission(handle,true);
+        if(!ok)throw new Error('Write permission was not granted.');
+        const wrote=await writePersistentMonthlyExcel(document.getElementById('excelMonth')?.value||getCurrentMonthKey());
+        if(wrote){showToast('✓ Existing Excel reconnected and write permission restored');return;}
+      }
+    }
+    alert('Please select your existing Excel file. A new Excel file is not required.');
+  }catch(e){if(e.name!=='AbortError')alert('Excel permission failed: '+e.message)}
 }
 
 async function updateMonthlyExcelAfterOrder(){

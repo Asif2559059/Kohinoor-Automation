@@ -205,8 +205,7 @@ textarea{min-height:75px;resize:vertical}
       <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
       <button class="btn btn-info" onclick="connectOrOpenMonthlyExcel()">📂 Connect / Open Monthly Excel</button>
       <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Google Sheet</button>
-      <button class="btn btn-light" onclick="setGoogleSheetUrl()">⚙️ Set Google Sheet</button>
-      <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
+            <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
       <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export New Excel</button>
       <button class="btn btn-light" onclick="closeModal('monthlyExcelModal')">Close</button>
     </div>
@@ -455,13 +454,11 @@ async function sendDraftOrder(draftId){
 
   // Then send the same order's product totals to Google Sheets.
   let sheetOk=false;
-  const sheetDraft={...draft,id:data?.id||draft.id};
   try{
-    await sendOrderToGoogleSheet(sheetDraft);
+    await sendOrderToGoogleSheet({...draft,id:data?.id||draft.id});
     sheetOk=true;
   }catch(e){
     console.error("Google Sheet send failed:",e);
-    await queueGoogleSheetOrder(sheetDraft);
   }
 
   draftOrders=draftOrders.filter(x=>x.id!==draftId);
@@ -791,11 +788,16 @@ function buildGoogleSheetPayload(draft){
   };
 }
 
-async function postGoogleSheetPayload(payload,silent=false){
+async function sendOrderToGoogleSheet(draft, silent=false){
+  const payload=buildGoogleSheetPayload(draft);
   const body=JSON.stringify(payload);
   let lastError=null;
+
   for(let attempt=1;attempt<=3;attempt++){
     try{
+      // Apps Script Web Apps commonly redirect the POST request. no-cors is
+      // intentional here: the browser is allowed to submit the request even
+      // though it cannot read the redirected response.
       await fetch(GOOGLE_SHEET_WEB_APP_URL,{
         method:"POST",
         mode:"no-cors",
@@ -809,14 +811,10 @@ async function postGoogleSheetPayload(payload,silent=false){
       return true;
     }catch(e){
       lastError=e;
-      if(attempt<3)await new Promise(r=>setTimeout(r,800*attempt));
+      if(attempt<3) await new Promise(r=>setTimeout(r,700*attempt));
     }
   }
   throw lastError||new Error("Google Sheet request failed");
-}
-
-async function sendOrderToGoogleSheet(draft,silent=false){
-  return postGoogleSheetPayload(buildGoogleSheetPayload(draft),silent);
 }
 
 async function queueGoogleSheetOrder(draft){
@@ -837,43 +835,19 @@ async function syncGoogleSheetQueue(){
   const remaining=[];
   for(const payload of q){
     try{
-      await postGoogleSheetPayload(payload,true);
+      await sendOrderToGoogleSheet({id:payload.orderId,order_date:payload.month+"-01",shop:payload.shop,products:payload.products},true);
     }catch(e){
       remaining.push(payload);
     }
   }
   saveGoogleSheetQueue(remaining);
-  if(q.length && !remaining.length)showToast("✅ Pending Google Sheet updates completed");
+  if(q.length && !remaining.length) showToast("✅ Pending Google Sheet updates completed");
 }
 
-const GOOGLE_SHEET_URL_KEY="kohinoor_google_sheet_url_v1";
-function getGoogleSheetUrl(){return String(localStorage.getItem(GOOGLE_SHEET_URL_KEY)||"").trim();}
-function setGoogleSheetUrl(){
-  const current=getGoogleSheetUrl();
-  const url=prompt("Paste your Google Sheet link here:",current);
-  if(url===null)return;
-  const value=String(url).trim();
-  if(!value){localStorage.removeItem(GOOGLE_SHEET_URL_KEY);showToast("Google Sheet link cleared");return;}
-  if(!/^https:\/\/(docs\.google\.com\/spreadsheets\/|drive\.google\.com\/)/i.test(value)){
-    alert("Please enter a valid Google Sheets link.");
-    return;
-  }
-  localStorage.setItem(GOOGLE_SHEET_URL_KEY,value);
-  showToast("✓ Google Sheet link saved");
-}
+const GOOGLE_SHEET_URL="https://docs.google.com/spreadsheets/d/1yQyfl5GRxPyhQVmmKUEFJ3K8wZlQ5rDXlrq5A23JdKs/edit";
+
 function openGoogleSheet(){
-  let url=getGoogleSheetUrl();
-  if(!url){
-    const entered=prompt("First, paste your Google Sheet link:");
-    if(entered===null)return;
-    url=String(entered).trim();
-    if(!/^https:\/\/(docs\.google\.com\/spreadsheets\/|drive\.google\.com\/)/i.test(url)){
-      alert("Please enter a valid Google Sheets link.");
-      return;
-    }
-    localStorage.setItem(GOOGLE_SHEET_URL_KEY,url);
-  }
-  window.open(url,"_blank","noopener,noreferrer");
+  window.open(GOOGLE_SHEET_URL,"_blank","noopener,noreferrer");
 }
 
 const MONTHLY_SNAPSHOT_KEY="kohinoor_monthly_excel_snapshot_v3";

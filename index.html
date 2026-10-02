@@ -978,7 +978,7 @@ async function writePersistentMonthlyExcel(month){
       try{
         const file=await handle.getFile();
         const buffer=await file.arrayBuffer();
-        wb=XLSX.read(buffer,{type:'array',cellStyles:true,cellNF:true});
+        wb=XLSX.read(buffer,{type:'array',cellStyles:true,cellNF:true,cellDates:true});
         wb=mergeMonthlyWorkbookPreservingEdits(wb,month);
       }catch(e){
         // A stale FileSystemFileHandle can throw exactly the error shown on Android.
@@ -987,9 +987,13 @@ async function writePersistentMonthlyExcel(month){
           const fresh=await refreshMonthlyFileHandleFromDB();
           if(fresh && fresh!==handle){handle=fresh;retriedWithFreshHandle=true;continue}
         }
-        console.warn('Existing Excel could not be read; creating a fresh workbook.',e);
-        wb=createFreshMonthlyWorkbook(month).wb;
-        saveMonthlySnapshot(month,{rows:monthlyRowsForSnapshot(buildMonthlyProductSales(month))});
+        // NEVER replace an existing workbook with a fresh workbook here.
+        // If the handle is stale or the file changed on disk, doing that would
+        // rebuild the sheet and destroy the user's manually edited colours,
+        // fonts, borders and other formatting. Force a reconnect instead.
+        console.warn('Existing Excel could not be read; refusing to rebuild it.',e);
+        setMonthlyExcelStatus('The existing Excel file could not be read safely. Please reconnect the SAME Excel file. Your formatting will not be replaced.',false);
+        return false;
       }
 
       const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true});

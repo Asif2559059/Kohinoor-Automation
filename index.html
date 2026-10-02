@@ -441,17 +441,42 @@ function exportLatestOrderToExcel(order){
 
 async function sendCurrentDraft(){if(!editingDraftId){alert("Save the draft first। Then Draft open Send Order click।");return}const data=getOrderFormData();if(!data)return;const i=draftOrders.findIndex(x=>x.id===editingDraftId);if(i<0){alert("Draft not found");return}draftOrders[i]={...draftOrders[i],...data,updated_at:new Date().toISOString()};saveDrafts();await sendDraftOrder(editingDraftId)}
 async function sendDraftOrder(draftId){
- const draft=draftOrders.find(x=>x.id===draftId);if(!draft){alert("Draft not found");return}
- if(!navigator.onLine){draft.status="pending_send";saveDrafts();renderHistory();showToast("Offline: Added to send queue. It will be sent automatically when the internet returns");return}
- if(!draft.autoSync&&!confirm(`"${draft.shop}" of Order Send online?`))return;
- if(!currentUser){alert("Online Order send before Login do।");return}
- const payload={user_id:currentUser.id,market:draft.market||"",shop:draft.shop,shop_code:draft.shop_code||"",address:draft.address,mobile:draft.mobile,representative:draft.representative,order_date:draft.order_date,delivery_date:draft.delivery_date,note:draft.note,products:(draft.products||[]).map(p=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0),quantity=Number(p.quantity||0);return {product_id:p.product_id||null,code:p.code||"",name:p.name||"",pack:p.pack||"",base_price:Number(p.base_price??p.price??0),price:selectedRate,carton_rate:Number(p.carton_rate||0),tp_rate:Number(p.tp_rate||0),offer:p.offer||"",rate_type:rateType,rate:selectedRate,quantity,bonus:Number(p.bonus||0),value:selectedRate*quantity}}),total:(draft.products||[]).reduce((sum,p)=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);return sum+selectedRate*Number(p.quantity||0)},0)};
- const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
- if(error){draft.status="pending_send";saveDrafts();alert("❌ Order was not sent; kept as pending:\n"+error.message);return}
- draftOrders=draftOrders.filter(x=>x.id!==draftId);saveDrafts();if(data){orders.unshift(data); updateMonthlyExcelAfterOrder().then(ok=>{if(ok)showToast('✓ Order sent and monthly Excel updated');else showToast('✓ Order sent. Monthly Excel needs permission');});}addNotification("Order Sent",`${draft.shop} order has been sent online.`);updateDashboard();renderHistory();if(document.getElementById("monthlyExcelModal")?.classList.contains("show"))refreshMonthlySalesSheet();closeModal("orderModal");showToast("✅ Order sent online successfully")
+  const draft=draftOrders.find(x=>x.id===draftId);
+  if(!draft){alert("Draft not found");return}
+  if(!navigator.onLine){draft.status="pending_send";saveDrafts();renderHistory();showToast("Offline: Added to send queue. It will be sent automatically when the internet returns");return}
+  if(!draft.autoSync&&!confirm(`"${draft.shop}" of Order Send online?`))return;
+  if(!currentUser){alert("Online Order send before Login do।");return}
+
+  const payload={user_id:currentUser.id,market:draft.market||"",shop:draft.shop,shop_code:draft.shop_code||"",address:draft.address,mobile:draft.mobile,representative:draft.representative,order_date:draft.order_date,delivery_date:draft.delivery_date,note:draft.note,products:(draft.products||[]).map(p=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0),quantity=Number(p.quantity||0);return {product_id:p.product_id||null,code:p.code||"",name:p.name||"",pack:p.pack||"",base_price:Number(p.base_price??p.price??0),price:selectedRate,carton_rate:Number(p.carton_rate||0),tp_rate:Number(p.tp_rate||0),offer:p.offer||"",rate_type:rateType,rate:selectedRate,quantity,bonus:Number(p.bonus||0),value:selectedRate*quantity}}),total:(draft.products||[]).reduce((sum,p)=>{const rateType=p.rate_type==="carton"?"carton":"main",selectedRate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);return sum+selectedRate*Number(p.quantity||0)},0)};
+
+  // First save the order to Supabase. If that fails, keep the draft.
+  const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
+  if(error){draft.status="pending_send";saveDrafts();alert("❌ Order was not sent; kept as pending:\n"+error.message);return}
+
+  // Then send the same order's product totals to Google Sheets.
+  let sheetOk=false;
+  try{
+    await sendOrderToGoogleSheet({...draft,id:data?.id||draft.id});
+    sheetOk=true;
+  }catch(e){
+    console.error("Google Sheet send failed:",e);
+  }
+
+  draftOrders=draftOrders.filter(x=>x.id!==draftId);
+  saveDrafts();
+  if(data){orders.unshift(data); updateMonthlyExcelAfterOrder().then(ok=>{
+    if(ok)showToast(sheetOk?'✓ Order sent + Google Sheet updated':'✓ Order sent. Google Sheet update failed');
+    else showToast(sheetOk?'✓ Order sent + Google Sheet updated':'✓ Order sent. Monthly Excel needs permission');
+  });}
+  addNotification("Order Sent",`${draft.shop} order has been sent online.`);
+  updateDashboard();
+  renderHistory();
+  if(document.getElementById("monthlyExcelModal")?.classList.contains("show"))refreshMonthlySalesSheet();
+  closeModal("orderModal");
+  showToast(sheetOk?"✅ Order sent and Google Sheet updated":"⚠️ Order sent, but Google Sheet update could not be confirmed");
 }
 async function syncPendingOrders(){if(syncRunning||!navigator.onLine||!currentUser)return;syncRunning=true;try{const pending=draftOrders.filter(d=>d.status==="pending_send");for(const d of pending){if(!navigator.onLine)break;d.autoSync=true;await sendDraftOrder(d.id);delete d.autoSync}}finally{syncRunning=false}}
-window.addEventListener("online",()=>{const el=document.getElementById("onlineStatus");if(el){el.textContent="Online — Sync is happening";el.className="online"}syncPendingOrders()});
+window.addEventListener("online",()=>{const el=document.getElementById("onlineStatus");if(el){el.textContent="Online — Sync is happening";el.className="online"}syncPendingOrders();syncGoogleSheetQueue()});
 async function loadOrdersFromSupabase(){if(!currentUser)return;const {data,error}=await supabaseClient.from("orders").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}orders=data||[];updateDashboard();renderHistory()}
 function getOrderLocalDate(order){
   const raw=String(order?.order_date||order?.created_at||"");
@@ -729,6 +754,97 @@ function openMonthlyExcel(){
 function monthlyExcelFilename(month){return `Kohinoor_Product_Wise_Sales_${month}.xlsx`;}
 
 // Google Sheet shortcut: stores the user's own Sheet URL locally and opens it directly.
+const GOOGLE_SHEET_WEB_APP_URL="https://script.google.com/macros/s/AKfycbwwZSrIoy1IVnH7QqAspslLfnsopR5OzHTqm3SRtwUwm0usBIivtphFGXVNj8Qn2E3v/exec";
+const GOOGLE_SHEET_QUEUE_KEY="kohinoor_google_sheet_queue_v2";
+
+function loadGoogleSheetQueue(){
+  try{return JSON.parse(localStorage.getItem(GOOGLE_SHEET_QUEUE_KEY)||"[]")}catch(e){return []}
+}
+function saveGoogleSheetQueue(q){
+  try{localStorage.setItem(GOOGLE_SHEET_QUEUE_KEY,JSON.stringify(q))}catch(e){console.warn("Google Sheet queue save failed",e)}
+}
+
+function buildGoogleSheetPayload(draft){
+  const items=Array.isArray(draft?.products)?draft.products:[];
+  if(!items.length) throw new Error("No products to send to Google Sheet");
+  const month=String(draft.order_date||new Date().toISOString()).slice(0,7);
+  const products=items.map(p=>{
+    const rateType=p.rate_type==="carton"?"carton":"main";
+    const rate=rateType==="carton"?Number(p.carton_rate||0):Number(p.base_price??p.price??0);
+    const quantity=Number(p.quantity||0);
+    return {
+      productName:String(p.name||p.productName||"").trim(),
+      pack:String(p.pack||"").trim(),
+      totalQuantity:quantity,
+      totalSalesValue:Number((rate*quantity).toFixed(2))
+    };
+  }).filter(p=>p.productName);
+  if(!products.length) throw new Error("No valid products to send to Google Sheet");
+  return {
+    action:"order",
+    orderId:String(draft.id||""),
+    month,
+    shop:String(draft.shop||""),
+    products
+  };
+}
+
+async function sendOrderToGoogleSheet(draft, silent=false){
+  const payload=buildGoogleSheetPayload(draft);
+  const body=JSON.stringify(payload);
+  let lastError=null;
+
+  for(let attempt=1;attempt<=3;attempt++){
+    try{
+      // Apps Script Web Apps commonly redirect the POST request. no-cors is
+      // intentional here: the browser is allowed to submit the request even
+      // though it cannot read the redirected response.
+      await fetch(GOOGLE_SHEET_WEB_APP_URL,{
+        method:"POST",
+        mode:"no-cors",
+        redirect:"follow",
+        cache:"no-store",
+        keepalive:true,
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body
+      });
+      if(!silent)showToast("📗 Google Sheet update request sent");
+      return true;
+    }catch(e){
+      lastError=e;
+      if(attempt<3) await new Promise(r=>setTimeout(r,700*attempt));
+    }
+  }
+  throw lastError||new Error("Google Sheet request failed");
+}
+
+async function queueGoogleSheetOrder(draft){
+  try{
+    const payload=buildGoogleSheetPayload(draft);
+    const q=loadGoogleSheetQueue();
+    const id=String(payload.orderId||draft.id||"");
+    const filtered=q.filter(x=>String(x?.orderId||"")!==id);
+    filtered.push(payload);
+    saveGoogleSheetQueue(filtered);
+  }catch(e){console.warn("Could not queue Google Sheet order",e)}
+}
+
+async function syncGoogleSheetQueue(){
+  if(!navigator.onLine)return;
+  const q=loadGoogleSheetQueue();
+  if(!q.length)return;
+  const remaining=[];
+  for(const payload of q){
+    try{
+      await sendOrderToGoogleSheet({id:payload.orderId,order_date:payload.month+"-01",shop:payload.shop,products:payload.products},true);
+    }catch(e){
+      remaining.push(payload);
+    }
+  }
+  saveGoogleSheetQueue(remaining);
+  if(q.length && !remaining.length) showToast("✅ Pending Google Sheet updates completed");
+}
+
 const GOOGLE_SHEET_URL_KEY="kohinoor_google_sheet_url_v1";
 function getGoogleSheetUrl(){return String(localStorage.getItem(GOOGLE_SHEET_URL_KEY)||"").trim();}
 function setGoogleSheetUrl(){
@@ -1139,6 +1255,8 @@ function setupRealtime(){
 }
 function startPolling(){clearInterval(pollingTimer);pollingTimer=setInterval(loadOrdersFromSupabase,20000)}
 window.addEventListener("beforeunload",()=>{if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel)});
+
+window.addEventListener("load",()=>{setTimeout(()=>{if(navigator.onLine)syncGoogleSheetQueue()},1200)});
 </script>
 </body>
 </html>

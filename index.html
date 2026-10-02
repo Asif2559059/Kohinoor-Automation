@@ -204,6 +204,7 @@ textarea{min-height:75px;resize:vertical}
     <div class="actions">
       <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
       <button class="btn btn-info" onclick="connectOrOpenMonthlyExcel()">📂 Connect / Open Monthly Excel</button>
+      <button class="btn btn-light" onclick="openConnectedMonthlyExcel()">📂 Open Connected Excel</button>
       <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Google Sheet</button>
             <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
       <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export New Excel</button>
@@ -1165,6 +1166,37 @@ async function connectOrOpenMonthlyExcel(){
     showToast('✓ Same existing Excel connected');
   }catch(e){
     if(e.name!=='AbortError')alert('Excel connection failed: '+e.message);
+  }
+}
+
+async function openConnectedMonthlyExcel(){
+  try{
+    let handle=monthlyFileHandle;
+    if(!handle){
+      const saved=await loadMonthlyFileHandle();
+      handle=saved?.handle||null;
+      if(handle) monthlyFileHandle=handle;
+    }
+    if(!handle){
+      alert('আগে “Connect / Open Monthly Excel” চাপ দিয়ে আপনার একই Excel ফাইলটি নির্বাচন করুন।');
+      return;
+    }
+    const ok=await verifyMonthlyFilePermission(handle,true);
+    if(!ok){
+      alert('Excel ফাইলের permission পাওয়া যায়নি। “Restore Write Permission” চাপুন বা একই Excel ফাইলটি আবার Connect করুন।');
+      return;
+    }
+    const file=await handle.getFile();
+    const url=URL.createObjectURL(file);
+    const w=window.open(url,'_blank','noopener,noreferrer');
+    if(!w){
+      alert('Excel ফাইলটি খুলতে browser popup permission দিন।');
+      URL.revokeObjectURL(url);
+      return;
+    }
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }catch(e){
+    if(e.name!=='AbortError') alert('Excel খুলতে সমস্যা হয়েছে: '+(e.message||e));
   }
 }
 

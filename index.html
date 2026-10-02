@@ -192,21 +192,18 @@ textarea{min-height:75px;resize:vertical}
 
 <div class="modal" id="monthlyExcelModal">
   <div class="modal-box">
-    <div class="modal-head"><h3>📊 Monthly Product Excel</h3><button class="close" onclick="closeModal('monthlyExcelModal')">✕</button></div>
-    <div class="small" style="margin-bottom:12px">For the selected month, all <b>Sent Orders</b> are combined Product-wise. Market/Shop is not separated. The connected Excel file is updated automatically.</div>
+    <div class="modal-head"><h3>📊 Monthly Product Sales</h3><button class="close" onclick="closeModal('monthlyExcelModal')">✕</button></div>
+    <div class="small" style="margin-bottom:12px">For the selected month, all <b>Sent Orders</b> are combined Product-wise. Market/Shop is not separated. The Google Sheet is the main online sales report and is updated after Sent Order.</div>
     <div class="form-grid">
       <div class="field"><label>Select Month</label><input id="excelMonth" type="month"></div>
       <div class="field"><label>Sent Order count</label><input id="excelMonthOrderCount" readonly></div>
     </div>
     <div id="excelMonthSummary" class="total" style="margin-top:12px">Monthly Product Sales: ৳0.00 · 0 Product</div>
-    <div id="monthlyExcelStatus" class="notice" style="margin-top:10px">No monthly Excel file connected. Connect your Excel file once. The same file will update after every Sent Order, while your manual Excel edits are preserved.</div>
+    <div id="monthlyExcelStatus" class="notice" style="margin-top:10px">📗 Google Sheet is connected. After every Sent Order, Product-wise Quantity and Sales are sent to the Google Sheet. Your Sheet design/formatting is not changed by the app.</div>
     <div id="monthlySalesSheet" class="order-table-wrap" style="margin-top:12px"></div>
     <div class="actions">
-      <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sheet</button>
-      <button class="btn btn-info" onclick="connectOrOpenMonthlyExcel()">📂 Connect / Open Monthly Excel</button>
-      <button class="btn btn-light" onclick="openConnectedMonthlyExcel()">📂 Open Connected Excel</button>
+      <button class="btn btn-primary" onclick="refreshMonthlySalesSheet()">🔄 Refresh Monthly Sales</button>
       <button class="btn btn-primary" onclick="openGoogleSheet()">📗 Open Google Sheet</button>
-            <button class="btn btn-light" onclick="requestMonthlyExcelPermission()">🔐 Restore Write Permission</button>
       <button class="btn btn-light" onclick="exportMonthlyProductExcel()">📥 Export New Excel</button>
       <button class="btn btn-light" onclick="closeModal('monthlyExcelModal')">Close</button>
     </div>
@@ -453,27 +450,27 @@ async function sendDraftOrder(draftId){
   const {data,error}=await supabaseClient.from("orders").insert(payload).select().single();
   if(error){draft.status="pending_send";saveDrafts();alert("❌ Order was not sent; kept as pending:\n"+error.message);return}
 
-  // Then send the same order's product totals to Google Sheets.
+  // Then send the same order's product totals to Google Sheet.
+  // If the request fails, keep a local queue so it can retry when internet returns.
+  const sheetDraft={...draft,id:data?.id||draft.id};
   let sheetOk=false;
   try{
-    await sendOrderToGoogleSheet({...draft,id:data?.id||draft.id});
+    await sendOrderToGoogleSheet(sheetDraft);
     sheetOk=true;
   }catch(e){
     console.error("Google Sheet send failed:",e);
+    await queueGoogleSheetOrder(sheetDraft);
   }
 
   draftOrders=draftOrders.filter(x=>x.id!==draftId);
   saveDrafts();
-  if(data){orders.unshift(data); updateMonthlyExcelAfterOrder().then(ok=>{
-    if(ok)showToast(sheetOk?'✓ Order sent + Google Sheet updated':'✓ Order sent. Google Sheet update failed');
-    else showToast(sheetOk?'✓ Order sent + Google Sheet updated':'✓ Order sent. Monthly Excel needs permission');
-  });}
+  if(data){orders.unshift(data);}
   addNotification("Order Sent",`${draft.shop} order has been sent online.`);
   updateDashboard();
   renderHistory();
   if(document.getElementById("monthlyExcelModal")?.classList.contains("show"))refreshMonthlySalesSheet();
   closeModal("orderModal");
-  showToast(sheetOk?"✅ Order sent and Google Sheet updated":"⚠️ Order sent, but Google Sheet update could not be confirmed");
+  showToast(sheetOk?"✅ Order sent and Google Sheet update request sent":"⚠️ Order sent. Google Sheet update queued for retry");
 }
 async function syncPendingOrders(){if(syncRunning||!navigator.onLine||!currentUser)return;syncRunning=true;try{const pending=draftOrders.filter(d=>d.status==="pending_send");for(const d of pending){if(!navigator.onLine)break;d.autoSync=true;await sendDraftOrder(d.id);delete d.autoSync}}finally{syncRunning=false}}
 window.addEventListener("online",()=>{const el=document.getElementById("onlineStatus");if(el){el.textContent="Online — Sync is happening";el.className="online"}syncPendingOrders();syncGoogleSheetQueue()});
@@ -725,7 +722,7 @@ async function refreshMonthlySalesSheet(){
   }
   updateMonthlyExcelPreview();
   renderMonthlySalesSheet(month);
-  showToast(`✅ ${month} monthly sales sheet updated`);
+  showToast(`✅ ${month} monthly sales preview updated`);
 }
 
 function updateMonthlyExcelPreview(){
@@ -1160,68 +1157,12 @@ async function connectOrOpenMonthlyExcel(){
     if(!handle)return;
     const ok=await verifyMonthlyFilePermission(handle,true);
     if(!ok)throw new Error('Write permission was not granted for the selected Excel file.');
-    await saveMonthlyFileHandle(handle,month);
+    const wrote=await writePersistentMonthlyExcel(month,false);
+    if(!wrote)throw new Error('Could not update the selected Excel file. Close Excel/Sheets if it is open and try again.');
     setMonthlyExcelStatus(`Connected: ${monthlyExcelFilename(month)} — This same file will update after every Sent Order. Existing formatting is preserved.`,true);
     showToast('✓ Same existing Excel connected');
   }catch(e){
     if(e.name!=='AbortError')alert('Excel connection failed: '+e.message);
-  }
-}
-
-async function openConnectedMonthlyExcel(){
-  try{
-    let handle=monthlyFileHandle;
-    if(!handle){
-      const saved=await loadMonthlyFileHandle();
-      handle=saved?.handle||null;
-      if(handle) monthlyFileHandle=handle;
-    }
-    if(!handle){
-      alert('আগে “Connect / Open Monthly Excel” চাপ দিয়ে আপনার একই Excel ফাইলটি নির্বাচন করুন।');
-      return;
-    }
-    let ok=await verifyMonthlyFilePermission(handle,true);
-    if(!ok){
-      alert('Excel ফাইলের permission পাওয়া যায়নি। একই Excel ফাইলটি আবার Connect করুন।');
-      return;
-    }
-
-    let file;
-    try{
-      file=await handle.getFile();
-    }catch(readErr){
-      // Android/Chrome can invalidate a previously saved FileSystemFileHandle
-      // after Files/Excel moves, replaces, or saves the workbook. In that case
-      // immediately ask the user to select the SAME existing .xlsx again.
-      console.warn('Saved Excel handle is stale:',readErr);
-      if('showOpenFilePicker' in window){
-        const fresh=await pickExistingMonthlyExcel();
-        if(!fresh)return;
-        ok=await verifyMonthlyFilePermission(fresh,true);
-        if(!ok){
-          alert('Excel ফাইলের permission দেওয়া হয়নি। আবার একই ফাইলটি Connect করুন।');
-          return;
-        }
-        handle=fresh;
-        monthlyFileHandle=fresh;
-        await saveMonthlyFileHandle(fresh,document.getElementById('excelMonth')?.value||getCurrentMonthKey());
-        file=await fresh.getFile();
-      }else{
-        alert('এই browser-এ Excel ফাইলটি আবার নির্বাচন করার সুবিধা নেই। Chrome ব্যবহার করুন।');
-        return;
-      }
-    }
-
-    const url=URL.createObjectURL(file);
-    const w=window.open(url,'_blank','noopener,noreferrer');
-    if(!w){
-      alert('Excel ফাইলটি খুলতে browser popup permission দিন।');
-      URL.revokeObjectURL(url);
-      return;
-    }
-    setTimeout(()=>URL.revokeObjectURL(url),60000);
-  }catch(e){
-    if(e.name!=='AbortError') alert('Excel খুলতে সমস্যা হয়েছে। একই Excel ফাইলটি আবার Connect করুন।');
   }
 }
 

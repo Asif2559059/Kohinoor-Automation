@@ -180,7 +180,7 @@ textarea{min-height:75px;resize:vertical}
 
 <div class="modal" id="marketShopModal"><div class="modal-box">
   <div class="modal-head"><h3>📍 Market & Shop List</h3><button class="close" onclick="closeModal('marketShopModal')">✕</button></div>
-  <div class="small" style="margin-bottom:10px">Add new markets and shops here. Existing information can be edited or deleted. Data is stored on this device.</div>
+  <div class="small" style="margin-bottom:10px">Add new markets and shops here. Existing information can be edited or deleted. Data is saved on this device and backed up online when cloud backup is configured.</div>
   <div class="form-grid">
     <div class="field"><label>Market Name *</label><input id="msMarket" placeholder="Example: Mirpur Market"></div><div class="field"><label>Shop Name *</label><input id="msShop" placeholder="Example: Rahim Store"></div>
     <div class="field"><label>Shop Code</label><input id="msShopCode" placeholder="Example: S-001"></div><div class="field full"><label>Address</label><input id="msAddress" placeholder="Shop Address"></div>
@@ -1371,8 +1371,52 @@ function renderNotifications(){const box=document.getElementById("notificationLi
 function openNotifications(){renderNotifications();openModal("notificationModal")}
 
 function getMarketShopsKey(){return currentUser?.id?MARKET_SHOPS_KEY+currentUser.id:null}
-function loadMarketShops(){const key=getMarketShopsKey();if(!key){marketShops=[];populateMarketSelect();populateShopSelect();return}try{marketShops=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(marketShops))marketShops=[]}catch{marketShops=[]}populateMarketSelect();populateShopSelect()}
-function saveMarketShops(){const key=getMarketShopsKey();if(!key){alert("User session not found. Please Login again.");return}localStorage.setItem(key,JSON.stringify(marketShops));populateMarketSelect();populateShopSelect()}
+const MARKET_SHOPS_BACKUP_KEY="kohinoor_market_shop_backup_v1_user_";
+function getMarketShopsBackupKey(){return currentUser?.id?MARKET_SHOPS_BACKUP_KEY+currentUser.id:null}
+function parseMarketShopList(value){try{const parsed=JSON.parse(value||"[]");return Array.isArray(parsed)?parsed:[]}catch(e){return []}}
+function saveMarketShopsLocal(){
+  const key=getMarketShopsKey(),backupKey=getMarketShopsBackupKey(),data=JSON.stringify(marketShops);
+  if(key){try{localStorage.setItem(key,data)}catch(e){console.warn("Market/shop local save failed",e)}}
+  if(backupKey){try{localStorage.setItem(backupKey,data)}catch(e){console.warn("Market/shop backup save failed",e)}}
+}
+async function loadMarketShops(){
+  const key=getMarketShopsKey(),backupKey=getMarketShopsBackupKey();
+  if(!key){marketShops=[];populateMarketSelect();populateShopSelect();return}
+  marketShops=parseMarketShopList(localStorage.getItem(key));
+  if(!marketShops.length&&backupKey){
+    const backup=parseMarketShopList(localStorage.getItem(backupKey));
+    if(backup.length)marketShops=backup;
+  }
+  populateMarketSelect();populateShopSelect();
+  // Cloud copy protects market/shop data when changing browser storage or reinstalling the app.
+  try{
+    const {data,error}=await supabaseClient.from("market_shop_backups").select("data").eq("user_id",currentUser.id).maybeSingle();
+    if(error)throw error;
+    if(data&&Array.isArray(data.data)){
+      marketShops=data.data;
+      saveMarketShopsLocal();
+      populateMarketSelect();populateShopSelect();
+      if(document.getElementById("marketShopModal")?.classList.contains("show"))renderMarketShopList();
+    }else if(marketShops.length){
+      await saveMarketShopsCloud();
+    }
+  }catch(e){console.warn("Market/shop cloud backup unavailable:",e)}
+}
+async function saveMarketShopsCloud(){
+  if(!currentUser?.id)return false;
+  const {error}=await supabaseClient.from("market_shop_backups").upsert({user_id:currentUser.id,data:marketShops,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+  if(error)throw error;
+  return true;
+}
+function saveMarketShops(){
+  const key=getMarketShopsKey();
+  if(!key){alert("User session not found. Please Login again.");return}
+  saveMarketShopsLocal();populateMarketSelect();populateShopSelect();
+  saveMarketShopsCloud().then(()=>showToast("✅ Market/Shop saved with cloud backup")).catch(e=>{
+    console.error("Market/shop cloud save failed:",e);
+    showToast("⚠️ Saved on this device; cloud backup needs setup");
+  });
+}
 function openMarketShopManager(){loadMarketShops();clearMarketShopForm();renderMarketShopList();openModal("marketShopModal")}
 function clearMarketShopForm(){editingMarketShopId=null;["msMarket","msShop","msShopCode","msAddress","msMobile","msRepresentative"].forEach(id=>document.getElementById(id).value="")}
 function saveMarketShop(){const market=document.getElementById("msMarket").value.trim(),shop=document.getElementById("msShop").value.trim();if(!market){alert("Enter Market Name");return}if(!shop){alert("Enter Shop Name");return}const item={id:editingMarketShopId||("ms-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)),market,shop,shop_code:document.getElementById("msShopCode").value.trim(),address:document.getElementById("msAddress").value.trim(),mobile:document.getElementById("msMobile").value.trim(),representative:document.getElementById("msRepresentative").value.trim(),updated_at:new Date().toISOString()};if(editingMarketShopId){const i=marketShops.findIndex(x=>x.id===editingMarketShopId);if(i>=0)marketShops[i]={...marketShops[i],...item}}else marketShops.unshift(item);saveMarketShops();renderMarketShopList();clearMarketShopForm();showToast("✅ Market/Shop saved")}
